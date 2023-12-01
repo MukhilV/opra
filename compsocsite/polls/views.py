@@ -35,6 +35,9 @@ import numpy as np
 import random
 import csv
 
+
+active_polls = []
+
 class IndexView(views.generic.ListView):
     """
     Define homepage view, inheriting ListView class, which specifies a context variable.
@@ -79,6 +82,8 @@ class RegularPollsView(views.generic.ListView):
         # sort the lists by date (most recent should be at the top)
         ctx['polls_created'] = list(Question.objects.filter(question_owner=self.request.user,
                                                        m_poll=False).order_by('-pub_date'))
+        ctx['active_polls'] = list(Question.objects.order_by('-pub_date'))
+        print("ctx['active_polls']", active_polls)
         # get all polls current user participates in and filter out those she is the owner of
         polls = self.request.user.poll_participated.filter(m_poll=False)
         polls = polls.exclude(question_owner=self.request.user).order_by('-pub_date')
@@ -154,6 +159,8 @@ class MainView(views.generic.ListView):
         ctx['poll_algorithms'] = getListPollAlgorithms()
         ctx['alloc_methods'] = getAllocMethods()
         ctx['view_preferences'] = getViewPreferences()
+        ctx['active_polls'] = active_polls
+        print("Active polls: ",active_polls)
 
         return ctx
 
@@ -585,8 +592,13 @@ def getPollWinner(question):
     (latest_responses, previous_responses) = categorizeResponses(all_responses)
     # Calculate results
     cand_map = getCandidateMapFromList(list(question.item_set.all()))
-    (vote_results, mixtures_pl1, mixtures_pl2,
-     mixtures_pl3) = getVoteResults(latest_responses, cand_map)
+    results = getVoteResults(latest_responses, cand_map)
+    (vote_results, mixtures_pl1, mixtures_pl2, mixtures_pl3) = ([],[],[],[])
+    if(len(results) == 4):
+        (vote_results, mixtures_pl1, mixtures_pl2, mixtures_pl3) = results
+    else : 
+        return "",json.dumps([]),json.dumps([]),json.dumps([])
+    
     index_vote_results = question.poll_algorithm - 1
     current_result = vote_results[index_vote_results]
 

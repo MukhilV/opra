@@ -212,13 +212,13 @@
 
     <div id="qrcode" style="margin-top:15px;">
         {% with question.id|stringformat:"i" as question_id %}
-                {% qr_from_text "https://opra.cs.rpi.edu/polls/"|add:question_id size="s" image_format="png" error_correction="L" %}
+                {% qr_from_text "http://127.0.0.1:8000/polls"|add:question_id size="s" image_format="png" error_correction="L" %}
         {% endwith %}
     </div>
     <a href="#" id="showQRLink">Show Link</a>
     <a href="#" id="hideQRLink">Hide Link</a>
     <br />
-    <h3 href="{% url 'polls:detail' question.id %}" id="QRLink">https://opra.cs.rpi.edu{% url 'polls:detail' question.id %}</h3>
+    <h3 href="{% url 'polls:detail' question.id %}" id="QRLink">http://127.0.0.1:8000{% url 'polls:detail' question.id %}</h3>
     <br />
     <form class="form-group" method="post" action="{% url 'polls:changeType' question.id %}">
         {% csrf_token %}

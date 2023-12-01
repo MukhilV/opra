@@ -11,6 +11,8 @@ from django.urls import reverse
 from django.views import generic
 from django.core import mail
 
+
+
 from .models import *
 
 from django.utils import timezone
@@ -20,9 +22,12 @@ from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.core.validators import validate_email
+from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth import get_user_model
 
 from polls.models import Message, Question, RandomUtilityPool
 from polls import opra_crypto
+from django.contrib.auth.forms import UserCreationForm
 
 def register(request):
     context = RequestContext(request)
@@ -36,6 +41,8 @@ def register(request):
         data=request.POST.copy()
         data["username"] = data["email"]
         user_form = UserForm(data=data)
+        # user_form = UserCreationForm(request.POST)
+        print(data)
  
         # If the two forms are valid...
         if user_form.is_valid():
@@ -43,19 +50,29 @@ def register(request):
             user = user_form.save()
             
             # Hash the password with the set_password method
-            user.set_password(user.password)
+            user = user_form.save(commit=False)
+            # user.set_password(user_form.cleaned_data['password'])
+            # user.password = user_form.cleaned_data['password']
             user.is_active = False
             user.save()
             profile = UserProfile(user=user, displayPref = 1, time_creation=timezone.now())
             profile.save()
-            # Update our variable to tell the template registration was successful.
-            registered = True
             
             htmlstr =  "<p><a href='https://opra.cs.rpi.edu/auth/register/confirm/"+opra_crypto.encrypt(user.id)+"'>Click This Link To Activate Your Account</a></p>"
-            mail.send_mail("OPRA Confirmation","Please confirm your account registration.",'oprahprogramtest@gmail.com',[user.email],html_message=htmlstr)
+            # mail.send_mail("OPRA Confirmation","Please confirm your account registration.", from_email='oprahprogramtest@gmail.com', auth_user='oprahprogramtest@gmail.com', auth_password='ThisIsJustATestProgram' ,recipient_list = [user.email],html_message=htmlstr)
+            # mail.send_mail("OPRA Confirmation","Please confirm your account registration." ,recipient_list = [user.email],html_message=htmlstr)
+
+            # Update our variable to tell the template registration was successful.
+            registered = True
+
+            # user = authenticate(username=username, password=password)
+            # login(request, user)
+
+            print("User registered with password : ", user_form.cleaned_data['password'], User.objects.get(username=user_form.cleaned_data['username']).check_password(user_form.cleaned_data['password']))
+            print("Registration successful")
         #else    print (user_form.errors)
         else:
-            return HttpResponse("This email already exists. Please try a different one. <a href='/auth/register'>Return to registration</a>")
+            return HttpResponse("The user_form.isValid(), failed OR This email already exists. Please try a different one. <a href='/auth/register'>Return to registration</a>")
 # Not a HTTP POST, so we render our form using two ModelForm instances.
 # These forms will be blank, ready for user input.
     else:
@@ -72,7 +89,8 @@ def confirm(request, key):
     user = get_object_or_404(User, pk=user_id)
     user.is_active = True
     user.save()
-    user.backend = 'django.contrib.auth.backends.ModelBackend'
+    # user.backend = 'django.contrib.auth.backends.ModelBackend'
+    user.backend = 'compsocsite.appauth.custom_backends.CustomUserModelBackend'
     login(request,user)
     return render(request, 'activation.html', {'quick':False})
 
@@ -118,19 +136,49 @@ def quickConfirm(request,question_id,key):
 def quickLogin(request, key, question_id):
     user_id = opra_crypto.decrypt(key)
     user = get_object_or_404(User, pk=user_id)
-    user.backend = 'django.contrib.auth.backends.ModelBackend'
+    # user.backend = 'django.contrib.auth.backends.ModelBackend'
+    user.backend = 'compsocsite.appauth.custom_backends.CustomUserModelBackend'
     login(request,user)
     return HttpResponseRedirect(reverse("polls:detail",args=(question_id,)))
     
 
 def user_login(request):
+    # return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     context = RequestContext(request)
     if request.method == 'POST':
         username = request.POST['email']
         password = request.POST['password']
+
+        # postdata = request.POST.copy()
+        # username = postdata.get('username', '')
+        # password = postdata.get('password', '')
+
+        print("usernname:", username, len(username), "password:", password, len(password))
+        User = get_user_model()
+        users = User.objects.all()
+        print(list(users))
         
         # Check if the username/password combination is valid - a User object is returned if it is.
         user = authenticate(username=username, password=password)
+        # user = authenticate(username=username)
+
+        for u in users: print(u.get_username(), username == u.get_username(), u.password, u.password == password, u.is_authenticated)
+        # for u in users: 
+        #     if(u.get_username() == username):
+        #         user = u
+                # user.is_authenticated = True
+                # user.__setattr__("is_authenticated", True)
+        # user = authenticate(username=username, password=user.password)
+        # if user : print("Is user authenticated:", user.is_authenticated)
+        # else : print(user)
+        
+        if user : 
+            print("Selected User : ", user)
+            login(request, user)
+            return HttpResponseRedirect('/polls/main')
+            # return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        else:
+            return HttpResponse("Invalid login details supplied.")
         
         if user:
             if user.is_active:
@@ -302,11 +350,13 @@ def createMturkUser(request):
                 profile = UserProfile(user=user,mturk=1,age=age,code=code,sequence=polls_str,cur_poll=polls[0],time_creation=timezone.now(),numq=len(polls))
                 profile.save()
                 redirect_page = polls[0]
-                user.backend = 'django.contrib.auth.backends.ModelBackend'
+                # user.backend = 'django.contrib.auth.backends.ModelBackend'
+                user.backend = 'compsocsite.appauth.custom_backends.CustomUserModelBackend'
                 login(request,user)
             else:
                 user = get_object_or_404(User, username=newname)
                 user.backend = 'django.contrib.auth.backends.ModelBackend'
+                # user.backend = 'compsocsite.appauth.custom_backends.CustomUserModelBackend'
                 login(request,user)
                 if user.userprofile.finished and user.userprofile.cur_poll in polls:
                     return HttpResponseRedirect(reverse('polls:SurveyCode'))

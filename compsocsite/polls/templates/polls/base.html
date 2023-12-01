@@ -155,7 +155,7 @@
             
         <!-- nav bar-->
         <div class="collapse navbar-collapse row" id="bs-example-navbar-collapse-1">
-		
+          <!-- <p>{{ user.is_authenticated }} {{ user.get_username }}</p> -->
 					{% if user.is_authenticated %}
 					<ul class="nav navbar-nav">
 						{% if not request.flavour == "mobile" %}
