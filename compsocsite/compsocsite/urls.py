@@ -5,15 +5,15 @@ The `urlpatterns` list routes URLs to views. For more information please see:
 Examples:
 Function views
     1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
+    2. Add a URL to urlpatterns:  re_path(r'^$', views.home, name='home')
 Class-based views
     1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
+    2. Add a URL to urlpatterns:  re_path(r'^$', Home.as_view(), name='home')
 Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
-    2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
+    2. Add a URL to urlpatterns:  re_path(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import include, url
+from django.urls import include, re_path
 from django.contrib import admin
 from django.views.generic.base import RedirectView
 from django.conf import settings
@@ -26,24 +26,24 @@ from polls.views import RGENView
 from polls.views import MturkView,RGView
 
 urlpatterns = [
-    url(r'^$', RedirectView.as_view(url='/polls/main')),
-    url(r'^polls/', include('polls.urls')),
-    url(r'^groups/', include('groups.urls')),
-    url(r'^admin/', admin.site.urls),
-    url(r'^auth/', include('appauth.urls')),
-    url(r'^sessions/', include('sessions_local.urls')),
-    url(r'^static/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT, 'show_indexes':True}),
-    url(r'^multipolls/', include('multipolls.urls')),
-    url(r'^GM2017$', GMView.as_view(), name='voting_demo'),
-    url(r'^message$', sendMessage, name='message'),
-    url(r'^GM2017$', GMView.as_view(), name='GM_2017'),
-    url(r'^GM2017results$', GMResultsView.as_view(), name='GM_2017results'),
+    re_path(r'^$', RedirectView.as_view(url='/polls/main')),
+    re_path(r'^polls/', include('polls.urls')),
+    re_path(r'^groups/', include('groups.urls')),
+    re_path(r'^admin/', admin.site.urls),
+    re_path(r'^auth/', include('appauth.urls')),
+    re_path(r'^sessions/', include('sessions_local.urls')),
+    re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT, 'show_indexes':True}),
+    re_path(r'^multipolls/', include('multipolls.urls')),
+    re_path(r'^GM2017$', GMView.as_view(), name='voting_demo'),
+    re_path(r'^message$', sendMessage, name='message'),
+    re_path(r'^GM2017$', GMView.as_view(), name='GM_2017'),
+    re_path(r'^GM2017results$', GMResultsView.as_view(), name='GM_2017results'),
     
-    url(r'^gm2017$', GMView.as_view(), name='gm_2017'),
-    url(r'^CSposter$', CSPosterView.as_view(), name='CS_poster'),
-    url(r'^csposter$', CSPosterView.as_view(), name='cs_poster'),
-    url(r'^Exp$', MturkView.as_view(), name='Mturk'),
-    url(r'^ResearchGroupCN$', RGView.as_view(), name='ResearchGroup'),
-    url(r'^ResearchGroupEN$', RGENView.as_view(), name='ResearchGroupEN'),
+    re_path(r'^gm2017$', GMView.as_view(), name='gm_2017'),
+    re_path(r'^CSposter$', CSPosterView.as_view(), name='CS_poster'),
+    re_path(r'^csposter$', CSPosterView.as_view(), name='cs_poster'),
+    re_path(r'^Exp$', MturkView.as_view(), name='Mturk'),
+    re_path(r'^ResearchGroupCN$', RGView.as_view(), name='ResearchGroup'),
+    re_path(r'^ResearchGroupEN$', RGENView.as_view(), name='ResearchGroupEN'),
                
 ]

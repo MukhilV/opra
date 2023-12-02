@@ -14,7 +14,7 @@ from django.db.models import Q
 
 from django.utils import timezone
 from django.template import RequestContext
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -2186,7 +2186,7 @@ def mixtureAPI(request):
 # Mixture API
 def mixtureAPI_test(request):
     context = RequestContext(request)
-    return render_to_response('polls/api_test.html')
+    return render(request, 'polls/api_test.html', context)
 
 #Poll search API
 def get_polls(request):

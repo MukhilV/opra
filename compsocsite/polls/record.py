@@ -12,7 +12,6 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from django.utils import timezone
 from django.template import RequestContext
-from django.shortcuts import render_to_response
 from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.decorators import login_required
 from django.core import mail
