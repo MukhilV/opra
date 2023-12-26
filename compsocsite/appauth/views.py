@@ -27,6 +27,7 @@ from django.contrib.auth import get_user_model
 from polls.models import Message, Question, RandomUtilityPool
 from polls import opra_crypto
 from django.contrib.auth.forms import UserCreationForm
+import bcrypt
 
 def register(request):
     context = RequestContext(request)
@@ -52,9 +53,15 @@ def register(request):
             user = user_form.save(commit=False)
             # user.set_password(user_form.cleaned_data['password'])
             # user.password = user_form.cleaned_data['password']
+
+            # Adding the salt to password
+            salt = bcrypt.gensalt()
+            # Hashing the password
+            user.password = bcrypt.hashpw(bytes(user_form.cleaned_data['password'],'utf-8'), salt).decode('utf-8')
+
             user.is_active = False
             user.save()
-            profile = UserProfile(user=user, displayPref = 1, time_creation=timezone.now())
+            profile = UserProfile(user=user, displayPref = 1, time_creation=timezone.now(), salt = salt.decode('utf-8'))
             profile.save()
             
             htmlstr =  "<p><a href='https://opra.cs.rpi.edu/auth/register/confirm/"+opra_crypto.encrypt(user.id)+"'>Click This Link To Activate Your Account</a></p>"
@@ -67,7 +74,6 @@ def register(request):
             # user = authenticate(username=username, password=password)
             # login(request, user)
 
-            print("User registered with password : ", user_form.cleaned_data['password'], User.objects.get(username=user_form.cleaned_data['username']).check_password(user_form.cleaned_data['password']))
             print("Registration successful")
         #else    print (user_form.errors)
         else:
@@ -156,12 +162,22 @@ def user_login(request):
         User = get_user_model()
         users = User.objects.all()
         print(list(users))
+
+        salt = ""
+        for user in users:
+            if(user.get_username() == username): 
+                salt = user.userprofile.salt
         
         # Check if the username/password combination is valid - a User object is returned if it is.
-        user = authenticate(username=username, password=password)
+        if(salt != None and len(salt)!=0): 
+            password = bcrypt.hashpw(bytes(password,'utf-8'), bytes(salt,'utf-8')).decode('utf-8')
+            user = authenticate(username=username, password=password)
+        else: 
+            user = authenticate(username=username, password=password)
         # user = authenticate(username=username)
 
-        for u in users: print(u.get_username(), username == u.get_username(), u.password, u.password == password, u.is_authenticated)
+        for u in users: 
+            print(u.get_username(), username == u.get_username(), u.password, u.password == password, u.is_authenticated)
         # for u in users: 
         #     if(u.get_username() == username):
         #         user = u

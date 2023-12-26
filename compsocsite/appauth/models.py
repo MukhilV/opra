@@ -27,6 +27,7 @@ class UserProfile(models.Model):
     finished = models.BooleanField(default=False)
     numq= models.IntegerField(default=0)
     exp_data = models.TextField(default="{}")
+    salt = models.CharField(max_length=1000, blank=True, null=True)
     # Override the __unicode__() method to return out something meaningful!
     def __unicode__(self):
         return self.user.username
