@@ -9,7 +9,7 @@ The web app is built on Django, and uses an SQLite database. [Click here](https:
 1. Install [Python](https://www.python.org/downloads/). It is recommended that you use the latest version of Python 3.
 2. Install [Django](https://www.djangoproject.com). The easiest way to do this is through [pip] (https://pip.pypa.io/en/latest/installing/#installing-with-get-pip-py). Then you can install django simply by entering the command: 
 
-   <code>pip install django==2.2</code>
+   <code>pip install django==4.2.7</code>
    
    You can verify installation by entering the command:
    
@@ -24,29 +24,6 @@ The web app is built on Django, and uses an SQLite database. [Click here](https:
 3. Install the dependencies listed below in the Dependencies section by entering:
 
     <code>  pip install Package-Name </code>
-	
-4. Clone [opra_dependencies] (https://github.com/tomjmwang/opra_dependencies) Github directoy to your local machine. Copy django_mobile and prefpy directoies to your python library and overwrite original files.
-	
-5. Clone this project from Github
-
-6. Copy settings.py from opra_dependencies to compsocsite/compsocsite. Copy opra_crypto.py from opra_dependencies to compsocsite/polls.
-
-7. Open command line (terminal), change to OPRA's directory, and then enter the following commands:
-  
-  <code>cd composcite</code>
-  
-  <code>python manage.py migrate</code>
-  
-  <code>python manage.py createcachetable</code>
-  
-  Then run the server by entering:
-
-  <code>python manage.py runserver</code>
-
-6. To view the page, go to your web browser and visit this address:
-
-  <code>http://127.0.0.1:8000</code>
-
 
 ##Dependencies
 * **django-mobile**:
@@ -60,6 +37,31 @@ The web app is built on Django, and uses an SQLite database. [Click here](https:
 * **networkx**:
 * **django-mathfilters**:
 * **matplotlib**:
+	
+4. Clone [opra_dependencies] (https://github.com/tomjmwang/opra_dependencies) Github directoy to your local machine. Copy django_mobile and prefpy directoies to your python library and overwrite original files.
+	
+5. Clone this project from Github
+
+6. If you can already find "settings.py" under "compsocsite/compsocsite" and "opra_crypto.py" under "compsocsite/polls", then don't do step 7. If you can't find those files, then follow step 7. 
+
+7. Copy settings.py from opra_dependencies to compsocsite/compsocsite. Copy opra_crypto.py from opra_dependencies to compsocsite/polls.
+
+8. Open command line (terminal), change to OPRA's directory, and then enter the following commands:
+  
+  <code>cd compsocsite</code>
+  
+  <code>python3 manage.py migrate</code>
+  
+  <code>python3 manage.py createcachetable</code>
+  
+  Then run the server by entering:
+
+  <code>python3 manage.py runserver</code>
+
+9. To view the page, go to your web browser and visit this address:
+
+  <code>http://127.0.0.1:8000</code>
+
 
 
 ##Models
