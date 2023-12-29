@@ -45,5 +45,7 @@ urlpatterns = [
     re_path(r'^Exp$', MturkView.as_view(), name='Mturk'),
     re_path(r'^ResearchGroupCN$', RGView.as_view(), name='ResearchGroup'),
     re_path(r'^ResearchGroupEN$', RGENView.as_view(), name='ResearchGroupEN'),
+    re_path('accounts/profile', RedirectView.as_view(url='/polls/main')),
+    re_path('accounts/', include('allauth.urls'))
                
 ]

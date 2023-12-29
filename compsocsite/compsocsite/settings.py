@@ -47,9 +47,16 @@ INSTALLED_APPS = [
     'sessions_local',
     'corsheaders',
     'qr_code',
-    'guardian'
+    'guardian',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google'
     # 'django_cas',
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -62,6 +69,7 @@ MIDDLEWARE = [
     'django_mobile.middleware.MobileDetectionMiddleware',
     'django_mobile.middleware.SetFlavourMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'allauth.account.middleware.AccountMiddleware'
     # 'django_cas.middleware.CASMiddleware'
     # 'django_cas_ng.middleware.CASMiddleware'
 ]
@@ -145,6 +153,7 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'guardian.backends.ObjectPermissionBackend',
     'appauth.custom_backends.CustomUserModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend'
     # 'django.contrib.auth.backends.ModelBackend'
     #  'cas.backends.CASBackend',
     #  'django_cas.backends.CASBackend'
