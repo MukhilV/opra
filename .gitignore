@@ -3,8 +3,6 @@ __pycache__/
 *.DS_Store
 compsocsite/db.sqlite3
 compsocsite/polls/.DS_Store
-compsocsite/django_mobile/
-compsocsite/prefpy/
 compsocsite/venv/
 static_root/
 .vscode/
