@@ -305,7 +305,7 @@ def forgetPassword(request):
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     user = get_object_or_404(User, email=email, username=username)
     htmlstr = "<p><a href='https://opra.cs.rpi.edu/auth/resetpassword/"+opra_crypto.encrypt(user.id) + "'>Click This Link To Reset Password</a></p>"
-    mail.send_mail("OPRA Forget Password","Please click the following link to reset password.",'oprahprogramtest@gmail.com',[email],html_message=htmlstr)
+    mail.send_mail("OPRA Forget Password","Please click the following link to reset password.",'mukhil1140@gmail.com',[email], auth_user="mukhil1140@gmail.com", auth_password="xkptaundeafioteq", html_message=htmlstr)
     return HttpResponse("An email has been sent to your email account. Please click on the link in that email and reset your password.")
     
 def resetPassword(request, key):

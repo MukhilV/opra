@@ -1070,7 +1070,7 @@ class VoteResultsView(views.generic.DetailView):
 # return List<String>
 def getListPollAlgorithms():
     return ["Plurality", "Borda", "Veto", "K-approval (k = 3)", "Simplified Bucklin",
-            "Copeland", "Maximin", "STV", "Baldwin", "Coombs", "Black", "Ranked Pairs",
+            "Copeland", "Maximin","MaxiMin-Duplicate", "STV", "Baldwin", "Coombs", "Black", "Ranked Pairs",
             "Plurality With Runoff", "Borda Mean", "Simulated Approval"]
 
 def getListAlgorithmLinks():
@@ -1328,6 +1328,7 @@ def getVoteResults(latest_responses, cand_map):
     scoreVectorList.append(MechanismKApproval(3).getCandScoresMap(pollProfile))
     scoreVectorList.append(MechanismSimplifiedBucklin().getCandScoresMap(pollProfile))
     scoreVectorList.append(MechanismCopeland(1).getCandScoresMap(pollProfile))
+    scoreVectorList.append(MechanismMaximin().getCandScoresMap(pollProfile))
     scoreVectorList.append(MechanismMaximin().getCandScoresMap(pollProfile))
 
     #STV, Baldwin, Coombs give list of integers as output
