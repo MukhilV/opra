@@ -1,0 +1,196 @@
+{% load mathfilters %}
+<script>
+    function computeTotal(){
+        console.log("change recognized");
+    }
+
+</script>
+
+<div id="budgetUI" {% if request.flavour == "mobile" %}style="padding:0.4em;" {% endif %}>
+    <!-- This is the voting form. Submit results through a voting function -->
+    <form id="budget" {% if request.user.username == "" %} action="{% url 'polls:anonymousvote' question.id %}" {% else %} action="{% url 'polls:vote' question.id %}" {% endif %} method="post">
+
+        <div class="row">
+            {% csrf_token %}
+            <!-- If this user isn't logged in and hasn't voted before -->
+            {% if request.user.username == "" and 'anonymousid' not in request.session %}
+            <div class="col-md-12" style="clear:right; ">
+                <h4>Your name (optional)</h4>
+                <input type="text" size="50" class="form-control" style="width=50%; clear:right;" name="anonymousname"/>
+            </div>
+            {% endif %}
+
+            <div class="col-md-12">
+
+                <!-- Panel for your preferences -->
+                <div class="panel panel-default" >
+				{% if request.flavour == "mobile" %}
+				<div class = "row col-xs-12" style="padding:0%;margin:0%;margin-bottom: 4%;">
+						<button id="submitbutton-slider-BUI" type="submit" onclick="checkSliderSum();" class="submitbutton reset-button-mobile" style = "height:2.7em;padding:0%;margin:0%;background:darkgreen;">
+                            <span class="glyphicon glyphicon-upload" style="font-size:140%;color:white;margin:0%;">Submit</span>
+                        </button> 
+                </div>
+				{% endif %}
+                    <!-- Your preferences header -->
+                    <div class="panel-heading" >
+                        <h4>Your preferences:
+                            {% if not request.flavour == "mobile" %}
+                            <button id="submitbutton-slider-BUI" type="submit" onclick="checkSliderSum();" class="submitbutton btn btn-success" style="">
+                                Submit
+                            </button>
+                            <button id="submitting-slider-BUI" type="button" class="submitting btn btn-default" style="visibility:hidden;position:absolute;z-index:1;">
+                                Submitting...
+                            </button>
+                            {% endif %}
+                            <input type="hidden" id="pref_order" class="pref_order" name="pref_order" value=""/>
+                            <input type="hidden" id="record_data" class="record_data" name="record_data" value=""/>
+
+                            <div class="pull-right">
+                            {% if messages %}
+                                {% for message in messages %}
+                                <span id="successMessage" {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>
+                                    {{ message }}
+                                </span>
+                                {% endfor %}
+                            {% endif %}
+                            </div>
+
+                        </h4>
+                    </div> <!-- end of header -->
+
+                    <!-- Your preferences main panel -->
+                    <div class="panel-body" >
+                        <ul id="slidersBUI" >
+                            {% for item in items %}
+                                <li class="slider_item" id="item{{ item.item_text }}" alt="{{forloop.counter}}" type="{{ forloop.counter }}">
+                                    <!-- Display image (uploaded) -->
+                                    {% if item.image %}
+                                        <img class="item" src='/{{ item.image.url }}'/>
+                                    {% endif %}
+                                    <!-- Display image (external URL) -->
+                                    {% if item.imageURL != Null %}
+                                        <img class="item" src='{{ item.imageURL }}'/>
+                                    {% endif %}
+                                    <!-- Display option text -->
+                                    <strong>{{ item.item_text }}</strong> : 
+									{% if item.item_description %}
+                                        <div style="display:inline-block;"><span class="glyphicon glyphicon-info-sign pull-right" data-toggle="tooltip" data-placement="top" title="{{item.item_description}}" data-title="Meddelanden" >
+                                        </span></div>
+                                    {% endif %}<div id="scoreSlideBUI{{forloop.counter}}">0</div>
+                                    <input type="hidden" id ="scoreSlideBUI{{forloop.counter}}" value ="0"></input>
+                                    <!-- Display tooltip for option description -->
+                                    
+                                    <div class="slide" id="SlideBUI{{ forloop.counter }}" type="{{ forloop.counter }}"></div>
+                                </li>
+								<hr/>
+                            {% endfor %}
+                            <div id="scoreSlideBUIshowTotalDiv" style="
+                                display: flex;
+                            ">
+                                Total: <div id="scoreSlideBUICurrTotal">0</div>
+                                <div id="scoreSlideBUITotal">/100</div>
+                            </div>
+                        </ul> <!-- end of main panel (left-sortable) -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% include "polls/voteOptions/_comment_section.html" %}
+    </form>
+</div>
+
+<script>
+var numOfSliders = $("#slidersBUI").children('li').length;
+for(var i=0; i<numOfSliders; i++) {
+    ObserveElement("scoreSlideBUI".concat((i+1).toString()));
+}
+
+function setSliderTotal(){
+    var total = computeSliderTotal();
+    document.getElementById("scoreSlideBUICurrTotal").innerHTML = total.toString();
+
+}
+
+function ObserveElement(elementId){
+    // Select the element you want to observe
+    const targetElement = document.getElementById(elementId);
+
+    // Create a new MutationObserver and specify a callback function
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            // Check if the innerHTML property has changed
+            if (mutation.type === 'childList' && mutation.target === targetElement) {
+                setSliderTotal();
+            }
+        });
+    });
+
+    // Configure the observer to watch for changes in the childList (which includes innerHTML changes)
+    const config = { childList: true };
+
+    // Start observing the target element
+    observer.observe(targetElement, config);
+}
+
+
+function computeSliderTotal() {
+        var list = '#slidersBUI';
+        var arr = $(list).children('li');
+        var numberOfItems = arr.length;
+        var sum = 0;
+        for(var i = 0; i<numberOfItems; i++){
+            var value = document.getElementById("scoreSlideBUI".concat((i+1).toString())).innerHTML;          
+            // var value = arr[0].children
+            
+            // .find("#scoreSlideBUI".concat((i+1).toString()));
+            sum += parseInt(value);
+        }
+        // console.log(sum);
+        return sum;
+    }
+
+    function checkSliderSum() {
+        var total = computeSliderTotal();
+        if(total>100){
+            alert("The sum of all the preferences should be less than or equal to 100.");
+        } else {
+            VoteUtil.submitPref();    
+        }
+    }
+
+    $(window).load(function(){
+        var original_order = [];
+        var t = 1;
+        {% if currentSelection %}
+            {% for s in currentSelection %}
+                {% if s %}
+                    var inner = [];
+                    {% for selection in s %}
+                        inner.push(t);
+                        t = t + 1;
+                    {% endfor %}
+                    original_order.push(inner);
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        
+        {% if currentSelection == None %}
+            {% for item in items %}
+                original_order.push([t]);
+                t = t + 1;
+            {% endfor %}
+        {% else %}
+
+            {% if unrankedCandidates %}
+                {% for item in unrankedCandidates %}
+                    original_order.push([t]);
+                    t = t + 1;
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+        //sliderSort(original_order);
+        sliderZeroSort(original_order);
+        order1 = JSON.stringify(dictSlideStar('slide'));
+    });
+</script>

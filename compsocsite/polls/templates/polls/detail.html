@@ -150,6 +150,8 @@
             {% if question.star_enabled %}<li><a href="#starsSection" onclick="changeMethod(4);">Stars</a></li> {% endif %}
             {% if question.yesno_enabled %}<li><a href="#yesNoSection" onclick="changeMethod(5);">Yes/No</a></li> {% endif %}
             {% if question.single_enabled %}<li><a href="#singleSection" onclick="changeMethod(6);">Single</a></li> {% endif %}
+            {% if question.slider_enabled %}<li><a href="#budgetUI" onclick="changeMethod(3);">Budget UI</a></li> {% endif %}
+            {% if question.yesno_enabled %}<li><a href="#listUISection" onclick="changeMethod(5);">List UI</a></li> {% endif %}
         </ul>
 		{% endif %}
             {% if question.twocol_enabled %}{% include "polls/voteOptions/twoCol.html" %}{% endif %}
@@ -166,6 +168,8 @@
                     {% include "polls/voteOptions/yesNo.html" %}
                 {% endif %}
             {% endwith %}
+            {% if question.slider_enabled %}{% include "polls/voteOptions/budgetUI.html" %}{% endif %}
+            {% if question.slider_enabled %}{% include "polls/voteOptions/listUI.html" %}{% endif %}
     </div>
 
     {% endif %}
