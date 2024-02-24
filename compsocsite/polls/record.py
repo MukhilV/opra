@@ -417,5 +417,9 @@ def getUIs(poll):
         result.append("yesno")
     if poll.yesno2_enabled:
         result.append("yesno_grid")
+    if(poll.budgetUI_enabled):
+        result.append("budget_ui")
+    if(poll.ListUI_enabled):
+        result.append("list_ui")
     return result
     

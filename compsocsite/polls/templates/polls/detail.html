@@ -168,8 +168,8 @@
                     {% include "polls/voteOptions/yesNo.html" %}
                 {% endif %}
             {% endwith %}
-            {% if question.slider_enabled %}{% include "polls/voteOptions/budgetUI.html" %}{% endif %}
-            {% if question.slider_enabled %}{% include "polls/voteOptions/listUI.html" %}{% endif %}
+            {% if question.budgetUI_enabled %}{% include "polls/voteOptions/budgetUI.html" %}{% endif %}
+            {% if question.ListUI_enabled %}{% include "polls/voteOptions/listUI.html" %}{% endif %}
     </div>
 
     {% endif %}
@@ -213,6 +213,8 @@
             if(document.getElementById("sliderSection") != null){ method = 3; methodIndicator = "slider";}
             if(document.getElementById("oneColSection") != null){ method = 2; methodIndicator = "one_column";}
             if(document.getElementById("twoColSection") != null){ method = 1; methodIndicator = "two_column";}
+            if(document.getElementById("budgetUI") != null){ method = 7; methodIndicator = "budget_ui";}
+            if(document.getElementById("listUISection") != null){ method = 3; methodIndicator = "list_ui";}
 
             //alert(method);
 
