@@ -468,6 +468,10 @@ function changeMethod (value){
 	else if(method == 5 || method == 6){
 		order = orderYesNo(method);
 	}
+	else if(method == 7){
+		swit += d + ";7";
+		order = orderSlideStar('slide');
+	}
   method = value;
   removeSelected();
   changeCSS();
@@ -557,7 +561,7 @@ var VoteUtil = (function () {
 		$(".top_tier").remove();
 		if(method == 1)      {order_list = orderCol(0); final_list = dictCol(1);}
 		else if(method == 2){ order_list = orderCol(method); final_list = dictCol(2);}
-		else if(method == 3){ order_list = orderSlideStar('slide'); item_type = ".slider_item"; final_list = dictSlideStar('slide');}
+		else if(method == 3 || method == 7){ order_list = orderSlideStar('slide'); item_type = ".slider_item"; final_list = dictSlideStar('slide');}
 		else if(method == 4){ order_list = orderSlideStar('star'); item_type= ".star_item";final_list = dictSlideStar('star');}
 		else if(method == 5){ order_list = orderYesNo(method); item_type= ".checkbox"; final_list = dictYesNo();}
 		else if(method == 6){ order_list = orderYesNo(method); item_type= ".checkbox_single";}

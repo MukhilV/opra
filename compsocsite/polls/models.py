@@ -57,6 +57,8 @@ class Question(models.Model):
     yesno_enabled = models.BooleanField(default=True)
     yesno2_enabled = models.BooleanField(default=False)
     single_enabled = models.BooleanField(default=False)
+    budgetUI_enabled = models.BooleanField(default=False) 
+    ListUI_enabled = models.BooleanField(default=False) 
     allowties = models.BooleanField(default=True)
     initial_ui = models.IntegerField(default=1)
     ui_number = models.IntegerField(default=6)

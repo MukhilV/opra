@@ -36,7 +36,15 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function UICheckboxes(){
-	if(document.getElementById("twocol_checkbox").checked || document.getElementById("onecol_checkbox").checked ||document.getElementById("slider_checkbox").checked ||document.getElementById("star_checkbox").checked||document.getElementById("yesno_checkbox").checked ||document.getElementById("yesno2_checkbox").checked){
+	if(document.getElementById("twocol_checkbox").checked 
+	|| document.getElementById("onecol_checkbox").checked 
+	||document.getElementById("slider_checkbox").checked 
+	||document.getElementById("star_checkbox").checked
+	||document.getElementById("yesno_checkbox").checked 
+	||document.getElementById("yesno2_checkbox").checked
+	||document.getElementById("budgetUI_slider_checkbox").checked
+	||document.getElementById("listUI_checkbox").checked
+	){
 		return true;
 	}
 	alert("You must choose at least one voting interface!");

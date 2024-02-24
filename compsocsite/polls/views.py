@@ -405,6 +405,8 @@ def editBasicInfo(request, question_id):
     star = False
     yesno = False
     yesno2 = False
+    BUI_slider = False
+    LUI = False
     uilist = request.POST.getlist('ui')
     if "twocol" in uilist:
         twocol = True
@@ -418,13 +420,19 @@ def editBasicInfo(request, question_id):
         yesno = True
     if "yesno2" in uilist:
         yesno2 = True
+    if "BUI_slider" in uilist:
+        BUI_slider = True 
+    if "LUI" in uilist:
+        LUI = True
     question.twocol_enabled = twocol
     question.onecol_enabled = onecol
     question.slider_enabled = slider
     question.star_enabled = star
     question.yesno_enabled = yesno
     question.yesno2_enabled = yesno2
-    question.ui_number = twocol+onecol+slider+star+yesno+yesno2
+    question.budgetUI_enabled = BUI_slider
+    question.ListUI_enabled =LUI
+    question.ui_number = twocol+onecol+slider+star+yesno+yesno2+BUI_slider+LUI
     
     # update whether ties are allowed
     tie=question.allowties
@@ -1606,6 +1614,8 @@ def setInitialSettings(request, question_id):
     star = False
     yesno = False
     yesno2 = False
+    BUI_slider = False
+    LUI = False
     uilist = request.POST.getlist('ui')
     if "twocol" in uilist:
         twocol = True
@@ -1619,6 +1629,11 @@ def setInitialSettings(request, question_id):
         yesno = True
     if "yesno2" in uilist:
         yesno2 = True
+    if "BUI_slider" in uilist:
+        BUI_slider = True 
+    if "LUI" in uilist:
+        LUI = True
+
     vr = (2 ** (int(request.POST['pollpreferences']) - 1))
     for rule in request.POST.getlist('vr'):
         if int(rule) != (2 ** (int(request.POST['pollpreferences']) - 1)):
@@ -1629,7 +1644,9 @@ def setInitialSettings(request, question_id):
     question.star_enabled = star
     question.yesno_enabled = yesno
     question.yesno2_enabled = yesno2
-    question.ui_number = twocol+onecol+slider+star+yesno+yesno2
+    question.budgetUI_enabled = BUI_slider
+    question.ListUI_enabled =LUI
+    question.ui_number = twocol+onecol+slider+star+yesno+yesno2+BUI_slider+LUI
     question.vote_rule = vr
     if openstring == "anon":
         question.open = 1
