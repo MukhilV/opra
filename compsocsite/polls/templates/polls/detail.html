@@ -151,7 +151,7 @@
             {% if question.yesno_enabled %}<li><a href="#yesNoSection" onclick="changeMethod(5);">Yes/No</a></li> {% endif %}
             {% if question.single_enabled %}<li><a href="#singleSection" onclick="changeMethod(6);">Single</a></li> {% endif %}
             {% if question.budgetUI_enabled %}<li><a href="#budgetUI" onclick="changeMethod(7);">Budget UI</a></li> {% endif %}
-            {% if question.ListUI_enabled %}<li><a href="#listUISection" onclick="changeMethod(5);">List UI</a></li> {% endif %}
+            {% if question.ListUI_enabled %}<li><a href="#listUISection" onclick="changeMethod(8);">List UI</a></li> {% endif %}
         </ul>
 		{% endif %}
             {% if question.twocol_enabled %}{% include "polls/voteOptions/twoCol.html" %}{% endif %}

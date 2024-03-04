@@ -52,12 +52,19 @@
 
                     <!-- Your preferences main panel -->
                     <div class="panel-body" >
-                        <ul id="ListUIList" >
+                        <ul id="ListUIList">
                         <!-- The user hasn't voted on this poll yet -->
                         {% for item in items %}
                         <!-- Display option text -->
                         {{ item.item_text }}
-                            <input type="number" id="item{{ item.item_text }}" type="{{ forloop.counter }}" style="width: 100%;" onchange="setTotal()"></input>
+                            <div style="display: flex;">
+                                <input class = "list_ui_pref_box" data-option="item{{ item.item_text }}" type="text" id="item{{ item.item_text }}" type="{{ forloop.counter }}" style="width: 80%;" onkeyup="setTotal()"></input>
+                                <div style="display:flex; width: 15%; margin-left: 10px;">
+                                    <!-- <div id="currSliderScore{{ forloop.counter }}">0</div> -->
+                                    <div id="slash{{ forloop.counter }}"> / </div>
+                                    <div id="currSliderTotal{{ forloop.counter }}">100</div>
+                                </div>
+                            </div>
                             <!-- <label class="checkbox" id="item{{ item.item_text }}" type="{{ forloop.counter }}" >
                               <input type="checkbox" style="display:none">
                               <span class="glyphicon" aria-hidden="true"></span> -->
@@ -92,36 +99,83 @@
     </form>
 </div>
 <script>
+
+        var list = '#ListUIList';
+        var n = $(list).children().length;
+        var arr=[];
+        for(var i=0; i<n-1; i++){
+            arr.push($($(list).children()[i]).children('input')[0])
+        }
+        // arr = $(list).children();
+        $.each(arr, function(index) {
+            this.addEventListener('input', function(event) {
+            // Get the entered text
+            var enteredText = event.target.value;
+
+            // Validate if the entered text is numeric
+            if (!isNumeric(enteredText)) {
+                event.target.value = '';
+            } else {
+                var curr_total = computeTotal();
+                if (curr_total > 100) {
+                    event.target.value = enteredText.slice(0,enteredText.length-1);
+                }
+                if(curr_total <= 100) setMaxValRange(curr_total);
+                // var curr_slider_score = document.getElementById("currSliderScore".concat((index+1).toString()));
+                // curr_slider_score.innerHTML = event.target.value;
+                document.getElementById("currSliderTotal".concat((index+1).toString())).style.display = "none";
+                document.getElementById("slash".concat((index+1).toString())).style.display = "none";
+            }
+        });
+        });
+
+
+function setMaxValRange(curr_total){
+    var list = '#ListUIList';
+        var n = $(list).children().length;
+        for(var i=0; i<n-1; i++){
+            document.getElementById("currSliderTotal".concat((i+1).toString())).innerHTML = 100 - curr_total;
+        }
+}
+
+
+// Function to check if a given value is numeric
+function isNumeric(value) {
+    return /^\d+$/.test(value);
+}
+
     function computeTotal() {
         var list = '#ListUIList';
-        var arr = $(list).children();
+        var n = $(list).children().length;
+        var arr=[];
+        for(var i=0; i<n-1; i++){
+            arr.push($($(list).children()[i]).children('input')[0])
+        }
         var values = [];
         var sum = 0;
         $.each(arr, function() {
-            // Retrieve and log the value of each input element
-            var inputValue = $(this).val();
+            var inputValue = $(this).val().toString();
             values.push(parseInt(inputValue));
             if(!isNaN(inputValue) && inputValue!=="") sum += parseInt(inputValue)
         });
-        // console.log(values);
         return sum;
     }
 
     function setTotal() {
         var total = computeTotal();
-        document.getElementById('scoreSlideListUICurrTotal').innerHTML = total.toString();
+        if(total<=100) document.getElementById('scoreSlideListUICurrTotal').innerHTML = total.toString();
     }
 
     function checkForValidInput(){
         var total = computeTotal();
-        if(total>100){
+        if(total!=100){
             alert("The sum of all the preferences should be less than or equal to 100.");
         } else {
             VoteUtil.submitPref();    
         }
     }
 </script>
-<!-- <script>
+<script>
     $(window).load(function(){
         var original_order = [];
         var t = 1;
@@ -181,4 +235,4 @@ function onCheckEvent(checkbox) {
 	}
                     select(checkbox);
 }
-</script> -->
+</script>

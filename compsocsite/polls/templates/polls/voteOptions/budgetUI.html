@@ -80,7 +80,7 @@
                                     <input type="hidden" id ="scoreSlideBUI{{forloop.counter}}" value ="0"></input>
                                     <!-- Display tooltip for option description -->
                                     
-                                    <div class="slide" id="SlideBUI{{ forloop.counter }}" type="{{ forloop.counter }}"></div>
+                                    <div class="slide_BUI" id="SlideBUI{{ forloop.counter }}" type="{{ forloop.counter }}"></div>
                                 </li>
 								<hr/>
                             {% endfor %}
@@ -108,8 +108,12 @@ for(var i=0; i<numOfSliders; i++) {
 
 function setSliderTotal(){
     var total = computeSliderTotal();
-    document.getElementById("scoreSlideBUICurrTotal").innerHTML = total.toString();
-
+    if(total<=100) {
+        document.getElementById("scoreSlideBUICurrTotal").innerHTML = total.toString();
+        document.getElementById("submitbutton-slider-BUI").disabled = false;
+    } else if(document.getElementById("scoreSlideBUICurrTotal").innerHTML<=100 && total>=100){
+        document.getElementById("scoreSlideBUICurrTotal").innerHTML = "100";
+    }
 }
 
 function ObserveElement(elementId){
@@ -123,6 +127,11 @@ function ObserveElement(elementId){
             if (mutation.type === 'childList' && mutation.target === targetElement) {
                 setSliderTotal();
             }
+            // if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+            //     console.log('Style changed:', targetElement.style.cssText);
+            // } else {
+
+            // }
         });
     });
 
@@ -140,11 +149,10 @@ function computeSliderTotal() {
         var numberOfItems = arr.length;
         var sum = 0;
         for(var i = 0; i<numberOfItems; i++){
-            var value = document.getElementById("scoreSlideBUI".concat((i+1).toString())).innerHTML;          
+            var value = $( "#SlideBUI".concat((i+1).toString()) ).slider( "option", "value" );       
             // var value = arr[0].children
-            
             // .find("#scoreSlideBUI".concat((i+1).toString()));
-            sum += parseInt(value);
+            sum += value;
         }
         // console.log(sum);
         return sum;
@@ -152,7 +160,7 @@ function computeSliderTotal() {
 
     function checkSliderSum() {
         var total = computeSliderTotal();
-        if(total>100){
+        if(total!=100){
             alert("The sum of all the preferences should be less than or equal to 100.");
         } else {
             VoteUtil.submitPref();    
@@ -190,7 +198,7 @@ function computeSliderTotal() {
             {% endif %}
         {% endif %}
         //sliderSort(original_order);
-        sliderZeroSort(original_order);
-        order1 = JSON.stringify(dictSlideStar('slide'));
+        sliderBUIZeroSort(original_order);
+        order1 = JSON.stringify(dictSlideStar('slide_BUI'));
     });
 </script>

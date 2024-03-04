@@ -122,7 +122,7 @@ function orderSlideStar(str){
 	var arr = [];
 	var values = [];
 	$('.' + str).each(function(i, obj){
-		if(str == 'slide'){ 
+		if(str == 'slide' || str == 'slide_BUI'){ 
 			var score = $( this ).slider("option", "value");
 		}
 		else if(str == 'star'){ 
@@ -148,18 +148,51 @@ function orderSlideStar(str){
 	return arr;
 }
 
+function getOrderFromListUI(){
+	var order = {};
+	// var options = [];
+	// var values = [];
+	$('.list_ui_pref_box').each(
+		function(index, object) {
+			// options.push(object.getAttribute('data-option'));
+			// values.push(object.value);
+			if(order[object.value] === undefined) {
+				order[object.value] = [object.getAttribute('data-option')];
+			} else {
+				var temp = order[object.value];
+				temp.push(object.getAttribute('data-option'));
+				order[object.value] =  temp;
+			}
+			
+		}
+	);
+	var temp = [];
+	var order_keys = Object.keys(order);
+	var index = 0;
+	for(var i=order_keys.length-1; i>=0; i--) {
+		temp[index] = order[order_keys[i]];
+		index+=1;
+	}
+
+	order = temp;
+	return order;
+}
+
 function dictSlideStar(str){
 	var arr = [];
 	var values = [];
 	var item_type = ".list-element";
 	$('.' + str).each(function(i, obj){
-		if(str == 'slide'){ 
+		if(str == 'slide' || str == 'slide_BUI'){ 
 			var score = $( this ).slider("option", "value");
 			item_type = ".slider_item";
 		}
 		else if(str == 'star'){ 
 			var score = parseFloat($( this ).rateYo("option", "rating")); 
 			item_type = ".star_item";
+		}else if(str == 'list_ui_pref_box'){ 
+			var score = parseFloat(this.value); 
+			item_type = ".list_ui_pref_box";
 		}
 		else{ return false; }
 		var type = $( this ).attr('type');
@@ -332,6 +365,15 @@ function sliderSort( order ){
 	});
 }
 
+function sliderBUIZeroSort( order ){
+	$.each(order, function(index, value){
+		$.each(value, function(i, v){
+			$(".slide_BUI[type='" + v.toString() + "']").slider("value", 0);
+			$("#score" + $(".slide[type='" + v.toString() + "']").attr("id")).text(0);
+		});
+	});
+}
+
 function sliderZeroSort( order ){
 	$.each(order, function(index, value){
 		$.each(value, function(i, v){
@@ -471,6 +513,9 @@ function changeMethod (value){
 	else if(method == 7){
 		swit += d + ";7";
 		order = orderSlideStar('slide');
+	}else if(method == 8){
+		swit += d + ";8";
+		order = getOrderFromListUI();
 	}
   method = value;
   removeSelected();
@@ -481,6 +526,8 @@ function changeMethod (value){
 	else if(method == 3){ swit += ";3;;"; methodIndicator = "slider"; sliderSort(order); }
 	else if(method == 4){ swit += ";4;;"; methodIndicator = "star"; init_star = true; starSort(order); init_star = false;}
 	else if(method == 5 || method == 6){ yesNoSort(method, order); }
+	else if(method == 7){ swit += ";7;;"; }
+	else if(method == 8){ swit += ";8;;"; }
 
 	// Hard-coded allowing submission
 	//if(method != 1){ $(".submitbutton").prop("disabled", "false");console.log("method", method); }
@@ -558,27 +605,39 @@ var VoteUtil = (function () {
 		var final_list;
 		var item_type = ".list-element";
 		var record_data = {};
+		var d = (Date.now() - startTime).toString();
 		$(".top_tier").remove();
 		if(method == 1)      {order_list = orderCol(0); final_list = dictCol(1);}
 		else if(method == 2){ order_list = orderCol(method); final_list = dictCol(2);}
-		else if(method == 3 || method == 7){ order_list = orderSlideStar('slide'); item_type = ".slider_item"; final_list = dictSlideStar('slide');}
+		else if(method == 3){ order_list = orderSlideStar('slide'); item_type = ".slider_item"; final_list = dictSlideStar('slide');}
 		else if(method == 4){ order_list = orderSlideStar('star'); item_type= ".star_item";final_list = dictSlideStar('star');}
 		else if(method == 5){ order_list = orderYesNo(method); item_type= ".checkbox"; final_list = dictYesNo();}
 		else if(method == 6){ order_list = orderYesNo(method); item_type= ".checkbox_single";}
+		else if(method == 7){ order_list = orderSlideStar('slide_BUI'); item_type = ".slider_item"; final_list = dictSlideStar('slide_BUI');}
+		else if(method == 8){ order_list = getOrderFromListUI(); item_type = ".list_ui_pref_box"; final_list = dictSlideStar('list_ui_pref_box');}
 		else{location.reload(); }
+
 		var final_order = [];
-		for (var i = 0; i < order_list.length; i++) {
-			var sametier = [];
-			for (var j = 0; j < order_list[i].length; j++) {
-				sametier.push($(item_type + "[type='" + order_list[i][j].toString() + "']").attr('id'));
+
+		if(method == 8) {
+			for (var i = 0; i < order_list.length; i++) {
+				final_order.push(order_list[i]);
 			}
-			final_order.push(sametier);
-    }
-		order = JSON.stringify(final_order);
+			order = JSON.stringify(final_order);
+		} else {
+			for (var i = 0; i < order_list.length; i++) {
+				var sametier = [];
+				for (var j = 0; j < order_list[i].length; j++) {
+					sametier.push($(item_type + "[type='" + order_list[i][j].toString() + "']").attr('id'));
+				}
+				final_order.push(sametier);
+			}
+			order = JSON.stringify(final_order);
+		}
+
 		//var d = Date.now() - startTime;
 		//record += "S" + d;
 		var record_final = JSON.stringify(final_list);
-		var d = (Date.now() - startTime).toString();
 
 		record_data["data"] = JSON.parse(record);
 		record_data["submitted_ranking"] = final_list;
@@ -1018,6 +1077,42 @@ $( document ).ready(function() {
 	if ($('#right-sortable li').length == 0) {
 		enableSubmission();
 	}
+
+	var isBUISliderDisbaled = false;
+	$(".slide_BUI").each(function(){
+		$(this).slider({
+			step: 1,
+			range: "min",
+            value: 0,
+            min: 0,
+            max: 100,
+			slide: function( event, ui ) {
+				var total = computeSliderTotal()
+				if (total <= 100) {
+					$("#score" + this.id).text(ui.value);
+				} 
+				console.log(ui.value);
+				return true;
+			},
+			start: function (event, ui){
+				var d = (Date.now() - startTime).toString();
+				temp_data = {"item":$(this).parent().attr("id")};
+				temp_data["time"] = [d];
+				temp_data["rank"] = [dictSlideStar("slide_BUI")];
+			},
+			stop: function (event, ui){
+				var d = (Date.now() - startTime).toString();
+				temp_data["time"].push(d);
+				temp_data["rank"].push(dictSlideStar("slide_BUI"));
+				var temp = JSON.parse(record);
+				temp.push(temp_data);
+				record = JSON.stringify(temp);
+			},
+			// change: function( event, ui ) {
+			// 	console.log("Slider change detected!")
+			// }
+		});
+	});
 
 	$(".slide").each(function(){
 		$(this).slider({
