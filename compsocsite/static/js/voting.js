@@ -121,15 +121,22 @@ function orderCol(num){
 function orderSlideStar(str){
 	var arr = [];
 	var values = [];
+	var type = "";
 	$('.' + str).each(function(i, obj){
-		if(str == 'slide' || str == 'slide_BUI'){ 
+		if(str == 'slide'){ 
 			var score = $( this ).slider("option", "value");
+			type = $( this ).attr('type')
+		} 
+		else if(str == 'slide_BUI'){
+			var score = parseInt(this.value);
+			type = this.dataset.type;
 		}
 		else if(str == 'star'){ 
 			var score = parseFloat($( this ).rateYo("option", "rating")); 
+			type = $( this ).attr('type')
 		}
 		else{ return false; }
-		var type = $( this ).attr('type')
+		// var type = $( this ).attr('type')
 		var bool = 0;
 		$.each(values, function( index, value ){
 			if(value < score){
@@ -182,20 +189,28 @@ function dictSlideStar(str){
 	var arr = [];
 	var values = [];
 	var item_type = ".list-element";
+	var type = "";
 	$('.' + str).each(function(i, obj){
-		if(str == 'slide' || str == 'slide_BUI'){ 
+		if(str == 'slide'){ 
 			var score = $( this ).slider("option", "value");
 			item_type = ".slider_item";
+			type = $( this ).attr('type');
+		}
+		else if(str == 'slide_BUI') {
+			var score = parseInt(this.value);
+			item_type = ".slider_item";
+			type = this.dataset.type;
 		}
 		else if(str == 'star'){ 
 			var score = parseFloat($( this ).rateYo("option", "rating")); 
 			item_type = ".star_item";
+			type = $( this ).attr('type');
 		}else if(str == 'list_ui_pref_box'){ 
 			var score = parseFloat(this.value); 
 			item_type = ".list_ui_pref_box";
+			type = $( this ).attr('type');
 		}
 		else{ return false; }
-		var type = $( this ).attr('type');
 		var bool = 0;
 		//console.log($(item_type + "[type='" + type + "']").attr('id'));
 		$.each(values, function( index, value ){
@@ -1078,41 +1093,6 @@ $( document ).ready(function() {
 		enableSubmission();
 	}
 
-	var isBUISliderDisbaled = false;
-	$(".slide_BUI").each(function(){
-		$(this).slider({
-			step: 1,
-			range: "min",
-            value: 0,
-            min: 0,
-            max: 100,
-			slide: function( event, ui ) {
-				var total = computeSliderTotal()
-				if (total <= 100) {
-					$("#score" + this.id).text(ui.value);
-				} 
-				console.log(ui.value);
-				return true;
-			},
-			start: function (event, ui){
-				var d = (Date.now() - startTime).toString();
-				temp_data = {"item":$(this).parent().attr("id")};
-				temp_data["time"] = [d];
-				temp_data["rank"] = [dictSlideStar("slide_BUI")];
-			},
-			stop: function (event, ui){
-				var d = (Date.now() - startTime).toString();
-				temp_data["time"].push(d);
-				temp_data["rank"].push(dictSlideStar("slide_BUI"));
-				var temp = JSON.parse(record);
-				temp.push(temp_data);
-				record = JSON.stringify(temp);
-			},
-			// change: function( event, ui ) {
-			// 	console.log("Slider change detected!")
-			// }
-		});
-	});
 
 	$(".slide").each(function(){
 		$(this).slider({

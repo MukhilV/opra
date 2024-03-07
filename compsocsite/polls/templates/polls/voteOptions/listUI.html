@@ -18,7 +18,10 @@
                 <div class="panel panel-default" >
 				{% if request.flavour == "mobile" %}
 				<div class = "row col-xs-12" style="padding:0%;margin:0%;margin-bottom: 4%;">
-						<button id="submitbutton-yesno-BUI" type="submit" onclick="checkForValidInput();" class="submitbutton reset-button-mobile" style = "height:2.7em;padding:0%;margin:0%;background:darkgreen;">
+						<button id="submitbutton-LUI" type="submit" 
+                        onclick="return checkForValidInput();" 
+                        class="submitbutton reset-button-mobile" 
+                        style = "height:2.7em;padding:0%;margin:0%;background:darkgreen;">
                             <span class="glyphicon glyphicon-upload" style="font-size:140%;color:white;margin:0%;">Submit</span>
                         </button> 
                 </div>
@@ -27,10 +30,13 @@
                     <div class="panel-heading" >
                         <h4>Your preferences:
                             {% if not request.flavour == "mobile" %}
-                                <button id="submitbutton-yesno-BUI" type="submit" onclick="checkForValidInput();" class="submitbutton btn btn-success" style="">
+                                <button id="submitbutton-LUI" type="submit" 
+                                onclick="return checkForValidInput();" 
+                                class="submitbutton btn btn-success" 
+                                style="">
                                     Submit
                                 </button>
-                                <button id="submitting-yesno-BUI" type="button" class="submitting btn btn-default" style="visibility:hidden;position:absolute;z-index:1;">
+                                <button id="submitting-LUI" type="button" class="submitting btn btn-default" style="visibility:hidden;position:absolute;z-index:1;">
                                     Submitting...
                                 </button>
                             {% endif %}
@@ -99,7 +105,9 @@
     </form>
 </div>
 <script>
-
+        // setTimeout(()=>{
+        //     document.getElementById("submitbutton-LUI").setAttribute("disabled","disabled");
+        // }, 2000);
         var list = '#ListUIList';
         var n = $(list).children().length;
         var arr=[];
@@ -111,6 +119,7 @@
             this.addEventListener('input', function(event) {
             // Get the entered text
             var enteredText = event.target.value;
+            // document.getElementById("submitbutton-LUI").setAttribute("disabled","disabled");
 
             // Validate if the entered text is numeric
             if (!isNumeric(enteredText)) {
@@ -125,6 +134,9 @@
                 // curr_slider_score.innerHTML = event.target.value;
                 document.getElementById("currSliderTotal".concat((index+1).toString())).style.display = "none";
                 document.getElementById("slash".concat((index+1).toString())).style.display = "none";
+                // if(curr_total == 100) {
+                //     document.getElementById("submitbutton-LUI").removeAttribute("disabled");
+                // }
             }
         });
         });
@@ -169,14 +181,17 @@ function isNumeric(value) {
     function checkForValidInput(){
         var total = computeTotal();
         if(total!=100){
-            alert("The sum of all the preferences should be less than or equal to 100.");
+            alert("The sum of all the preferences should be equal to 100.");
+            return false;
         } else {
-            VoteUtil.submitPref();    
+            VoteUtil.submitPref();  
+            return true;  
         }
     }
 </script>
 <script>
     $(window).load(function(){
+
         var original_order = [];
         var t = 1;
         {% if currentSelection %}

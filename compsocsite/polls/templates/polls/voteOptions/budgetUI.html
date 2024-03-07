@@ -26,7 +26,7 @@
                 <div class="panel panel-default" >
 				{% if request.flavour == "mobile" %}
 				<div class = "row col-xs-12" style="padding:0%;margin:0%;margin-bottom: 4%;">
-						<button id="submitbutton-slider-BUI" type="submit" onclick="checkSliderSum();" class="submitbutton reset-button-mobile" style = "height:2.7em;padding:0%;margin:0%;background:darkgreen;">
+						<button id="submitbutton-slider-BUI" type="submit" onclick="return checkSliderSum();" class="submitbutton reset-button-mobile" style = "height:2.7em;padding:0%;margin:0%;background:darkgreen;">
                             <span class="glyphicon glyphicon-upload" style="font-size:140%;color:white;margin:0%;">Submit</span>
                         </button> 
                 </div>
@@ -35,7 +35,7 @@
                     <div class="panel-heading" >
                         <h4>Your preferences:
                             {% if not request.flavour == "mobile" %}
-                            <button id="submitbutton-slider-BUI" type="submit" onclick="checkSliderSum();" class="submitbutton btn btn-success" style="">
+                            <button id="submitbutton-slider-BUI" type="submit" onclick="return checkSliderSum();" class="submitbutton btn btn-success" style="">
                                 Submit
                             </button>
                             <button id="submitting-slider-BUI" type="button" class="submitting btn btn-default" style="visibility:hidden;position:absolute;z-index:1;">
@@ -76,11 +76,15 @@
 									{% if item.item_description %}
                                         <div style="display:inline-block;"><span class="glyphicon glyphicon-info-sign pull-right" data-toggle="tooltip" data-placement="top" title="{{item.item_description}}" data-title="Meddelanden" >
                                         </span></div>
-                                    {% endif %}<div id="scoreSlideBUI{{forloop.counter}}">0</div>
-                                    <input type="hidden" id ="scoreSlideBUI{{forloop.counter}}" value ="0"></input>
+                                    {% endif %}
+                                    <!-- <div id="scoreSlideBUI{{forloop.counter}}">0</div>
+                                    <input type="hidden" id ="scoreSlideBUI{{forloop.counter}}" value ="0"></input> -->
                                     <!-- Display tooltip for option description -->
                                     
-                                    <div class="slide_BUI" id="SlideBUI{{ forloop.counter }}" type="{{ forloop.counter }}"></div>
+                                    <p>Value: <span id="sliderValue{{ forloop.counter }}">0</span></p>
+                                    <div class="slider_div">
+                                        <input type="range" min="0" max="100" value="0" class="slide_BUI" id="slideBUI{{ forloop.counter }}" data-type = "{{ forloop.counter }}">
+                                    </div>
                                 </li>
 								<hr/>
                             {% endfor %}
@@ -88,7 +92,7 @@
                                 display: flex;
                             ">
                                 Total: <div id="scoreSlideBUICurrTotal">0</div>
-                                <div id="scoreSlideBUITotal">/100</div>
+                                <div id="scoreSlideBUITotal"></div>
                             </div>
                         </ul> <!-- end of main panel (left-sortable) -->
                     </div>
@@ -101,72 +105,63 @@
 </div>
 
 <script>
-var numOfSliders = $("#slidersBUI").children('li').length;
-for(var i=0; i<numOfSliders; i++) {
-    ObserveElement("scoreSlideBUI".concat((i+1).toString()));
-}
+        const BUDGET = 100;
+        document.addEventListener("DOMContentLoaded", function() {
+        // Initialize sliders
+        const sliders = document.querySelectorAll('.slide_BUI');
+        document.getElementById("scoreSlideBUITotal").innerHTML = "/"+BUDGET;
 
-function setSliderTotal(){
-    var total = computeSliderTotal();
-    if(total<=100) {
-        document.getElementById("scoreSlideBUICurrTotal").innerHTML = total.toString();
-        document.getElementById("submitbutton-slider-BUI").disabled = false;
-    } else if(document.getElementById("scoreSlideBUICurrTotal").innerHTML<=100 && total>=100){
-        document.getElementById("scoreSlideBUICurrTotal").innerHTML = "100";
-    }
-}
-
-function ObserveElement(elementId){
-    // Select the element you want to observe
-    const targetElement = document.getElementById(elementId);
-
-    // Create a new MutationObserver and specify a callback function
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            // Check if the innerHTML property has changed
-            if (mutation.type === 'childList' && mutation.target === targetElement) {
-                setSliderTotal();
-            }
-            // if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-            //     console.log('Style changed:', targetElement.style.cssText);
-            // } else {
-
-            // }
+        sliders.forEach(function(slider) {
+            slider.addEventListener('input', function() {
+                updateSliders(this);
+            });
         });
+
+        function updateSliders(currentSlider) {
+            // Calculate the sum of all slider values
+            const sum = computeSliderTotal(sliders)
+
+            // Check if the sum is less than or equal to 100
+            if (sum <= BUDGET+1) {
+                // Allow the current slider to be moved
+                var id = currentSlider.id.toString(); 
+                document.getElementById("sliderValue".concat(id[id.length-1])).innerHTML = currentSlider.value;
+                setSliderTotal(sliders);
+            } else {
+                // Prevent the current slider from being moved if the sum is more than 100
+                currentSlider.value = parseInt(currentSlider.value) - (sum - BUDGET);
+            }
+        }
     });
 
-    // Configure the observer to watch for changes in the childList (which includes innerHTML changes)
-    const config = { childList: true };
-
-    // Start observing the target element
-    observer.observe(targetElement, config);
-}
-
-
-function computeSliderTotal() {
-        var list = '#slidersBUI';
-        var arr = $(list).children('li');
-        var numberOfItems = arr.length;
-        var sum = 0;
-        for(var i = 0; i<numberOfItems; i++){
-            var value = $( "#SlideBUI".concat((i+1).toString()) ).slider( "option", "value" );       
-            // var value = arr[0].children
-            // .find("#scoreSlideBUI".concat((i+1).toString()));
-            sum += value;
-        }
-        // console.log(sum);
+    function computeSliderTotal(sliders) {
+        const sum = Array.from(sliders).reduce(function(acc, slider) {
+                return acc + parseInt(slider.value);
+            }, 0);
         return sum;
     }
-
+    
     function checkSliderSum() {
-        var total = computeSliderTotal();
-        if(total!=100){
-            alert("The sum of all the preferences should be less than or equal to 100.");
+        sliders = document.querySelectorAll('.slide_BUI');
+        var total = computeSliderTotal(sliders);
+        if(total!=BUDGET){
+            alert("The sum of all the preferences should be equal to "+BUDGET+". ");
+            return false;
         } else {
             VoteUtil.submitPref();    
+            return true;
         }
     }
-
+    
+    function setSliderTotal(sliders){
+    var total = computeSliderTotal(sliders);
+    if(total<=BUDGET) {
+        document.getElementById("scoreSlideBUICurrTotal").innerHTML = total.toString();
+        document.getElementById("submitbutton-slider-BUI").disabled = false;
+    } else if(document.getElementById("scoreSlideBUICurrTotal").innerHTML<=BUDGET && total>=BUDGET){
+        document.getElementById("scoreSlideBUICurrTotal").innerHTML = BUDGET.toString();
+    }
+}
     $(window).load(function(){
         var original_order = [];
         var t = 1;
