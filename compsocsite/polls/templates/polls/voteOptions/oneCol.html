@@ -99,7 +99,7 @@
                                         <li class="list-element" id="item{{ item.item_text }}" >
                                             <!-- Display image (uploaded) -->
                                             {% if item.image %}
-                                                <img class="item" src='/{{ item.image.url }}'/>
+                                                <img class="item" src='{{ item.image.url }}'/>
                                             {% endif %}
                                             <!-- Display image (external URL) -->
                                             {% if item.imageURL != Null %}
@@ -125,7 +125,7 @@
                                             <li class="list-element" id="item{{ item.item_text }}">
                                                 <!-- Display image (uploaded) -->
                                                 {% if item.image %}
-                                                    <img class="item" src='/{{ item.image.url }}'/>
+                                                    <img class="item" src='{{ item.image.url }}' />
                                                 {% endif %}
                                                 <!-- Display image (external URL) -->
                                                 {% if item.imageURL != Null %}

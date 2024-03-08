@@ -58,11 +58,11 @@
                                 <li class="slider_item" id="item{{ item.item_text }}" alt="{{forloop.counter}}" type="{{ forloop.counter }}">
                                     <!-- Display image (uploaded) -->
                                     {% if item.image %}
-                                        <img class="item" src='/{{ item.image.url }}'/>
+                                        <img class="item" src='{{ item.image.url }}' style="margin: 8px;"/>
                                     {% endif %}
                                     <!-- Display image (external URL) -->
                                     {% if item.imageURL != Null %}
-                                        <img class="item" src='{{ item.imageURL }}'/>
+                                        <img class="item" src='{{ item.imageURL }}' style="margin: 8px;"/>
                                     {% endif %}
                                     <!-- Display option text -->
                                     <strong>{{ item.item_text }}</strong> : 

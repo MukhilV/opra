@@ -62,6 +62,13 @@
                         <!-- The user hasn't voted on this poll yet -->
                         {% for item in items %}
                         <!-- Display option text -->
+                            {% if item.image %}
+                                <img class="item" src='{{ item.image.url }}' style="margin: 8px;"/>
+                            {% endif %}
+                                <!-- Display image (external URL) -->
+                            {% if item.imageURL != Null %}
+                                <img class="item" src='{{ item.imageURL }}' style="margin: 8px;"/>
+                            {% endif %}
                         {{ item.item_text }}
                             <div style="display: flex;">
                                 <input class = "list_ui_pref_box" data-option="item{{ item.item_text }}" type="text" id="item{{ item.item_text }}" type="{{ forloop.counter }}" style="width: 80%;" onkeyup="setTotal()"></input>
@@ -75,13 +82,7 @@
                               <input type="checkbox" style="display:none">
                               <span class="glyphicon" aria-hidden="true"></span> -->
                                 <!-- Display image (uploaded) -->
-                                {% if item.image %}
-                                    <img class="item" src='/{{ item.image.url }}'/>
-                                {% endif %}
-                                <!-- Display image (external URL) -->
-                                {% if item.imageURL != Null %}
-                                    <img class="item" src='{{ item.imageURL }}'/>
-                                {% endif %}
+                                
                                 <!-- Display tooltip for option description -->
                                 <!-- {% if item.item_description %}
                                     <span class="glyphicon glyphicon-info-sign pull-right" data-toggle="tooltip" data-placement="top" title="{{item.item_description}}" data-title="Meddelanden">
