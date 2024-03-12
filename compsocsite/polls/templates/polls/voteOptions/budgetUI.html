@@ -122,7 +122,7 @@
             const sum = computeSliderTotal(sliders)
 
             // Check if the sum is less than or equal to 100
-            if (sum <= BUDGET+1) {
+            if (sum <= BUDGET) {
                 // Allow the current slider to be moved
                 var id = currentSlider.id.toString(); 
                 document.getElementById("sliderValue".concat(id[id.length-1])).innerHTML = currentSlider.value;

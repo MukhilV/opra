@@ -52,7 +52,7 @@
                             <li class="star_item" id="item{{ item.item_text }}" type="{{ forloop.counter }}" style="list-style-type: none;">
                                 <!-- Display image (uploaded) -->
                                 {% if item.image %}
-                                    <img class="item" src='/{{ item.image.url }}'/>
+                                    <img class="item" src='{{ item.image.url }}'/>
                                 {% endif %}
                                 <!-- Display image (external URL) -->
                                 {% if item.imageURL != Null %}

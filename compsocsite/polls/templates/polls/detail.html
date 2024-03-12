@@ -200,6 +200,17 @@
 
     $(function(){
         $(document).ready(function() {
+            
+            // To remove the additional '/' at the starting of the image URL
+            var imagesWithClass = document.getElementsByClassName('item');
+            for (var i = 0; i < imagesWithClass.length; i++) {
+                var staticIndex = imagesWithClass[i].src.indexOf('static');
+                if(imagesWithClass[i].src[staticIndex-1] === '/' && imagesWithClass[i].src[staticIndex-2] === '/' ) {
+                    imagesWithClass[i].src = imagesWithClass[i].src.slice(0,[staticIndex-1]) 
+                    + imagesWithClass[i].src.slice([staticIndex])
+                }
+            }
+
 			$(".dropdown-toggle").dropdown();
 
 			$('[data-toggle="tooltip"]').tooltip();

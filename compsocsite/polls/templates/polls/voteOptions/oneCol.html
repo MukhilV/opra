@@ -68,11 +68,11 @@
                                                 <li class="list-element" id="item{{ selection.item_text }}" type="{{ selection.id }}">
                                                     <!-- Display image (uploaded) -->
                                                     {% if selection.image %}
-                                                    <img class="item" src='/{{ selection.image.url }}'/>
+                                                    <img class="item" src='{{ selection.image.url }}' style="height: 25px; margin-top: -8px;"/>
                                                     {% endif %}
                                                     <!-- Display image (external URL) -->
                                                     {% if selection.imageURL != Null %}
-                                                    <img class="item" src='{{ selection.imageURL }}'/>
+                                                    <img class="item" src='{{ selection.imageURL }}' style="height: 25px; margin-top: -8px;"/>
                                                     {% endif %}
                                                     <!-- Display option text -->
                                                     {{ selection.item_text }}
@@ -96,14 +96,14 @@
                                     <ul class="choice1" id="{{ prev|add:1 }}">
                                     <div class="tier one"> #{{ forloop.counter }}  </div>
                                     {% endwith %}
-                                        <li class="list-element" id="item{{ item.item_text }}" >
+                                        <li class="list-element" id="item{{ item.item_text }}">
                                             <!-- Display image (uploaded) -->
                                             {% if item.image %}
-                                                <img class="item" src='{{ item.image.url }}'/>
+                                                <img class="item" src='{{ item.image.url }}' style="height: 25px; margin-top: -8px;"/>
                                             {% endif %}
                                             <!-- Display image (external URL) -->
                                             {% if item.imageURL != Null %}
-                                                <img class="item" src='{{ item.imageURL }}'/>
+                                                <img class="item" src='{{ item.imageURL }}' style="height: 25px; margin-top: -8px;"/>
                                             {% endif %}
                                             <!-- Display option text -->
                                             {{ item.item_text }}
@@ -125,11 +125,11 @@
                                             <li class="list-element" id="item{{ item.item_text }}">
                                                 <!-- Display image (uploaded) -->
                                                 {% if item.image %}
-                                                    <img class="item" src='{{ item.image.url }}' />
+                                                    <img class="item" src='{{ item.image.url }}' style="height: 25px; margin-top: -8px;"/>
                                                 {% endif %}
                                                 <!-- Display image (external URL) -->
                                                 {% if item.imageURL != Null %}
-                                                    <img class="item" src='{{ item.imageURL }}'/>
+                                                    <img class="item" src='{{ item.imageURL }}' style="height: 25px; margin-top: -8px;"/>
                                                 {% endif %}
                                                 <!-- Display option text -->
                                                 {{ item.item_text }}

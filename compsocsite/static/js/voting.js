@@ -456,9 +456,9 @@ function yesNoZeroSort( order ){
 
 function changeCSS(){
   if(method == 1){
-    $(".choice1").css("width", "550px");
-    $(".empty"). css("width", "550px");
-    $(".col-placeHolder").css("width", "550px");
+    $(".choice1").css("width", "inherit");
+    $(".empty"). css("width", "inherit");
+    $(".col-placeHolder").css("width", "inherit");
 
     $("#left-sortable").children(".choice1").each(function(){
 	  size = $(this).children(":not(.ui-selected, .transporter)").size();
@@ -479,9 +479,9 @@ function changeCSS(){
     });
   }
   else if(method == 2){
-    $(".choice1").css("width", "800px");
-    $(".empty"). css("width", "800px");
-    $(".col-placeHolder").css("width", "800px");
+    $(".choice1").css("width", "inherit");
+    $(".empty"). css("width", "inherit");
+    $(".col-placeHolder").css("width", "inherit");
   }
   $("#one-sortable").children(".choice1").each(function(){
 	size = $(this).children(":not(.ui-selected, .transporter)").size();
@@ -964,8 +964,8 @@ $( document ).ready(function() {
 			handle: ".tier",
 			//items: "ul",
 			change: function(e, ui) {
-			if (method == 1)      { $(".col-placeHolder").css("width", "550px"); }
-			else if (method == 2) { $(".col-placeHolder").css("width", "800px"); }
+			if (method == 1)      { $(".col-placeHolder").css("width", "inherit"); }
+			else if (method == 2) { $(".col-placeHolder").css("width", "inherit"); }
 			},
 			stop: function(e, ui) {
 			checkAll();
@@ -1002,10 +1002,10 @@ $( document ).ready(function() {
 			change: function(e, ui) {
 				if (ui.placeholder.parent().hasClass("sortable-ties")) {
 					if (method == 1) { 
-						$(".li-placeHolder").css("width", "550px");
+						$(".li-placeHolder").css("width", "inherit");
 					 }
 					else if (method == 2) { 
-						$(".li-placeHolder").css("width", "800px"); 
+						$(".li-placeHolder").css("width", "inherit"); 
 					}
 					$(".li-placeHolder").css({ "float": "none", "height": "40px", "margin": "0px 0px" });
 				}

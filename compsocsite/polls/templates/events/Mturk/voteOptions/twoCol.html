@@ -88,7 +88,7 @@
                                                 <li class="li_item" id="item{{ selection.item_text }}">
                                                     <!-- Display image (uploaded) -->
                                                     {% if selection.image %}
-                                                        <img class="item" src='/{{ selection.image.url }}'/>
+                                                        <img class="item" src='{{ selection.image.url }}'/>
                                                     {% endif %}
                                                     <!-- Display image (external URL) -->
                                                     {% if selection.imageURL != Null %}
@@ -153,8 +153,7 @@
                                         <li class="li_item" id="item{{ item.item_text }}" type="{{ item.id }}">
                                             <!-- Display image (uploaded) -->
                                             {% if item.image %}
-                                 
-                                                <img class="item" src='/{{ item.image.url }}'/>
+                                                <img class="item" src='{{ item.image.url }}'/>
                                             {% endif %}
                                             <!-- Display image (external URL) -->
                                             {% if item.imageURL != Null %}
@@ -184,7 +183,7 @@
     										<li class="li_item" id="item{{ item.item_text }}" type="{{ forloop.counter }}" >
     											<!-- Display image (uploaded) -->
     											{% if item.image %}
-    												<img class="item" src='/{{ item.image.url }}'/>
+    												<img class="item" src='{{ item.image.url }}'/>
     											{% endif %}
     											<!-- Display image (external URL) -->
     											{% if item.imageURL != Null %}

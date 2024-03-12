@@ -360,7 +360,7 @@ th {
     float: left;
     margin: 2.5px 8px;
     cursor: default;
-    width: 125px;
+    width: auto;
     height: 35px;
     line-height: 35px; 
     background-color: white;
@@ -369,6 +369,7 @@ th {
     color: #252525;
     border: 2px solid rgb(145, 138, 138);
     border-radius: 0.3rem; 
+    padding-right: 5px;
 
 }
 .list-element.ui-selected {
