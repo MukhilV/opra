@@ -503,6 +503,7 @@ function changeCSS(){
   
 }
 
+
 function changeMethod (value){
 	var order;
 	var d = Date.now() - startTime;

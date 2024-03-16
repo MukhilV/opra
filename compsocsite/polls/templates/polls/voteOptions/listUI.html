@@ -61,15 +61,16 @@
                         <ul id="ListUIList">
                         <!-- The user hasn't voted on this poll yet -->
                         {% for item in items %}
-                        <!-- Display option text -->
-                            {% if item.image %}
-                                <img class="item" src='{{ item.image.url }}' style="margin: 8px;"/>
-                            {% endif %}
-                                <!-- Display image (external URL) -->
-                            {% if item.imageURL != Null %}
-                                <img class="item" src='{{ item.imageURL }}' style="margin: 8px;"/>
-                            {% endif %}
-                        {{ item.item_text }}
+                        <div>
+                            <!-- Display option text -->
+                                {% if item.image %}
+                                    <img class="item" src='{{ item.image.url }}' style="margin: 8px;"/>
+                                {% endif %}
+                                    <!-- Display image (external URL) -->
+                                {% if item.imageURL != Null %}
+                                    <img class="item" src='{{ item.imageURL }}' style="margin: 8px;"/>
+                                {% endif %}
+                            {{ item.item_text }}
                             <div style="display: flex;">
                                 <input class = "list_ui_pref_box" data-option="item{{ item.item_text }}" type="text" id="item{{ item.item_text }}" type="{{ forloop.counter }}" style="width: 80%;" onkeyup="setTotal()"></input>
                                 <div style="display:flex; width: 15%; margin-left: 10px;">
@@ -78,6 +79,7 @@
                                     <div id="currSliderTotal{{ forloop.counter }}">100</div>
                                 </div>
                             </div>
+                        </div>
                             <!-- <label class="checkbox" id="item{{ item.item_text }}" type="{{ forloop.counter }}" >
                               <input type="checkbox" style="display:none">
                               <span class="glyphicon" aria-hidden="true"></span> -->
@@ -113,7 +115,7 @@
         var n = $(list).children().length;
         var arr=[];
         for(var i=0; i<n-1; i++){
-            arr.push($($(list).children()[i]).children('input')[0])
+            arr.push($($($(list).children()[i]).children('div')).children('input')[0]);
         }
         // arr = $(list).children();
         $.each(arr, function(index) {
@@ -162,7 +164,7 @@ function isNumeric(value) {
         var n = $(list).children().length;
         var arr=[];
         for(var i=0; i<n-1; i++){
-            arr.push($($(list).children()[i]).children('input')[0])
+            arr.push($($($(list).children()[i]).children('div')).children('input')[0]);
         }
         var values = [];
         var sum = 0;

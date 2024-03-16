@@ -334,7 +334,7 @@ th {
     background:rgb(223, 222, 222);
     height: 40px;
     line-height: 40px; 
-    width: 550px;
+    width: auto;
     padding: 0;
     margin: 8px 0px;
     border: 0;
@@ -346,12 +346,16 @@ th {
     white-space: nowrap;
     background: whitesmoke;
     height: 40px;
-    width: 250px;
+    width: auto;
     padding: 0;
     margin: 5px 0px;
     animation-duration: 3s;
     border: 0;
     border-radius: 0.3rem;
+}
+
+.list-element-small {
+    width: 125px !important;
 }
 
 .list-element {
@@ -369,7 +373,8 @@ th {
     color: #252525;
     border: 2px solid rgb(145, 138, 138);
     border-radius: 0.3rem; 
-    padding-right: 5px;
+    padding-right: 10px;
+    padding-left: 10px;
 
 }
 .list-element.ui-selected {

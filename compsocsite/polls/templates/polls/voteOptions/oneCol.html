@@ -152,3 +152,36 @@
         {% include "polls/voteOptions/_comment_section.html" %}
     </form>
 </div>
+
+<script>
+
+
+    // function adjustWidthOneCol(){
+    //     {% if items %}
+    //         {% for item in items %}
+    //             {% if item %}
+    //                 console.log("item{{ item.item_text }}");
+    //                 var width = document.getElementById("item{{ item.item_text }}").offsetWidth;
+    //                 if(width!==0 && width <= 125){
+    //                     var list_of_options = document.getElementsByClassName('list-element');
+    //                     for(var i=0; i<list_of_options.length; i++){
+    //                         // list_of_options[i].style.width = "125px";
+    //                         if(!list_of_options[i].classList.contains('list-element-small')){
+    //                             list_of_options[i].classList.add('list-element-small');
+    //                         }     
+    //                     }
+    //                 }
+    //             {% endif %}
+    //         {% endfor %}
+    //     {% endif %}
+    // }
+
+
+    
+$(function(){
+        $(document).ready(function() {
+            // adjustWidthOneCol();
+        });
+    });
+
+</script>
