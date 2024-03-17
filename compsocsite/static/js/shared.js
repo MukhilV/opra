@@ -44,6 +44,7 @@ function UICheckboxes(){
 	||document.getElementById("yesno2_checkbox").checked
 	||document.getElementById("budgetUI_slider_checkbox").checked
 	||document.getElementById("listUI_checkbox").checked
+	||document.getElementById("InfiniteBudgetUI_checkbox").checked
 	){
 		return true;
 	}

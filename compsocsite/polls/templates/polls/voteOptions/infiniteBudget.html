@@ -1,5 +1,5 @@
 {% load mathfilters %}
-<div id="listUISection" {% if request.flavour == "mobile" %}style="padding:0.4em;" {% endif %}>
+<div id="InfiniteBudgetUISection" {% if request.flavour == "mobile" %}style="padding:0.4em;" {% endif %}>
     <!-- This is the voting form. Submit results through a voting function -->
     <form id="{% if num == 1 %}yesNo{% else %}single{% endif %}" {% if request.user.username == "" %} action="{% url 'polls:anonymousvote' question.id %}" {% else %} action="{% url 'polls:vote' question.id %}" {% endif %} method="post">
         <div class="row">
@@ -18,8 +18,8 @@
                 <div class="panel panel-default" >
 				{% if request.flavour == "mobile" %}
 				<div class = "row col-xs-12" style="padding:0%;margin:0%;margin-bottom: 4%;">
-						<button id="submitbutton-LUI" type="submit" 
-                        onclick="return checkForValidInput();" 
+						<button id="submitbutton-IBUI" type="submit" 
+                        onclick="VoteUtil.submitPref(this);" 
                         class="submitbutton reset-button-mobile" 
                         style = "height:2.7em;padding:0%;margin:0%;background:darkgreen;">
                             <span class="glyphicon glyphicon-upload" style="font-size:140%;color:white;margin:0%;">Submit</span>
@@ -30,13 +30,13 @@
                     <div class="panel-heading" >
                         <h4>Your preferences:
                             {% if not request.flavour == "mobile" %}
-                                <button id="submitbutton-LUI" type="submit" 
-                                onclick="return checkForValidInput();" 
+                                <button id="submitbutton-IBUI" type="submit" 
+                                onclick="VoteUtil.submitPref(this);" 
                                 class="submitbutton btn btn-success" 
                                 style="">
                                     Submit
                                 </button>
-                                <button id="submitting-LUI" type="button" class="submitting btn btn-default" style="visibility:hidden;position:absolute;z-index:1;">
+                                <button id="submitting-IBUI" type="button" class="submitting btn btn-default" style="visibility:hidden;position:absolute;z-index:1;">
                                     Submitting...
                                 </button>
                             {% endif %}
@@ -58,7 +58,7 @@
 
                     <!-- Your preferences main panel -->
                     <div class="panel-body" >
-                        <ul id="ListUIList">
+                        <ul id="InfiniteBudgetUIList">
                         <!-- The user hasn't voted on this poll yet -->
                         {% for item in items %}
                         <div>
@@ -72,34 +72,16 @@
                                 {% endif %}
                             {{ item.item_text }}
                             <div style="display: flex;">
-                                <input class = "list_ui_pref_box" data-option="item{{ item.item_text }}" type="text"
-                                id="item{{ item.item_text }}" type="{{ forloop.counter }}" 
+                                <input class = "infinite_budget_ui_pref_box" data-option="item{{ item.item_text }}" 
+                                type="text" id="item{{ item.item_text }}" type="{{ forloop.counter }}" 
                                 style="width: 80%;" onkeyup="setTotal()" value="0"></input>
-                                <div style="display:flex; width: 15%; margin-left: 10px;">
-                                    <!-- <div id="currSliderScore{{ forloop.counter }}">0</div> -->
+                                <!-- <div style="display:flex; width: 15%; margin-left: 10px;">
                                     <div id="slash{{ forloop.counter }}"> / </div>
                                     <div id="currSliderTotal{{ forloop.counter }}">100</div>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
-                            <!-- <label class="checkbox" id="item{{ item.item_text }}" type="{{ forloop.counter }}" >
-                              <input type="checkbox" style="display:none">
-                              <span class="glyphicon" aria-hidden="true"></span> -->
-                                <!-- Display image (uploaded) -->
-                                
-                                <!-- Display tooltip for option description -->
-                                <!-- {% if item.item_description %}
-                                    <span class="glyphicon glyphicon-info-sign pull-right" data-toggle="tooltip" data-placement="top" title="{{item.item_description}}" data-title="Meddelanden">
-                                    </span>
-                                {% endif %}
-                            </label> -->
                         {% endfor %}
-                        <div id="scoreListUIshowTotalDiv" style="
-                                display: flex;
-                            ">
-                                Total: <div id="scoreSlideListUICurrTotal">0</div>
-                                <div id="scoreSlideListUITotal">/100</div>
-                            </div>
                         </ul> <!-- end of main panel (left-sortable) -->
                     </div>
                 </div>
@@ -110,19 +92,16 @@
     </form>
 </div>
 <script>
-        // setTimeout(()=>{
-        //     document.getElementById("submitbutton-LUI").setAttribute("disabled","disabled");
-        // }, 2000);
-        var list = '#ListUIList';
+
+    var list = '#InfiniteBudgetUIList';
         var n = $(list).children().length;
         var arr=[];
-        for(var i=0; i<n-1; i++){
+        for(var i=0; i<n; i++){
             arr.push($($($(list).children()[i]).children('div')).children('input')[0]);
         }
         // arr = $(list).children();
         $.each(arr, function(index) {
             this.addEventListener('input', function(event) {
-            // Get the entered text
             var enteredText = event.target.value;
             // document.getElementById("submitbutton-LUI").setAttribute("disabled","disabled");
 
@@ -130,66 +109,13 @@
             if (!isNumeric(enteredText)) {
                 event.target.value = '';
             } else {
-                var curr_total = computeTotal();
-                if (curr_total > 100) {
-                    event.target.value = enteredText.slice(0,enteredText.length-1);
-                }
-                if(curr_total <= 100) setMaxValRange(curr_total);
-                // var curr_slider_score = document.getElementById("currSliderScore".concat((index+1).toString()));
-                // curr_slider_score.innerHTML = event.target.value;
-                document.getElementById("currSliderTotal".concat((index+1).toString())).style.display = "none";
-                document.getElementById("slash".concat((index+1).toString())).style.display = "none";
-                // if(curr_total == 100) {
-                //     document.getElementById("submitbutton-LUI").removeAttribute("disabled");
-                // }
+                // code here
             }
         });
         });
 
 
-function setMaxValRange(curr_total){
-    var list = '#ListUIList';
-        var n = $(list).children().length;
-        for(var i=0; i<n-1; i++){
-            document.getElementById("currSliderTotal".concat((i+1).toString())).innerHTML = 100 - curr_total;
-        }
-}
 
-
-    function computeTotal() {
-        var list = '#ListUIList';
-        var n = $(list).children().length;
-        var arr=[];
-        for(var i=0; i<n-1; i++){
-            arr.push($($($(list).children()[i]).children('div')).children('input')[0]);
-        }
-        var values = [];
-        var sum = 0;
-        $.each(arr, function() {
-            var inputValue = $(this).val().toString();
-            values.push(parseInt(inputValue));
-            if(!isNaN(inputValue) && inputValue!=="") sum += parseInt(inputValue)
-        });
-        return sum;
-    }
-
-    function setTotal() {
-        var total = computeTotal();
-        if(total<=100) document.getElementById('scoreSlideListUICurrTotal').innerHTML = total.toString();
-    }
-
-    function checkForValidInput(){
-        var total = computeTotal();
-        if(total!=100){
-            alert("The sum of all the preferences should be equal to 100.");
-            return false;
-        } else {
-            VoteUtil.submitPref();  
-            return true;  
-        }
-    }
-</script>
-<script>
     $(window).load(function(){
 
         var original_order = [];

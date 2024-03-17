@@ -18,6 +18,11 @@ var init_star = false;
 
 var top_tier_layer = 0;
 
+// Function to check if a given value is numeric
+function isNumeric(value) {
+    return /^\d+$/.test(value);
+}
+
 function select(item){
 	var d = (Date.now() - startTime).toString();
 	temp_data = {"item":$(item).attr("id")};
@@ -184,6 +189,37 @@ function getOrderFromListUI(){
 	order = temp;
 	return order;
 }
+
+function getOrderFromInfiniteBudgetUI(){
+	var order = {};
+	// var options = [];
+	// var values = [];
+	$('.infinite_budget_ui_pref_box').each(
+		function(index, object) {
+			// options.push(object.getAttribute('data-option'));
+			// values.push(object.value);
+			if(order[object.value] === undefined) {
+				order[object.value] = [object.getAttribute('data-option')];
+			} else {
+				var temp = order[object.value];
+				temp.push(object.getAttribute('data-option'));
+				order[object.value] =  temp;
+			}
+			
+		}
+	);
+	var temp = [];
+	var order_keys = Object.keys(order);
+	var index = 0;
+	for(var i=order_keys.length-1; i>=0; i--) {
+		temp[index] = order[order_keys[i]];
+		index+=1;
+	}
+
+	order = temp;
+	return order;
+}
+
 
 function dictSlideStar(str){
 	var arr = [];
@@ -532,6 +568,9 @@ function changeMethod (value){
 	}else if(method == 8){
 		swit += d + ";8";
 		order = getOrderFromListUI();
+	}else if(method == 9){
+		swit += d + ";9";
+		order = getOrderFromInfiniteBudgetUI();
 	}
   method = value;
   removeSelected();
@@ -631,11 +670,12 @@ var VoteUtil = (function () {
 		else if(method == 6){ order_list = orderYesNo(method); item_type= ".checkbox_single";}
 		else if(method == 7){ order_list = orderSlideStar('slide_BUI'); item_type = ".slider_item"; final_list = dictSlideStar('slide_BUI');}
 		else if(method == 8){ order_list = getOrderFromListUI(); item_type = ".list_ui_pref_box"; final_list = dictSlideStar('list_ui_pref_box');}
+		else if(method == 9){ order_list = getOrderFromInfiniteBudgetUI(); item_type = ".infinite_budget_ui_pref_box"; final_list = dictSlideStar('infinite_budget_ui_pref_box');}
 		else{location.reload(); }
 
 		var final_order = [];
 
-		if(method == 8) {
+		if(method == 8 || method == 9) {
 			for (var i = 0; i < order_list.length; i++) {
 				final_order.push(order_list[i]);
 			}

@@ -421,5 +421,7 @@ def getUIs(poll):
         result.append("budget_ui")
     if(poll.ListUI_enabled):
         result.append("list_ui")
+    if(poll.infiniteBudgetUI_enabled):
+        result.append("infinite_budget_ui")
     return result
     

@@ -407,6 +407,7 @@ def editBasicInfo(request, question_id):
     yesno2 = False
     BUI_slider = False
     LUI = False
+    IBUI = False
     uilist = request.POST.getlist('ui')
     if "twocol" in uilist:
         twocol = True
@@ -424,6 +425,8 @@ def editBasicInfo(request, question_id):
         BUI_slider = True 
     if "LUI" in uilist:
         LUI = True
+    if "IBUI" in uilist:
+        IBUI = True
     question.twocol_enabled = twocol
     question.onecol_enabled = onecol
     question.slider_enabled = slider
@@ -432,7 +435,8 @@ def editBasicInfo(request, question_id):
     question.yesno2_enabled = yesno2
     question.budgetUI_enabled = BUI_slider
     question.ListUI_enabled =LUI
-    question.ui_number = twocol+onecol+slider+star+yesno+yesno2+BUI_slider+LUI
+    question.infiniteBudgetUI_enabled =IBUI
+    question.ui_number = twocol+onecol+slider+star+yesno+yesno2+BUI_slider+LUI+IBUI
     
     # update whether ties are allowed
     tie=question.allowties
@@ -1616,6 +1620,7 @@ def setInitialSettings(request, question_id):
     yesno2 = False
     BUI_slider = False
     LUI = False
+    IBUI = False
     uilist = request.POST.getlist('ui')
     if "twocol" in uilist:
         twocol = True
@@ -1633,6 +1638,8 @@ def setInitialSettings(request, question_id):
         BUI_slider = True 
     if "LUI" in uilist:
         LUI = True
+    if "IBUI" in uilist:
+        IBUI = True
 
     vr = (2 ** (int(request.POST['pollpreferences']) - 1))
     for rule in request.POST.getlist('vr'):
@@ -1646,7 +1653,8 @@ def setInitialSettings(request, question_id):
     question.yesno2_enabled = yesno2
     question.budgetUI_enabled = BUI_slider
     question.ListUI_enabled =LUI
-    question.ui_number = twocol+onecol+slider+star+yesno+yesno2+BUI_slider+LUI
+    question.infiniteBudgetUI_enabled = IBUI
+    question.ui_number = twocol+onecol+slider+star+yesno+yesno2+BUI_slider+LUI+IBUI
     question.vote_rule = vr
     if openstring == "anon":
         question.open = 1
@@ -1759,6 +1767,7 @@ def duplicatePoll(request, question_id):
                             star_enabled=question.star_enabled,
                             budgetUI_enabled = question.budgetUI_enabled,
                             ListUI_enabled = question.ListUI_enabled,
+                            infiniteBudgetUI_enabled = question.infiniteBudgetUI_enabled,
                             yesno_enabled=question.yesno_enabled,
                             allowties=question.allowties,
                             vote_rule=question.vote_rule)
@@ -2642,6 +2651,7 @@ def newQuiz(request, pk):
                                 single_enabled=False,
                                 budgetUI_enabled = False,
                                 ListUI_enabled = False,
+                                infiniteBudgetUI_enabled = False,
                                 ui_number=True+True+True+True+True,
                                 vote_rule=1,
                                 creator_pref=1,
@@ -2678,6 +2688,7 @@ def takeAttendance(request, pk):
                                 single_enabled=True,
                                 budgetUI_enabled = False,
                                 ListUI_enabled = False,
+                                infiniteBudgetUI_enabled = False,
                                 ui_number=True+True+True+True+True,
                                 vote_rule=1,
                                 creator_pref=1,
