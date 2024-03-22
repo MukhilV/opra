@@ -1881,6 +1881,48 @@ class MechanismBordaMean():
         return winners
 
 
+import numpy as np
+class MechanismRoundRobinAllocation: 
+    def getPreferences(self):
+        preferences = np.array([["Cake", "Cookies", "Chocolate", "Honey", "Sweets"],
+                    ["Cake","Chocolate","Sweets","Cookies","Honey"],
+                    ["Sweets","Honey","Chocolate","Cookies","Cake"],])
+        return preferences
+
+    def getItems(self):
+        items = np.array(["Cake", "Cookies", "Chocolate", "Honey", "Sweets"])
+        return items
+
+
+    def roundRobin(self, items, preferences, N):
+        candidate = 0
+        allocated_items=[[] for i in range(N)]
+        count = 1
+
+        while(items.size != 0):
+
+            # get the most preferred item for the current candidate
+            item = preferences[candidate][0]
+
+            # allocate the item to the candidate
+            allocated_items[candidate].append(item)
+
+            # Remove the allocated item from remaing items
+            items = np.delete(items, np.where(items == item))
+
+            # print("Shape: ",np.shape(items))
+            new_pref = np.empty((N, np.shape(items)[0]), dtype=object)
+            # print("New_Pref:", new_pref)
+            for i in range(N):
+                new_pref[i] = np.delete(preferences[i], np.where(preferences[i] == item))
+
+            preferences = new_pref
+
+            candidate=(candidate+1)%N
+            count+=1
+            
+        return allocated_items
+
 class Node:
     def __init__(self, value=None):
         self.value = value

@@ -18,4 +18,28 @@
         {% endfor %}
         </ul>
     </div>
+
+
+    <br><br>
+    Preferences: 
+    {% for preference in preferences %}
+        <p>{{ preference }}</p>
+    {% endfor %}
+    <br><br>
+    
+    <table>
+        <tr>
+          <th>Allocation Mechanism</th>
+          <th>Allocated Items</th>
+        </tr>
+        <tr>
+            <td> Allocation - Round Robin </td>
+            <td>{{ round_robin_alloc_items }}</td>
+        </tr>
+        <tr>
+            <td> Allocation - Round Robin Actual</td>
+            <td>{{ allocated_items }}</td>
+        </tr>
+    </table>
+
 {% endblock %}

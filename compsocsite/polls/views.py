@@ -955,15 +955,53 @@ class PollInfoView(views.generic.DetailView):
         """
         return Question.objects.filter(pub_date__lte=timezone.now())
 
+import ast
 # view for results detail
 class AllocateResultsView(views.generic.DetailView):
     model = Question
     template_name = 'polls/allocate_results.html'
 
+    def get_context_data(self, **kwargs):
+
+        # round robin alloc test
+        ctx = super(AllocateResultsView, self).get_context_data(**kwargs)
+        round_robin = MechanismRoundRobinAllocation()
+        items, prefs = round_robin.getItems(), round_robin.getPreferences()
+        N,M = len(prefs),len(prefs[0])
+        allocated_items = round_robin.roundRobin(items, prefs, N)
+        ctx['round_robin_alloc_items'] = allocated_items
+
+        ########### actual round robin impl ################
+        if len(list(self.object.response_set.all())) == 0:
+            return ctx
+
+        response_set = self.object.response_set.all()
+        preferences = []
+        for response in response_set:
+            preferences.append(ast.literal_eval(response.resp_str))
+        for i in range(len(preferences)):
+            for j in range(len(preferences[i])):
+                preferences[i][j] = preferences[i][j][0]
+        
+        ctx['preferences'] = preferences
+
+        N,M = len(preferences),len(preferences[0])
+
+        items = ast.literal_eval(response_set[0].resp_str)
+        for i in range(len(items)):
+            items[i] = items[i][0]
+        # print(np.array(items), np.array(preferences))
+        
+        allocated_items = round_robin.roundRobin(np.array(items), np.array(preferences), N)
+        ctx['allocated_items'] = allocated_items
+
+        return ctx
+
 # view for submission confirmation
 class ConfirmationView(views.generic.DetailView):
     model = Question
     template_name = 'polls/confirmation.html'
+
 
 # view that displays vote results using various algorithms
 class VoteResultsView(views.generic.DetailView):
@@ -1026,6 +1064,7 @@ class VoteResultsView(views.generic.DetailView):
         ctx['wmg_edges'] = l[4]
         ctx['time'] = final_result.timestamp
         ctx['margin_len'] = len(margin_victory)
+
         #else:
             #all_responses = self.object.response_set.filter(active=1).order_by('-timestamp')
             #(latest_responses, previous_responses) = categorizeResponses(all_responses)
