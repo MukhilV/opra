@@ -956,6 +956,7 @@ class PollInfoView(views.generic.DetailView):
         return Question.objects.filter(pub_date__lte=timezone.now())
 
 import ast
+import json
 # view for results detail
 class AllocateResultsView(views.generic.DetailView):
     model = Question
@@ -963,39 +964,147 @@ class AllocateResultsView(views.generic.DetailView):
 
     def get_context_data(self, **kwargs):
 
-        # round robin alloc test
         ctx = super(AllocateResultsView, self).get_context_data(**kwargs)
         round_robin = MechanismRoundRobinAllocation()
-        items, prefs = round_robin.getItems(), round_robin.getPreferences()
-        N,M = len(prefs),len(prefs[0])
-        allocated_items = round_robin.roundRobin(items, prefs, N)
-        ctx['round_robin_alloc_items'] = allocated_items
 
-        ########### actual round robin impl ################
         if len(list(self.object.response_set.all())) == 0:
             return ctx
 
+        # Neccessary variables
         response_set = self.object.response_set.all()
+        pref_set = {}
         preferences = []
+        candidates={}
+        submitted_rankings={}
+
+        # extracting required information from response_set
+        # using dictionary instead of list to avoid duplicate preferences in response_set
         for response in response_set:
-            preferences.append(ast.literal_eval(response.resp_str))
+            candidates[response.user_id] = response.user.first_name 
+            pref_set[response.user_id] = ast.literal_eval(response.resp_str)
+            submitted_rankings[response.user_id]  = json.loads(response.behavior_data)["submitted_ranking"]
+
+        # sorting the set based on key values, as round robin is based on the user_id
+        pref_set = dict(sorted(pref_set.items()))
+        candidates = dict(sorted(candidates.items()))
+        submitted_rankings = dict(sorted(submitted_rankings.items()))
+
+        ctx['candidates'] = list(candidates.values())
+
+        # change the type of preferences so that it is compatible to 
+        # store and retrieve from list
+        for pref in pref_set.values(): preferences.append(pref)
         for i in range(len(preferences)):
             for j in range(len(preferences[i])):
                 preferences[i][j] = preferences[i][j][0]
-        
         ctx['preferences'] = preferences
 
+        # extract paramters to call round robin mechanism
         N,M = len(preferences),len(preferences[0])
-
         items = ast.literal_eval(response_set[0].resp_str)
         for i in range(len(items)):
             items[i] = items[i][0]
-        # print(np.array(items), np.array(preferences))
         
-        allocated_items = round_robin.roundRobin(np.array(items), np.array(preferences), N)
+        # call roundRobin mechanism
+        allocated_items, allocation_matrix = round_robin.roundRobin(np.array(items), np.array(preferences), N)
         ctx['allocated_items'] = allocated_items
+        ctx['allocation_matrix'] = allocation_matrix
+
+        
+        # Computing allocated items and Sum of values of allocated items for each candidate
+        sum_of_alloc_items_values = []
+        allocated_items_with_values =[]
+        for i in range(len(allocated_items)):
+            sum_of_values = 0
+            items_with_values = []
+            for j in range(len(allocated_items[i])):
+                submitted_rankings_values = list(submitted_rankings.values())[i]
+                for k in range(len(submitted_rankings_values)):
+                    if "score" in submitted_rankings_values[k][0]:
+                        if(submitted_rankings_values[k][0]["name"] == allocated_items[i][j]):
+                            sum_of_values+=submitted_rankings_values[k][0]["score"]
+                            items_with_values.append((submitted_rankings_values[k][0]["name"], submitted_rankings_values[k][0]["score"]))
+            sum_of_alloc_items_values.append(sum_of_values)
+            allocated_items_with_values.append(items_with_values)
+        ctx['sum_of_alloc_items_values'] = sum_of_alloc_items_values
+
+        # remove 'item' from 'itemOption' string
+        for i in range(len(items)):
+            items[i] = items[i][4:]
+        ctx['items'] = items
+
+
+        # computing preferences with values for each candidate
+        preferences_with_values = []
+        for i in range(len(submitted_rankings)):
+            curr_cand_preferences_with_values=[]
+            submitted_rankings_values = list(submitted_rankings.values())[i]
+            for j in range(len(submitted_rankings_values)):
+                if "score" in submitted_rankings_values[j][0]:
+                    curr_cand_preferences_with_values.append((submitted_rankings_values[j][0]["name"], submitted_rankings_values[j][0]["score"]))
+            preferences_with_values.append(curr_cand_preferences_with_values)
+
+        # compute envy matrix
+        envy_matrix = [[0 for j in range(len(preferences))] for i in range(len(preferences))]
+        for i in range(len(allocated_items_with_values)):
+            for j in range(len(allocated_items_with_values)):
+                if i!=j:
+                    envy_matrix[i][j] = getEnvy(preferences_with_values[i], allocated_items_with_values[i], preferences_with_values[j],allocated_items_with_values[j])
+                    if envy_matrix[i][j] < 0:
+                        ef1_val = getEF1(preferences_with_values[i], allocated_items_with_values[i], preferences_with_values[j],allocated_items_with_values[j])
+                        if ef1_val == "EF1":
+                            envy_matrix[i][j] = "EF1"
+                else:
+                    envy_matrix[i][j] = 0
+        ctx['envy_matrix'] = envy_matrix
+
+        # compute envy free upto 1 item matrix
+        ef1_matrix = [[0 for j in range(len(preferences))] for i in range(len(preferences))]
+        for i in range(len(allocated_items_with_values)):
+            for j in range(len(allocated_items_with_values)):
+                if i!=j:
+                    ef1_matrix[i][j] = getEF1(preferences_with_values[i], allocated_items_with_values[i], preferences_with_values[j],allocated_items_with_values[j])
+                else:
+                    ef1_matrix[i][j] = 0
+        ctx['ef1_matrix'] = ef1_matrix
 
         return ctx
+    
+
+def getEnvy(pref1, allocated_items1, pref2, allocated_items2):
+    sum1 = 0
+    for item,val in allocated_items1:
+        sum1+=val
+    
+    sum2 = 0
+    for item1, val1 in allocated_items1:
+        for item2, val2 in pref2:
+            if(item1 == item2):sum2+=val2
+        
+    return sum1-sum2
+
+def getEF1(pref1, allocated_items1, pref2, allocated_items2):
+    for i in range(len(allocated_items1)):
+        copy_allocated_items1 = allocated_items1.copy()
+        for j in range(len(allocated_items1)):
+            if copy_allocated_items1[j][0] == allocated_items1[i][0]:
+                copy_allocated_items1.remove(allocated_items1[i])
+                break
+
+        sum1 = 0
+        for item,val in copy_allocated_items1:
+            sum1+=val
+        
+        sum2 = 0
+        for item1, val1 in copy_allocated_items1:
+            for item2, val2 in pref2:
+                if(item1 == item2):sum2+=val2
+
+        EF1_val = sum1-sum2   
+        if EF1_val > 0:
+            return "EF1"
+    return "Not EF1"
+
 
 # view for submission confirmation
 class ConfirmationView(views.generic.DetailView):

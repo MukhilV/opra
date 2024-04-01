@@ -135,6 +135,7 @@
         const sum = Array.from(sliders).reduce(function(acc, slider) {
                 return acc + parseInt(slider.value);
             }, 0);
+        document.getElementById("submitbutton-slider-BUI").disabled = false;
         return sum;
     }
     
@@ -154,7 +155,6 @@
     var total = computeSliderTotal(sliders);
     if(total<=BUDGET) {
         document.getElementById("scoreSlideBUICurrTotal").innerHTML = total.toString();
-        document.getElementById("submitbutton-slider-BUI").disabled = false;
     } else if(document.getElementById("scoreSlideBUICurrTotal").innerHTML<=BUDGET && total>=BUDGET){
         document.getElementById("scoreSlideBUICurrTotal").innerHTML = BUDGET.toString();
     }

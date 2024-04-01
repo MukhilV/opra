@@ -3,7 +3,7 @@
 {% load static%}
 
 {% block content %}
-    <div class="col-md-12">
+<div class="col-md-12">
         <h1>{{ question.question_text }}</h1>
 
         <ul>
@@ -23,7 +23,8 @@
 
 
     <br><br>
-    Preferences: 
+    <div class="col-md-12">
+    Bundles: 
     <div class="panel-body">
         <div class="table-responsive">
             <table class="table">
@@ -32,11 +33,11 @@
                     <th>Bundles</th>
                     <th>Value</th>
                 </tr>
-                {% for preference in preferences %}
+                {% for items in allocated_items %}
                 <tr>
                     <td>{{ candidates|index:forloop.counter0 }}</td>
-                    <td>{{ preference }}</td>
-                    <td>{{ sum_of_pref_values|index:forloop.counter0 }}</td>
+                    <td>{{ items }}</td>
+                    <td>{{ sum_of_alloc_items_values|index:forloop.counter0 }}</td>
                 </tr>
                 {% endfor %}
                 
@@ -67,5 +68,53 @@
             </table>
         </div>
     </div>
+
+
+    <br><br>
+    Envy matrix: 
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table class="table">
+                <tr>
+                    <th>Candidates</th>
+                    {% for candidate in candidates %}
+                        <th>{{ candidate }}</th>
+                    {% endfor %}
+                </tr>
+                {% for row in envy_matrix %}
+                <tr>
+                    <td>{{ candidates|index:forloop.counter0 }}</td>
+                    {% for entry in row %}
+                    <td>{{ entry }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <br><br>
+    EF1 matrix: 
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table class="table">
+                <tr>
+                    <th>Candidates</th>
+                    {% for candidate in candidates %}
+                        <th>{{ candidate }}</th>
+                    {% endfor %}
+                </tr>
+                {% for row in ef1_matrix %}
+                <tr>
+                    <td>{{ candidates|index:forloop.counter0 }}</td>
+                    {% for entry in row %}
+                    <td>{{ entry }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
