@@ -1883,21 +1883,41 @@ class MechanismBordaMean():
 
 import numpy as np
 class MechanismRoundRobinAllocation: 
+
+    # this function is to mock the data of round robin allocation
     def getPreferences(self):
         preferences = np.array([["Cake", "Cookies", "Chocolate", "Honey", "Sweets"],
                     ["Cake","Chocolate","Sweets","Cookies","Honey"],
                     ["Sweets","Honey","Chocolate","Cookies","Cake"],])
         return preferences
 
+    # this function is to mock the data of round robin allocation
     def getItems(self):
         items = np.array(["Cake", "Cookies", "Chocolate", "Honey", "Sweets"])
         return items
 
+    '''
+    The function takes in preferences of various items for different candidates.
+    Implements the round robin algorithm to allocate the items to candidates. 
+    The candidates are selected based on their user_id
+    Sorting candidates based on user_id is done before passing it as input to this function
+    The function returns the allocation_matrix
 
+    input:
+        items: np arrays of items
+        preferences: list of preferences 
+        N: number of preferences (one preference per candidate)
+
+    output:
+        allocated_items: list of allocated items
+        allocation_matrix: N x num_items matrix, where Aij says whether ith candidate allocated item j
+    
+    '''
     def roundRobin(self, items, preferences, N):
         candidate = 0
         allocated_items=[[] for i in range(N)]
         count = 1
+        items_copied = items
 
         while(items.size != 0):
 
@@ -1912,7 +1932,7 @@ class MechanismRoundRobinAllocation:
 
             # print("Shape: ",np.shape(items))
             new_pref = np.empty((N, np.shape(items)[0]), dtype=object)
-            # print("New_Pref:", new_pref)
+
             for i in range(N):
                 new_pref[i] = np.delete(preferences[i], np.where(preferences[i] == item))
 
@@ -1920,8 +1940,19 @@ class MechanismRoundRobinAllocation:
 
             candidate=(candidate+1)%N
             count+=1
+
+        # Allocation matrix
+        n_items = len(items_copied)
+        allocation_matrix = [[0 for j in range(n_items)] for i in range(N)]
+        for i in range(len(allocated_items)):
+            for j in range(len(allocated_items[i])):
+                index = np.where(items_copied == allocated_items[i][j])[0][0]
+                allocation_matrix[i][index] = 1
+
+        # allocation_matrix.insert(0, items_copied.tolist())
+        print(*allocation_matrix)
             
-        return allocated_items
+        return allocated_items, allocation_matrix
 
 class Node:
     def __init__(self, value=None):

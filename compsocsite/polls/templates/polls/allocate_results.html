@@ -1,4 +1,6 @@
 {% extends 'polls/base.html' %}
+{% load poll_extra %}
+{% load static%}
 
 {% block content %}
     <div class="col-md-12">
@@ -22,24 +24,48 @@
 
     <br><br>
     Preferences: 
-    {% for preference in preferences %}
-        <p>{{ preference }}</p>
-    {% endfor %}
-    <br><br>
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table class="table">
+                <tr>
+                    <th>Candidates</th>
+                    <th>Bundles</th>
+                    <th>Value</th>
+                </tr>
+                {% for preference in preferences %}
+                <tr>
+                    <td>{{ candidates|index:forloop.counter0 }}</td>
+                    <td>{{ preference }}</td>
+                    <td>{{ sum_of_pref_values|index:forloop.counter0 }}</td>
+                </tr>
+                {% endfor %}
+                
+            </table>
+        </div>
+    </div>
     
-    <table>
-        <tr>
-          <th>Allocation Mechanism</th>
-          <th>Allocated Items</th>
-        </tr>
-        <tr>
-            <td> Allocation - Round Robin </td>
-            <td>{{ round_robin_alloc_items }}</td>
-        </tr>
-        <tr>
-            <td> Allocation - Round Robin Actual</td>
-            <td>{{ allocated_items }}</td>
-        </tr>
-    </table>
+
+    <br><br>
+    Allocation: 
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table class="table">
+                <tr>
+                    <th>Candidates</th>
+                    {% for item in items %}
+                        <th>{{ item }}</th>
+                    {% endfor %}
+                </tr>
+                {% for row in allocation_matrix %}
+                <tr>
+                    <td>{{ candidates|index:forloop.counter0 }}</td>
+                    {% for entry in row %}
+                    <td>{{ entry }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
 
 {% endblock %}

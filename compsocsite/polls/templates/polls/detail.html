@@ -121,7 +121,8 @@
                     	{{ question.question_text }} 
               
 						{% if currentSelection %}
-                            <a href="{% url 'polls:voteresults' question.id %}" class ="btn btn-dark pull-right" role="button" target="_blank" >Current Winners</a>
+                            <a href="{% url 'polls:voteresults' question.id %}" class ="btn btn-dark pull-right" role="button" target="_blank" >Poll Winners</a>
+                            <a href="{% url 'polls:allocate_results' question.id %}" class ="btn btn-dark pull-right" role="button" target="_blank" style="margin-right: 5px;">Allocation Results</a>
                     {% endif %}
 					</h4>
 					
