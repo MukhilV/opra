@@ -244,7 +244,11 @@ function dictSlideStar(str){
 		}else if(str == 'list_ui_pref_box'){ 
 			var score = parseFloat(this.value); 
 			item_type = ".list_ui_pref_box";
-			type = $( this ).attr('type');
+			type = $( this ).attr('data-option');
+		}else if(str == 'infinite_budget_ui_pref_box'){ 
+			var score = parseFloat(this.value); 
+			item_type = ".infinite_budget_ui_pref_box";
+			type = $( this ).attr('data-option');
 		}
 		else{ return false; }
 		var bool = 0;
@@ -252,7 +256,11 @@ function dictSlideStar(str){
 		$.each(values, function( index, value ){
 			if(value < score){
 				var temp = {};
-				temp["name"] = $(item_type + "[type='" + type + "']").attr('id');
+				if(item_type === ".list_ui_pref_box" || item_type === ".infinite_budget_ui_pref_box"){
+					temp["name"] = $(item_type + "[data-option='" + type + "']").attr('id');
+				} else {
+					temp["name"] = $(item_type + "[type='" + type + "']").attr('id');
+				}
 				temp["score"] = score;
 				temp["ranked"] = 0;
 				values.splice(index, 0, score);
@@ -261,7 +269,11 @@ function dictSlideStar(str){
 				return false;
 			}else if(value == score){
 				var temp = {};
-				temp["name"] = $(item_type + "[type='" + type + "']").attr('id');
+				if(item_type === ".list_ui_pref_box" || item_type === ".infinite_budget_ui_pref_box"){
+					temp["name"] = $(item_type + "[data-option='" + type + "']").attr('id');
+				} else {
+					temp["name"] = $(item_type + "[type='" + type + "']").attr('id');
+				}
 				temp["score"] = score;
 				temp["ranked"] = 0;
 				arr[index].push(temp);
@@ -271,7 +283,11 @@ function dictSlideStar(str){
 		});
 		if(bool == 0){ 
 			var temp = {};
-			temp["name"] = $(item_type + "[type='" + type + "']").attr('id');
+			if(item_type === ".list_ui_pref_box" || item_type === ".infinite_budget_ui_pref_box"){
+				temp["name"] = $(item_type + "[data-option='" + type + "']").attr('id');
+			} else {
+				temp["name"] = $(item_type + "[type='" + type + "']").attr('id');
+			}
 			temp["score"] = score;
 			temp["ranked"] = 0;
 			values.push(score); 

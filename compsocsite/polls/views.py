@@ -976,6 +976,7 @@ class AllocateResultsView(views.generic.DetailView):
         preferences = []
         candidates={}
         submitted_rankings={}
+        items = ast.literal_eval(response_set[0].resp_str) # change this
 
         # extracting required information from response_set
         # using dictionary instead of list to avoid duplicate preferences in response_set
@@ -991,9 +992,30 @@ class AllocateResultsView(views.generic.DetailView):
 
         ctx['candidates'] = list(candidates.values())
 
+        #transform submitted rankings
+        for entry in submitted_rankings.items():
+            key,values = entry
+            if(len(values) < len(items)):
+                temp = []
+                for j in range(len(values)):
+                    for entry in values[j]:
+                        temp.append([entry])
+                values= temp
+                submitted_rankings[key] = values
+
         # change the type of preferences so that it is compatible to 
         # store and retrieve from list
         for pref in pref_set.values(): preferences.append(pref)
+
+        # transform Preferences
+        for i in range(len(preferences)):
+            if(len(preferences[i]) < len(items)):
+                temp = []
+                for j in range(len(preferences[i])):
+                    for entry in preferences[i][j]:
+                        temp.append([entry])
+                preferences[i]= temp
+
         for i in range(len(preferences)):
             for j in range(len(preferences[i])):
                 preferences[i][j] = preferences[i][j][0]
@@ -1001,7 +1023,6 @@ class AllocateResultsView(views.generic.DetailView):
 
         # extract paramters to call round robin mechanism
         N,M = len(preferences),len(preferences[0])
-        items = ast.literal_eval(response_set[0].resp_str)
         for i in range(len(items)):
             items[i] = items[i][0]
         

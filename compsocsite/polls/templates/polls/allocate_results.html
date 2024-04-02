@@ -74,7 +74,7 @@
     Envy matrix: 
     <div class="panel-body">
         <div class="table-responsive">
-            <table class="table">
+            <table class="table" id = "envy_matrix">
                 <tr>
                     <th>Candidates</th>
                     {% for candidate in candidates %}
@@ -116,5 +116,32 @@
         </div>
     </div>
 </div>
+
+<script>
+
+$(window).load(function(){
+
+var table = document.getElementById("envy_matrix");
+
+for (var i = 0; i < table.rows.length; i++) {
+    for (var j = 0; j < table.rows[i].cells.length; j++) {
+        var cellValue = table.rows[i].cells[j].innerText;
+        if (!isNaN(parseFloat(cellValue)) && isFinite(cellValue)) {
+            if (parseFloat(cellValue) > 0) {
+                table.rows[i].cells[j].style.backgroundColor = "#00cc00";
+            } else if (parseFloat(cellValue) < 0) {
+                table.rows[i].cells[j].style.backgroundColor = "#ff3333";
+            }
+        } else if (cellValue === "EF1") {
+            // Cell value is "EF1"
+            table.rows[i].cells[j].style.backgroundColor = "#ffff4d";
+        }
+    }
+}
+
+
+});
+
+</script>
 
 {% endblock %}

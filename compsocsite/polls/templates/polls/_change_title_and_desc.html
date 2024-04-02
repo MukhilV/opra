@@ -29,15 +29,18 @@
 	<fieldset class="form-group">
         <label>Allowed Interfaces</label>
         <div>
+			{% if question.question_type == 1 %}
 			<label class="checkbox-inline"><input id="twocol_checkbox" type="checkbox" value="twocol" name="ui" {% if question.twocol_enabled %} checked {% endif %}>Two Column</label>
 			<label class="checkbox-inline"><input id="onecol_checkbox" type="checkbox" value="onecol" name="ui" {% if question.onecol_enabled %} checked {% endif %}>One Column</label>
 			<label class="checkbox-inline"><input id="slider_checkbox" type="checkbox" value="slider" name="ui" {% if question.slider_enabled %} checked {% endif %}>Slider</label>
 			<label class="checkbox-inline"><input id="star_checkbox" type="checkbox" value="star" name="ui" {% if question.star_enabled %} checked {% endif %}>Star Rating</label>
 			<label class="checkbox-inline"><input id="yesno_checkbox" type="checkbox" value="yesno" name="ui" {% if question.yesno_enabled %} checked {% endif %}>Yes/No</label>
             <label class="checkbox-inline"><input id="yesno2_checkbox" type="checkbox" value="yesno2" name="ui" {% if question.yesno2_enabled %} checked {% endif %}>Yes/No Grid</label>
+			{% elif question.question_type == 2 %}
 			<label class="checkbox-inline"><input id="budgetUI_slider_checkbox" type="checkbox" value="BUI_slider" name="ui" {% if question.budgetUI_enabled %} checked {% endif %}>Budget UI</label>
 			<label class="checkbox-inline"><input id="listUI_checkbox" type="checkbox" value="LUI" name="ui" {% if question.ListUI_enabled %} checked {% endif %}>List UI</label>
 			<label class="checkbox-inline"><input id="listUI_checkbox" type="checkbox" value="IBUI" name="ui" {% if question.infiniteBudgetUI_enabled %} checked {% endif %}>Infinite Budget UI</label>
+			{% endif %}
 		</div>
     </fieldset>
     <br/>
