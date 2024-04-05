@@ -976,7 +976,15 @@ class AllocateResultsView(views.generic.DetailView):
         preferences = []
         candidates={}
         submitted_rankings={}
-        items = ast.literal_eval(response_set[0].resp_str) # change this
+        # items = ast.literal_eval(response_set[0].resp_str) # change this
+        items = [] 
+        items_obj=[]
+        for item in list(self.object.item_set.all()):
+            items.append("item"+item.item_text)
+            items_obj.append(item)
+        # print()
+
+        ctx['items_obj'] = items_obj
 
         # extracting required information from response_set
         # using dictionary instead of list to avoid duplicate preferences in response_set
@@ -1023,8 +1031,8 @@ class AllocateResultsView(views.generic.DetailView):
 
         # extract paramters to call round robin mechanism
         N,M = len(preferences),len(preferences[0])
-        for i in range(len(items)):
-            items[i] = items[i][0]
+        # for i in range(len(items)):
+        #     items[i] = items[i][0]
         
         # call roundRobin mechanism
         allocated_items, allocation_matrix = round_robin.roundRobin(np.array(items), np.array(preferences), N)
@@ -1092,37 +1100,35 @@ class AllocateResultsView(views.generic.DetailView):
         return ctx
     
 
-def getEnvy(pref1, allocated_items1, pref2, allocated_items2):
+def getEnvy(pref1, allocated_items1, pref2, allocated_items2):  
     sum1 = 0
-    for item,val in allocated_items1:
-        sum1+=val
-    
+    for item1, val1 in allocated_items2:
+        for item2, val2 in pref1:
+            if(item1 == item2):sum1+=val2
+
     sum2 = 0
-    for item1, val1 in allocated_items1:
-        for item2, val2 in pref2:
-            if(item1 == item2):sum2+=val2
+    for item,val in allocated_items2:
+        sum2+=val
         
-    return sum1-sum2
+    return sum2-sum1
 
 def getEF1(pref1, allocated_items1, pref2, allocated_items2):
-    for i in range(len(allocated_items1)):
-        copy_allocated_items1 = allocated_items1.copy()
-        for j in range(len(allocated_items1)):
-            if copy_allocated_items1[j][0] == allocated_items1[i][0]:
-                copy_allocated_items1.remove(allocated_items1[i])
-                break
+    for i in range(len(allocated_items2)):
+
+        copy_allocated_items2 = allocated_items2.copy()
+        copy_allocated_items2.remove(allocated_items2[i])
 
         sum1 = 0
-        for item,val in copy_allocated_items1:
-            sum1+=val
-        
-        sum2 = 0
-        for item1, val1 in copy_allocated_items1:
-            for item2, val2 in pref2:
-                if(item1 == item2):sum2+=val2
+        for item1, val1 in copy_allocated_items2:
+            for item2, val2 in pref1:
+                if(item1 == item2):sum1+=val2
 
-        EF1_val = sum1-sum2   
-        if EF1_val > 0:
+        sum2 = 0
+        for item,val in copy_allocated_items2:
+            sum2+=val
+
+        EF1_val = sum2-sum1   
+        if EF1_val >= 0:
             return "EF1"
     return "Not EF1"
 

@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="col-md-12">
-        <h1>{{ question.question_text }}</h1>
+        <h1 style="margin-top: 40px; margin-bottom: 25px;">{{ question.question_text }}</h1>
 
         <ul>
         {% for response in question.response_set.all %}
@@ -19,9 +19,9 @@
             {% endif %}
         {% endfor %}
         </ul>
-    </div>
 
 
+    {% if false %}
     <br><br>
     <div class="col-md-12">
     Bundles: 
@@ -44,55 +44,77 @@
             </table>
         </div>
     </div>
+    {% endif %}
     
 
+    <div class="panel panel-default" style="margin: 20px;">
+        <div class="panel-heading">Allocation Results</div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <th></th>
+                        {% for item in items_obj %}
+                            <th>
+                                <div style="display: flex; padding-left: 25%; padding-right: 25%;">
+                                    {% if item.image %}
+                                    <img class="item" src='{{ item.image.url }}'/>
+                                    {% endif %}
+                                    <div style="margin: auto;">{{ item.item_text }}</div>
+                                </div>
+                            </th>
+                        {% endfor %}
+                    </tr>
+                    {% for row in allocation_matrix %}
+                    <tr>
+                        <td>{{ candidates|index:forloop.counter0 }}</td>
+                        {% for entry in row %}
+                        <td style="text-align: center;">{{ entry }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+
+
     <br><br>
-    Allocation: 
-    <div class="panel-body">
-        <div class="table-responsive">
-            <table class="table">
-                <tr>
-                    <th>Candidates</th>
-                    {% for item in items %}
-                        <th>{{ item }}</th>
+    <div class="panel panel-default" style="margin: 20px;">
+        <div class="panel-heading"> Envy matrix upto EF1 </div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table" id = "envy_matrix" style="border-spacing: 3px; border-collapse: separate;">
+                    <tr>
+                        <th></th>
+                        {% for candidate in candidates %}
+                            <th style="text-align: center;">{{ candidate }}</th>
+                        {% endfor %}
+                    </tr>
+                    {% for row in envy_matrix %}
+                    <tr>
+                        <td>{{ candidates|index:forloop.counter0 }}</td>
+                        {% for entry in row %}
+                        <td style="text-align: center;">{{ entry }}</td>
+                        {% endfor %}
+                    </tr>
                     {% endfor %}
-                </tr>
-                {% for row in allocation_matrix %}
-                <tr>
-                    <td>{{ candidates|index:forloop.counter0 }}</td>
-                    {% for entry in row %}
-                    <td>{{ entry }}</td>
-                    {% endfor %}
-                </tr>
-                {% endfor %}
-            </table>
+                    <tr>
+                        <td>Dummy values</td>
+                        <td style="text-align: center;">-5</td>
+                        <td style="text-align: center;">10</td>
+                        <td style="text-align: center;">EF1</td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
 
 
-    <br><br>
-    Envy matrix: 
-    <div class="panel-body">
-        <div class="table-responsive">
-            <table class="table" id = "envy_matrix">
-                <tr>
-                    <th>Candidates</th>
-                    {% for candidate in candidates %}
-                        <th>{{ candidate }}</th>
-                    {% endfor %}
-                </tr>
-                {% for row in envy_matrix %}
-                <tr>
-                    <td>{{ candidates|index:forloop.counter0 }}</td>
-                    {% for entry in row %}
-                    <td>{{ entry }}</td>
-                    {% endfor %}
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-    </div>
-
+   
+    {% if false %}
     <br><br>
     EF1 matrix: 
     <div class="panel-body">
@@ -115,6 +137,11 @@
             </table>
         </div>
     </div>
+    {% endif %}
+
+    <br><br><br><br>
+  
+</div>
 </div>
 
 <script>
@@ -128,13 +155,18 @@ for (var i = 0; i < table.rows.length; i++) {
         var cellValue = table.rows[i].cells[j].innerText;
         if (!isNaN(parseFloat(cellValue)) && isFinite(cellValue)) {
             if (parseFloat(cellValue) > 0) {
-                table.rows[i].cells[j].style.backgroundColor = "#00cc00";
+                // green
+                table.rows[i].cells[j].style.backgroundColor = "#66B032";
             } else if (parseFloat(cellValue) < 0) {
-                table.rows[i].cells[j].style.backgroundColor = "#ff3333";
+                // red
+                table.rows[i].cells[j].style.backgroundColor = "#FE8176";
+            }else if (parseFloat(cellValue) === 0) {
+                // grey
+                table.rows[i].cells[j].style.backgroundColor = "#C4CCA7";
             }
         } else if (cellValue === "EF1") {
-            // Cell value is "EF1"
-            table.rows[i].cells[j].style.backgroundColor = "#ffff4d";
+            // Cell value is "EF1" // yellow
+            table.rows[i].cells[j].style.backgroundColor = "#FBA90A";
         }
     }
 }
