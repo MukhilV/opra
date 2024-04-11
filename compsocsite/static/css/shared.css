@@ -167,6 +167,19 @@ button:hover .greencolor {
     background: rgb(68, 157, 68,0.9);
 }
 
+.submit_button{
+    background-color: #04AA6D;
+    border: none;
+    color: white;
+    padding: 10px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 17px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
 .submit-button-mobile {
     border: none;
     float: right;

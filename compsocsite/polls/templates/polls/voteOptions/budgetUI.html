@@ -5,7 +5,7 @@
 
 <div id="budgetUI" {% if request.flavour == "mobile" %}style="padding:0.4em;" {% endif %}>
     <!-- This is the voting form. Submit results through a voting function -->
-    <form id="budget" {% if request.user.username == "" %} action="{% url 'polls:anonymousvote' question.id %}" {% else %} action="{% url 'polls:vote' question.id %}" {% endif %} method="post">
+    <form id="budget" {% if request.user.username == "" %} action="{% url 'polls:anonymousvote' question.id %}" {% else %} action="{% url 'polls:vote' question.id %}" {% endif %} method="post" autocomplete="off">
 
         <div class="row">
             {% csrf_token %}
@@ -32,9 +32,11 @@
                     <div class="panel-heading" >
                         <h4>Your preferences:
                             {% if not request.flavour == "mobile" %}
-                            <button id="submitbutton-slider-BUI" type="submit" onclick="return checkSliderSum();" class="submitbutton btn btn-success" style="">
+                            <!-- <button id="submitbutton-slider-BUI" type="submit" onclick="return checkSliderSum();" class="submitbutton btn btn-success">
                                 Submit
-                            </button>
+                            </button> -->
+                            <button id ="submitbutton-slider-BUI" type="submit" onclick="return checkSliderSum();" 
+                            class = "submit_button"> Submit </button>
                             <button id="submitting-slider-BUI" type="button" class="submitting btn btn-default" style="visibility:hidden;position:absolute;z-index:1;">
                                 Submitting...
                             </button>
@@ -101,6 +103,12 @@
     </form>
 </div>
 
+<style>
+
+
+
+</style>
+
 <script>
         const BUDGET = 100;
         document.addEventListener("DOMContentLoaded", function() {
@@ -135,7 +143,7 @@
         const sum = Array.from(sliders).reduce(function(acc, slider) {
                 return acc + parseInt(slider.value);
             }, 0);
-        document.getElementById("submitbutton-slider-BUI").disabled = false;
+        // document.getElementById("submitbutton-slider-BUI").disabled = false;
         return sum;
     }
     
