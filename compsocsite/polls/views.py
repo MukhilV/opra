@@ -83,7 +83,6 @@ class RegularPollsView(views.generic.ListView):
         ctx['polls_created'] = list(Question.objects.filter(question_owner=self.request.user,
                                                        m_poll=False).order_by('-pub_date'))
         ctx['active_polls'] = list(Question.objects.order_by('-pub_date'))
-        print("ctx['active_polls']", active_polls)
         # get all polls current user participates in and filter out those she is the owner of
         polls = self.request.user.poll_participated.filter(m_poll=False)
         polls = polls.exclude(question_owner=self.request.user).order_by('-pub_date')
@@ -160,7 +159,6 @@ class MainView(views.generic.ListView):
         ctx['alloc_methods'] = getAllocMethods()
         ctx['view_preferences'] = getViewPreferences()
         ctx['active_polls'] = active_polls
-        print("Active polls: ",active_polls)
 
         return ctx
 
@@ -1057,7 +1055,7 @@ class AllocateResultsView(views.generic.DetailView):
                     if "score" in submitted_rankings_values[k][0]:
                         if(submitted_rankings_values[k][0]["name"] == allocated_items[i][j]):
                             sum_of_values+=submitted_rankings_values[k][0]["score"]
-                            items_with_values.append((submitted_rankings_values[k][0]["name"], submitted_rankings_values[k][0]["score"]))
+                            items_with_values.append((submitted_rankings_values[k][0]["name"][4:], submitted_rankings_values[k][0]["score"]))
             sum_of_alloc_items_values.append(sum_of_values)
             allocated_items_with_values.append(items_with_values)
         ctx['sum_of_alloc_items_values'] = sum_of_alloc_items_values
@@ -1119,16 +1117,19 @@ class AllocateResultsView(views.generic.DetailView):
     
 
 def getEnvy(pref1, allocated_items1, pref2, allocated_items2):  
+
+    # cand 1 sum
     sum1 = 0
+    for item,val in allocated_items1:
+        sum1+=val
+
+    # cand 2 sum with cand 1 preferences
+    sum2 = 0
     for item1, val1 in allocated_items2:
         for item2, val2 in pref1:
-            if(item1 == item2):sum1+=val2
-
-    sum2 = 0
-    for item,val in allocated_items2:
-        sum2+=val
+            if(item1 == item2):sum2+=val2
         
-    return sum2-sum1
+    return sum1-sum2
 
 def getEF1(pref1, allocated_items1, pref2, allocated_items2):
     for i in range(len(allocated_items2)):
@@ -1136,16 +1137,18 @@ def getEF1(pref1, allocated_items1, pref2, allocated_items2):
         copy_allocated_items2 = allocated_items2.copy()
         copy_allocated_items2.remove(allocated_items2[i])
 
+        # cand 1 sum
         sum1 = 0
+        for item,val in allocated_items1:
+            sum1+=val
+
+        # cand 2 sum with cand 1 preferences
+        sum2 = 0
         for item1, val1 in copy_allocated_items2:
             for item2, val2 in pref1:
-                if(item1 == item2):sum1+=val2
+                if(item1 == item2):sum2+=val2
 
-        sum2 = 0
-        for item,val in copy_allocated_items2:
-            sum2+=val
-
-        EF1_val = sum2-sum1   
+        EF1_val = sum1-sum2   
         if EF1_val >= 0:
             return "EF1"
     return "Not EF1"
