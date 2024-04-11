@@ -971,6 +971,7 @@ class AllocateResultsView(views.generic.DetailView):
             return ctx
 
         # Neccessary variables
+        current_user_id = self.request.user.id;
         response_set = self.object.response_set.all()
         pref_set = {}
         preferences = []
@@ -998,6 +999,7 @@ class AllocateResultsView(views.generic.DetailView):
         candidates = dict(sorted(candidates.items()))
         submitted_rankings = dict(sorted(submitted_rankings.items()))
 
+        # ctx['curr_user_allocated_bundle']
         ctx['candidates'] = list(candidates.values())
 
         #transform submitted rankings
@@ -1036,9 +1038,12 @@ class AllocateResultsView(views.generic.DetailView):
         
         # call roundRobin mechanism
         allocated_items, allocation_matrix = round_robin.roundRobin(np.array(items), np.array(preferences), N)
-        ctx['allocated_items'] = allocated_items
+        allocated_items_transformed = [["" for j in range(len(allocated_items[i]))] for i in range(len(allocated_items))]
+        for i in range(len(allocated_items)):
+            for j in range(len(allocated_items[i])):
+                allocated_items_transformed[i][j] = allocated_items[i][j][4:]
+        ctx['allocated_items'] = allocated_items_transformed
         ctx['allocation_matrix'] = allocation_matrix
-
         
         # Computing allocated items and Sum of values of allocated items for each candidate
         sum_of_alloc_items_values = []
@@ -1057,6 +1062,11 @@ class AllocateResultsView(views.generic.DetailView):
             allocated_items_with_values.append(items_with_values)
         ctx['sum_of_alloc_items_values'] = sum_of_alloc_items_values
 
+        ctx['current_user_name'] = candidates[current_user_id];
+        curr_user_index = sorted(list(candidates.keys())).index(current_user_id)
+        ctx['curr_user_bundle'] = allocated_items_transformed[curr_user_index]
+        ctx['curr_user_bundle_sum'] = sum_of_alloc_items_values[curr_user_index]
+
         # remove 'item' from 'itemOption' string
         for i in range(len(items)):
             items[i] = items[i][4:]
@@ -1070,8 +1080,16 @@ class AllocateResultsView(views.generic.DetailView):
             submitted_rankings_values = list(submitted_rankings.values())[i]
             for j in range(len(submitted_rankings_values)):
                 if "score" in submitted_rankings_values[j][0]:
-                    curr_cand_preferences_with_values.append((submitted_rankings_values[j][0]["name"], submitted_rankings_values[j][0]["score"]))
+                    curr_cand_preferences_with_values.append([submitted_rankings_values[j][0]["name"][4:], submitted_rankings_values[j][0]["score"]])
             preferences_with_values.append(curr_cand_preferences_with_values)
+
+        curr_preferences_with_values = preferences_with_values[curr_user_index];
+        zipped = list(zip(*curr_preferences_with_values))
+        curr_user_pref = zipped[0]
+        curr_user_pref_values = zipped[1]
+
+        ctx['curr_user_pref'] = curr_user_pref
+        ctx['curr_user_pref_values'] = curr_user_pref_values
 
         # compute envy matrix
         envy_matrix = [[0 for j in range(len(preferences))] for i in range(len(preferences))]

@@ -119,12 +119,16 @@
                 <div class="col-md-10" {% if request.flavour == "mobile" %} style="width:100%;" {% endif %}>
                     <h4 {% if request.flavour == "mobile" %} style="width:70%;display:inline;" {% endif %}><span class="caret" style="color:#377BB5;"></span> 
                     	{{ question.question_text }} 
-              
-						{% if currentSelection %}
-                            <a href="{% url 'polls:voteresults' question.id %}" class ="btn btn-dark pull-right" role="button" target="_blank" >Poll Winners</a>
+                            <!-- if currentSelection and question.question_type == 1 -->
+                            {% if question.question_type == 1 %}
+                                <a href="{% url 'polls:voteresults' question.id %}" class ="btn btn-dark pull-right" role="button" target="_blank" >Poll Winners</a>
+                            {% endif %}
+                        
+                        {% if question.question_type == 2%}
                             <a href="{% url 'polls:allocate_results' question.id %}" class ="btn btn-dark pull-right" role="button" target="_blank" style="margin-right: 5px;">Allocation Results</a>
-                    {% endif %}
-					</h4>
+                        {% endif %}
+                        
+                        </h4>
 					
                 </div>
             </div> </a>

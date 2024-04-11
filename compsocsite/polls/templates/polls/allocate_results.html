@@ -45,8 +45,55 @@
         </div>
     </div>
     {% endif %}
+
+    <div class="panel panel-default" style="margin: 20px;">
+        <div class="panel-heading">My Preference:</div> 
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <th>Item</th>
+                        <th>Value</th>
+                    </tr>
+
+                    {% for item in curr_user_pref %}
+                    <tr>
+                        <td>{{ item }}</td>
+                        <td>{{ curr_user_pref_values|index:forloop.counter0 }}</td>
+                    </tr>
+                    {% endfor %}
+                    
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <br><br>
+    <div class="panel panel-default" style="margin: 20px;">
+        <div class="panel-heading">Allocated Items Bundle:</div> 
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Bundle</th>
+                        <th>Value</th>
+                    </tr>
+
+                    <tr>
+                        <td>{{ current_user_name }}</td>
+                        <td>{{ curr_user_bundle }}</td>
+                        <td>{{ curr_user_bundle_sum }}</td>
+                    </tr>
+                    
+                </table>
+            </div>
+        </div>
+    </div>
     
 
+    
+    <br><br>
     <div class="panel panel-default" style="margin: 20px;">
         <div class="panel-heading">Allocation Results</div>
         <div class="panel-body">
