@@ -157,12 +157,19 @@ td,th{
                     <tr>
                         <th></th>
                         {% for candidate in candidates %}
-                            <th style="text-align: center;">{{ candidate }}</th>
+                            <th style="text-align: center;">
+                                {{ candidate }}
+                            </th>
                         {% endfor %}
                     </tr>
                     {% for row in envy_matrix %}
                     <tr>
-                        <td>{{ candidates|index:forloop.counter0 }}</td>
+                        <td>
+                            <div>  
+                            <img src = "{{ profile_pics|index:forloop.counter0 }}" style="height: 40px; width: 40px;"></img>
+                            {{ candidates|index:forloop.counter0 }}
+                            </div>
+                        </td>
                         {% for envy,sum2 in row %}
                         <td style="text-align: center;">
                             <div style="height: 100%; width: 100%;" class="table-data" >
@@ -251,7 +258,7 @@ var table = document.getElementById("envy_matrix");
 for (var i = 0; i < table.rows.length; i++) {
     for (var j = 0; j < table.rows[i].cells.length; j++) {
         // var cellValue = table.rows[i].cells[j].innerText;
-        var cellValue = table.rows[i].cells[j]?.children[0]?.children[0].value;
+        var cellValue = table.rows[i].cells[j]?.children[0]?.children[0]?.value;
         if (!isNaN(parseFloat(cellValue)) && isFinite(cellValue)) {
             if (parseFloat(cellValue) > 0) {
                 // green

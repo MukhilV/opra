@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 class UserProfile(models.Model):
     # This line is required. Links UserProfile to a User model instance.
     user = models.OneToOneField(User,on_delete=models.CASCADE,)
+    profile_pic = models.ImageField(upload_to='static/img/profile_pics', blank=True, null=True)
     time_creation = models.DateTimeField()
     displayPref = models.IntegerField(default=1)
     emailInvite = models.BooleanField(default=False)

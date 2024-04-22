@@ -17,8 +17,18 @@
         <div class="panel panel-default">
             <div class="panel-heading">Profile Settings</div>
             <div class="panel-body">
-            <form method="post" action="{% url 'appauth:updateSettings' %}">
+            <form method="post" action="{% url 'appauth:updateSettings' %}" enctype="multipart/form-data">
                 {% csrf_token %}
+                
+                <div class="col-xs-1">
+                <img src='/{{ request.user.userprofile.profile_pic  }}' width="40px"/>
+                </div>
+               
+                <fieldset>
+                    <label for="profile_pic">Profile Picture</label>
+                    <label for="profile_pic" class="btn btn-default"><span class="glyphicon glyphicon-camera"></span></label> 
+                    <input style="display:none" id="profile_pic" type="file" name="profile_pic" >
+                </fieldset>
                 <fieldset class="form-group">
                     <label for="first_name">First Name (Optional)</label>
                     <input type="text" class="form-control" id="first_name" name="first_name" value="{{ request.user.first_name }}">

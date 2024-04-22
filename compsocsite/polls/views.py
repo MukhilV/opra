@@ -972,13 +972,16 @@ class AllocateResultsView(views.generic.DetailView):
         pref_set = {}
         candidates={}
         submitted_rankings={}
+        profile_pics = {}
         # extracting required information from response_set
         # using dictionary instead of list to avoid duplicate preferences in response_set
         for response in response_set:
             candidates[response.user_id] = response.user.first_name 
+            url = response.user.userprofile.profile_pic.name;
+            profile_pics[response.user_id] = "/"+url if url != None else ''
             pref_set[response.user_id] = ast.literal_eval(response.resp_str)
             submitted_rankings[response.user_id]  = json.loads(response.behavior_data)["submitted_ranking"]
-        return pref_set, candidates, submitted_rankings
+        return pref_set, candidates, submitted_rankings, profile_pics
     
     def transformSubmittedRankings(self, items, submitted_rankings):
         #transform submitted rankings
@@ -1133,8 +1136,11 @@ class AllocateResultsView(views.generic.DetailView):
             return ctx
 
         # Neccessary variables
-        current_user_id = self.request.user.id;
+        current_user_id = self.request.user.id
         response_set = self.object.response_set.all()
+
+        current_user_profile_pic = self.request.user.userprofile.profile_pic
+        ctx['current_user_profile_pic'] = current_user_profile_pic
         
         # items = ast.literal_eval(response_set[0].resp_str) # change this
 
@@ -1142,14 +1148,16 @@ class AllocateResultsView(views.generic.DetailView):
         ctx['items_obj'] = items_obj
 
         # Get neccessar data fro response_set
-        pref_set, candidates, submitted_rankings = self.getDataFromResponseSet(response_set)
+        pref_set, candidates, submitted_rankings, profile_pics = self.getDataFromResponseSet(response_set)
 
         # sorting the set based on key values, as round robin is based on the user_id
         pref_set = dict(sorted(pref_set.items()))
         candidates = dict(sorted(candidates.items()))
+        profile_pics = dict(sorted(profile_pics.items()))
         submitted_rankings = dict(sorted(submitted_rankings.items()))
 
         ctx['candidates'] = list(candidates.values())
+        ctx['profile_pics'] = list(profile_pics.values())
 
         # get transformed Submitted rankings
         submitted_rankings = self.transformSubmittedRankings(items, submitted_rankings)
