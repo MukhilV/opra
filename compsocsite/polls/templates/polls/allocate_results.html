@@ -46,6 +46,7 @@
     </div>
     {% endif %}
 
+    {% if current_user_name != empty_string %}
     <div class="panel panel-default" style="margin: 20px;">
         <div class="panel-heading">My Preference:</div> 
         <div class="panel-body">
@@ -90,7 +91,7 @@
             </div>
         </div>
     </div>
-    
+    {% endif %}
 
     
     <br><br>
@@ -126,7 +127,12 @@
 
     </div>
 
-
+    <style>
+td,th{
+    height: 7px;
+    width: 20px;
+}
+    </style>
 
     <br><br>
     <div class="panel panel-default" style="margin: 20px;">
@@ -157,17 +163,23 @@
                     {% for row in envy_matrix %}
                     <tr>
                         <td>{{ candidates|index:forloop.counter0 }}</td>
-                        {% for entry in row %}
-                        <td style="text-align: center;">{{ entry }}</td>
+                        {% for envy,sum2 in row %}
+                        <td style="text-align: center;">
+                            <div style="height: 100%; width: 100%;" class="table-data" >
+                                <input type="hidden" value = "{{ envy }}"/>
+                                <span class= "hover-message">{{ sum2 }}</span>
+                                <span class="hide-sum">{{ sum2 }}</span>
+                            </div>
+                        </td>
                         {% endfor %}
                     </tr>
                     {% endfor %}
-                    <tr>
+                    <!-- <tr>
                         <td>Dummy values</td>
                         <td style="text-align: center;">-5</td>
                         <td style="text-align: center;">10</td>
                         <td style="text-align: center;">EF1</td>
-                    </tr>
+                    </tr> -->
                 </table>
             </div>
         </div>
@@ -205,6 +217,31 @@
 </div>
 </div>
 
+<style>
+.color-green{
+    background-color: #66B032;
+}
+
+.color-red{
+    background-color: #FE8176;
+}
+
+.color-grey{
+    background-color: #C4CCA7;
+}
+
+.color-yellow{
+    background-color: #FBA90A;
+}
+
+.show-sum{
+    display: block;
+}
+
+.hide-sum{
+    display: none;
+}
+</style>
 <script>
 
 $(window).load(function(){
@@ -213,27 +250,40 @@ var table = document.getElementById("envy_matrix");
 
 for (var i = 0; i < table.rows.length; i++) {
     for (var j = 0; j < table.rows[i].cells.length; j++) {
-        var cellValue = table.rows[i].cells[j].innerText;
+        // var cellValue = table.rows[i].cells[j].innerText;
+        var cellValue = table.rows[i].cells[j]?.children[0]?.children[0].value;
         if (!isNaN(parseFloat(cellValue)) && isFinite(cellValue)) {
             if (parseFloat(cellValue) > 0) {
                 // green
-                table.rows[i].cells[j].style.backgroundColor = "#66B032";
+                table.rows[i].cells[j].classList.add("color-green");
             } else if (parseFloat(cellValue) < 0) {
                 // red
-                table.rows[i].cells[j].style.backgroundColor = "#FE8176";
+                table.rows[i].cells[j].classList.add("color-red");
             }else if (parseFloat(cellValue) === 0) {
                 // grey
-                table.rows[i].cells[j].style.backgroundColor = "#C4CCA7";
+                table.rows[i].cells[j].classList.add("color-grey");
             }
         } else if (cellValue === "EF1") {
             // Cell value is "EF1" // yellow
-            table.rows[i].cells[j].style.backgroundColor = "#FBA90A";
+            table.rows[i].cells[j].classList.add("color-yellow");
         }
     }
 }
 
 
 });
+
+function displaySum(element){
+    // console.log(element);
+    element.children[0].children[2].classList.remove('hide-sum');
+    element.children[0].children[2].classList.add('show-sum');
+}
+
+function hideSum(element){
+    // console.log(element);
+    element.children[0].children[2].classList.remove('show-sum');
+    element.children[0].children[2].classList.add('hide-sum');
+}
 
 </script>
 
