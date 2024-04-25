@@ -115,7 +115,12 @@
                     </tr>
                     {% for row in allocation_matrix %}
                     <tr>
-                        <td>{{ candidates|index:forloop.counter0 }}</td>
+                        <td>
+                            <div>  
+                            <img src = "{{ profile_pics|index:forloop.counter0 }}" style="height: 40px; width: 40px;"></img>
+                            {{ candidates|index:forloop.counter0 }}
+                            </div>
+                        </td>
                         {% for entry in row %}
                         <td style="text-align: center;">{{ entry }}</td>
                         {% endfor %}
@@ -158,7 +163,10 @@ td,th{
                         <th></th>
                         {% for candidate in candidates %}
                             <th style="text-align: center;">
-                                {{ candidate }}
+                                <div>  
+                                    <img src = "{{ profile_pics|index:forloop.counter0 }}" style="height: 40px; width: 40px;"></img>
+                                    {{ candidate}}
+                                    </div>
                             </th>
                         {% endfor %}
                     </tr>
