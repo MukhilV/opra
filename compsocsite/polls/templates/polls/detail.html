@@ -146,7 +146,7 @@
         </div>
     </div>
 	
-    <div id="tabs" clsss="row">
+    <div id="tabs" class="row">
 		{% if not question.ui_number == 1%}
         <ul>
             {% if question.twocol_enabled %}<li><a href="#twoColSection" onclick="changeMethod(1);">Two Columns</a></li> {% endif %}
@@ -234,6 +234,11 @@
             if(document.getElementById("listUISection") != null){ method = 8; methodIndicator = "list_ui";}
             if(document.getElementById("InfiniteBudgetUISection") != null) { method = 9; methodIndicator = "infinite_budget_ui" }
             method = 1;
+
+            // for allocation UIs:
+            {% if question.budgetUI_enabled %} changeMethod(7);{% endif %}
+            {% if question.ListUI_enabled %} changeMethod(8);{% endif %}
+            {% if question.infiniteBudgetUI_enabled %} changeMethod(9);{% endif %}
 
             //alert(method);
 
