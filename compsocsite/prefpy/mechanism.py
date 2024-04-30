@@ -1919,6 +1919,10 @@ class MechanismRoundRobinAllocation:
         count = 1
         items_copied = items
 
+        # if preferences is [] or preferences is None:
+        #     print("*****Error in capturing the data******")
+        #     return 
+
         while(items.size != 0):
 
             # get the most preferred item for the current candidate
@@ -1950,7 +1954,7 @@ class MechanismRoundRobinAllocation:
                 allocation_matrix[i][index] = 1
 
         # allocation_matrix.insert(0, items_copied.tolist())
-        print(*allocation_matrix)
+        # print(*allocation_matrix)
             
         return allocated_items, allocation_matrix
 

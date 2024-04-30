@@ -599,6 +599,7 @@ function changeMethod (value){
 	else if(method == 5 || method == 6){ yesNoSort(method, order); }
 	else if(method == 7){ swit += ";7;;"; }
 	else if(method == 8){ swit += ";8;;"; }
+	else if(method == 9){ swit += ";9;;"; }
 
 	// Hard-coded allowing submission
 	//if(method != 1){ $(".submitbutton").prop("disabled", "false");console.log("method", method); }
