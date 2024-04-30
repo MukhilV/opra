@@ -81,12 +81,55 @@ class RegularPollsView(views.generic.ListView):
         
         # sort the lists by date (most recent should be at the top)
         ctx['polls_created'] = list(Question.objects.filter(question_owner=self.request.user,
-                                                       m_poll=False).order_by('-pub_date'))
-        ctx['active_polls'] = list(Question.objects.order_by('-pub_date'))
+                                                       m_poll=False, question_type = 1).order_by('-pub_date'))
+        ctx['active_polls'] = list(Question.objects.filter(question_type = 1).order_by('-pub_date'))
         # get all polls current user participates in and filter out those she is the owner of
         polls = self.request.user.poll_participated.filter(m_poll=False)
         polls = polls.exclude(question_owner=self.request.user).order_by('-pub_date')
-        ctx['polls_participated'] = list(polls)
+        ctx['polls_participated'] = list(polls) # .filter(question_type = 1)
+        
+        # for polls in folders, do not show them in the main page
+        for poll in unshown:
+            if poll in ctx['polls_created']:
+                ctx['polls_created'].remove(poll)
+            elif poll in ctx['polls_participated']:
+                ctx['polls_participated'].remove(poll)
+        return ctx
+    
+class RegularAllocationView(views.generic.ListView):
+    """
+    Define regular polls view, inheriting ListView class, which specifies a context variable.
+    
+    The variables used in regular polls page are extracted from database and defined below.
+    """
+    
+    template_name = 'polls/allocation_tab.html'
+    context_object_name = 'question_list'
+    def get_queryset(self):
+        """Override function in parent class and return all questions."""
+        
+        return Question.objects.all().order_by('-pub_date')
+        
+    
+    def get_context_data(self, **kwargs):
+        """Override function in parent class and define additional context variables to be used in the page."""
+        
+        
+        ctx = super(RegularAllocationView, self).get_context_data(**kwargs)
+        # get folders
+        ctx['folders'] = Folder.objects.filter(user=self.request.user).all()
+        unshown = []
+        for folder in ctx['folders']:
+            unshown += folder.questions.all()
+        
+        # sort the lists by date (most recent should be at the top)
+        ctx['polls_created'] = list(Question.objects.filter(question_owner=self.request.user,
+                                                       m_poll=False, question_type = 2).order_by('-pub_date'))
+        ctx['active_polls'] = list(Question.objects.filter(question_type = 2).order_by('-pub_date'))
+        # get all polls current user participates in and filter out those she is the owner of
+        polls = self.request.user.poll_participated.filter(m_poll=False)
+        polls = polls.exclude(question_owner=self.request.user).order_by('-pub_date')
+        ctx['polls_participated'] = list(polls) # # .filter(question_type = 2)
         
         # for polls in folders, do not show them in the main page
         for poll in unshown:
@@ -1365,8 +1408,9 @@ def getListAlgorithmLinks():
 # get a list of allocation methods
 # return List<String>
 def getAllocMethods():
-    return ["Serial dictatorship: early voters first",
-            "Serial dictatorship: late voter first", "Manually allocate"]
+    return ["Round Robin"]
+    # return ["Serial dictatorship: early voters first",
+    #         "Serial dictatorship: late voter first", "Manually allocate"]
 
 # get a list of visibility settings
 # return List<String>
@@ -1375,6 +1419,9 @@ def getViewPreferences():
             "Everyone can see all votes", "Only show the names of voters",
             "Only show number of voters", "Everyone can only see his/her own vote",
             "All votes will be shown, but usernames will be hidden"]
+
+def getViewPreferencesForAllocation():
+    return ["This is Duplicate view pref"]
 
 
 def getWinnersFromIDList(idList):
@@ -1875,8 +1922,8 @@ def removeVoter(request, question_id):
 def setInitialSettings(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     question.poll_algorithm = request.POST['pollpreferences']
-    question.display_pref = request.POST['viewpreferences']
-    question.creator_pref = request.POST['creatorpreferences']
+    if "viewpreferences" in request.POST.keys(): question.display_pref = request.POST['viewpreferences']
+    if "creatorpreferences" in request.POST.keys(): question.creator_pref = request.POST['creatorpreferences']
     openstring = request.POST['openpoll']
     signup_string = request.POST['selfsignup']
     twocol = False

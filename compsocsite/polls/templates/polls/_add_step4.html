@@ -51,7 +51,9 @@
               </div>
             </div>
             {% elif question.question_type == 2 %}
-                <label for="pollpreferences">Select an allocation method <i class="fa fa-question-circle" aria-hidden="true" data-toggle="modal" data-target=".bs-example-modal-lg" style="color:GoldenRod;"></i></label>
+                <label for="pollpreferences">Select an allocation method to calculate results
+                    <!-- <i class="fa fa-question-circle" aria-hidden="true" data-toggle="modal" data-target=".bs-example-modal-lg" style="color:GoldenRod;"></i> -->
+                </label>
                 <select name="pollpreferences" class="form-control">
                 {% for item in alloc_methods %}
                     <option value="{{ forloop.counter }}">
@@ -82,7 +84,8 @@
               </div>
             </div>
             {% endif %}
-
+            
+            {% if question.question_type == 1 %}
             <label for="viewpreferences">Information visible to voters</label>
             <select name="viewpreferences" class="form-control">
                 {% for item in view_preferences %}
@@ -92,6 +95,7 @@
                 {% endfor %}
             </select>
             <br />
+        
 			
 			<label for="creatorpreferences">Information visible to the creator</label>
             <select name="creatorpreferences" class="form-control">
@@ -99,8 +103,9 @@
 				<option value="2">Creator has the same visibility setting as all voters</option>
             </select>
             <br />
+            {% endif %}
 
-            <label for="openpoll">Voting? (QR Code can be accessed under poll settings)</label> <br />
+            <label for="openpoll">Who can participate? (QR Code can be accessed under poll settings)</label> <br />
             <div class="btn-group" data-toggle="buttons">
                 <label class="btn btn-default active">
                 <input type="radio" name="openpoll" value="anon" checked>Anonymous</option>
@@ -136,7 +141,7 @@
                 <label class="checkbox-inline"><input id="yesno_checkbox" type="checkbox" value="yesno" name="ui" checked>Yes/No</label>
                 <label class="checkbox-inline"><input id="yesno2_checkbox" type="checkbox" value="yesno2" name="ui">Yes/No Grid</label>
                 {% elif question.question_type == 2 %}
-                <label class="checkbox-inline"><input id="budgetUI_slider_checkbox" type="radio" value="BUI_slider" name="ui" >Budget UI</label>
+                <label class="checkbox-inline"><input id="budgetUI_slider_checkbox" type="radio" value="BUI_slider" name="ui" checked >Budget UI</label>
                 <label class="checkbox-inline"><input id="listUI_checkbox" type="radio" value="LUI" name="ui" >List UI</label>
                 <label class="checkbox-inline"><input id="InfiniteBudgetUI_checkbox" type="radio" value="IBUI" name="ui" >Infinite Budget UI</label>
                 {% endif %}
@@ -161,6 +166,13 @@
 				<label class="checkbox-inline"><input id="vis4096" type="checkbox" value="4096" name="vr" checked>Plurality With Runoff</label>
 				<label class="checkbox-inline"><input id="vis8192" type="checkbox" value="8192" name="vr" checked>Borda Mean</label>
 				<label class="checkbox-inline"><input id="vis16384" type="checkbox" value="16384" name="vr" checked>Simulated Approval</label>
+            </div>
+            {% endif %}
+
+            {% if question.question_type == 2 %}
+            <label>Allocation algorithms to show results</label>
+            <div id="visible">
+                <label class="checkbox-inline"><input id="round_robin_alloc" type="checkbox" value="1" name="Round_Robin_alloc" checked disabled>Round Robin</label>
             </div>
             {% endif %}
 

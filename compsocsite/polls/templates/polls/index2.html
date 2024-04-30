@@ -39,7 +39,7 @@ ga(function(tracker) {
                 <p>You can create or participate in a regular vote here.</p>
             </div>
         </div>
-        <div class="col-md-4  col-sm-6" align="center">
+        <!-- <div class="col-md-4  col-sm-6" align="center">
             <br/>
             <div class="service-item">
                 <a href="{% url 'polls:m_polls' %}">
@@ -48,6 +48,17 @@ ga(function(tracker) {
                     <h4><strong>Multi-Polls</strong></h4>
                 </a>
                 <p>You can link multiple polls.</p>
+            </div>
+        </div> -->
+        <div class="col-md-4  col-sm-6" align="center">
+            <br/>
+            <div class="service-item">
+                <a href="{% url 'polls:allocation_tab' %}">
+                <i class="fa fa-balance-scale fa-5x" aria-hidden="true"></i>
+                
+                    <h4><strong>Allocation</strong></h4>
+                </a>
+                <p>You can create allocation polls.</p>
             </div>
         </div>
                         

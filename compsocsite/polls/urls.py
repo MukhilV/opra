@@ -21,6 +21,7 @@ urlpatterns = [
 
     #Two main types of polls
     re_path(r'^regular_polls$', login_required(views.RegularPollsView.as_view()), name='regular_polls'),
+    re_path(r'^allocation_tab$', login_required(views.RegularAllocationView.as_view()), name='allocation_tab'),
     re_path(r'^regular_polls/(?P<pk>[0-9]+)/folder$', login_required(views.RegularPollsFolderView.as_view()), name='regular_polls_folder'),
     re_path(r'^m_polls$', login_required(views.MultiPollsView.as_view()), name='m_polls'),
     re_path(r'^(?P<pk>[0-9]+)/demo$', views.DemoView.as_view(), name='voting_demo'),

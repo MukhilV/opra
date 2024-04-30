@@ -10,7 +10,7 @@
         {% endfor %}
         </select>
     {% elif question.question_type == 2 %}
-        <label for="pollpreferences">Select an allocation method</label>
+        <label for="pollpreferences">Select an allocation method to calculate result</label>
         <select name="pollpreferences" class="form-control" {% if question.status != 1 %} disabled {% endif %}>
         {% for item in alloc_methods %}
             <option value="{{ forloop.counter }}" {% if question.poll_algorithm == forloop.counter %} selected {% endif %}>
@@ -33,7 +33,8 @@
         {% endif %}
         <br />
     {% endif %}
-
+    
+    {% if question.question_type == 1 %}
     <br />
     <label for="viewpreferences">Visibility setting for voters for this specific poll</label>
     <select name="viewpreferences" class="form-control">
@@ -53,7 +54,9 @@
     </select>
     
     <br/>
+    {% endif %}
 
+    {% if question.question_type == 1 %}
     <fieldset class="form-group">
         <label>Visible Voting Rules</label>
         <div id="visible">
@@ -62,6 +65,16 @@
             {% endfor %}
         </div>
     </fieldset>
+    {% endif %}
+
+    {% if question.question_type == 2 %}
+    <fieldset class="form-group"></fieldset>
+            <label>Allocation algorithms to show results</label>
+            <div id="visible">
+                <label class="checkbox-inline"><input id="round_robin_alloc" type="checkbox" value="1" name="Round_Robin_alloc" checked disabled>Round Robin</label>
+            </div>
+        </fieldset>
+    {% endif %}
     <script>
         var val = 0;
         var bools = {{ bools }};

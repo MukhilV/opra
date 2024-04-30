@@ -135,7 +135,7 @@
     </div>
 </div>
 
-<p>Active Polls:</p>
+<p>Active Polls (in allocation page):</p>
 {% for question in active_polls %}
     <h3>{{ question.question_text }}</h3>
     <h5 href="{% url 'polls:detail' question.id %}" id="QRLink">http://127.0.0.1:8000{% url 'polls:detail' question.id %}</h5>
@@ -166,6 +166,7 @@
     </div>
 </div>
 
+
 <!-- for created by you section -->
 <div class="container" >
     <div name="created" class="panel panel-default">
@@ -174,7 +175,7 @@
             <thead>
                 <tr>
                     <th colspan=2>
-		                  Regular polls created by you ({{ polls_created|length }})
+		                  Allocation instance created by you ({{ polls_created|length }})
                     </th>
                     <th>
                         <!-- <a href="{% url 'polls:AddStep1' %}" style='font-size:60%; float:right;' class="btn btn-yellow">
