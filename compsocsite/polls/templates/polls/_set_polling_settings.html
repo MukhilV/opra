@@ -1,3 +1,4 @@
+{% load poll_extra %}
 <form class="form-group" method="post" action="{% url 'polls:setPollingSettings' question.id %}" align="center">
     {% csrf_token %}
     {% if question.question_type == 1 %}
@@ -75,6 +76,18 @@
             </div>
         </fieldset>
     {% endif %}
+
+    {% if question.question_type == 2 %}
+    <br><br>
+        <label>Tables to show in Allocation Results Page</label>
+        <div id="visible">
+            <label class="checkbox-inline"><input id="my_pref_table" type="checkbox" value="1" name="alloc_res_tables" {% if selected_alloc_res_tables_sum|bitwise_and:1 != 0 %} checked {% endif %} >My Preferences</label>
+            <label class="checkbox-inline"><input id="alloc_items_bundle_table" type="checkbox" value="2" name="alloc_res_tables" {% if selected_alloc_res_tables_sum|bitwise_and:2 != 0 %} checked {% endif %}>Items Bundle</label>
+            <label class="checkbox-inline"><input id="alloc_res_table" type="checkbox" value="4" name="alloc_res_tables" {% if selected_alloc_res_tables_sum|bitwise_and:4 != 0 %} checked {% endif %}>Allocation Result Table</label>
+            <label class="checkbox-inline"><input id="EF1_matrix" type="checkbox" value="8" name="alloc_res_tables" {% if selected_alloc_res_tables_sum|bitwise_and:8 != 0 %} checked {% endif %}>Envy Matrix Upto EF1 </label>
+        </div>
+    {% endif %}
+
     <script>
         var val = 0;
         var bools = {{ bools }};

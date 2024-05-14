@@ -47,90 +47,97 @@
     {% endif %}
 
     {% if current_user_name != empty_string %}
-    <div class="panel panel-default" style="margin: 20px;">
-        <div class="panel-heading">My Preference:</div> 
-        <div class="panel-body">
-            <div class="table-responsive">
-                <table class="table">
-                    <tr>
-                        <th>Item</th>
-                        <th>Value</th>
-                    </tr>
+        {% if selected_alloc_res_tables_sum|bitwise_and:1 != 0 %}
+            <div class="panel panel-default" style="margin: 20px;">
+                <div class="panel-heading">My Preference:</div> 
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tr>
+                                <th>Item</th>
+                                <th>Value</th>
+                            </tr>
 
-                    {% for item in curr_user_pref %}
-                    <tr>
-                        <td>{{ item }}</td>
-                        <td>{{ curr_user_pref_values|index:forloop.counter0 }}</td>
-                    </tr>
-                    {% endfor %}
-                    
-                </table>
+                            {% for item in curr_user_pref %}
+                            <tr>
+                                <td>{{ item }}</td>
+                                <td>{{ curr_user_pref_values|index:forloop.counter0 }}</td>
+                            </tr>
+                            {% endfor %}
+                            
+                        </table>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
+            <br><br>
+        {% endif %}
 
-    <br><br>
-    <div class="panel panel-default" style="margin: 20px;">
-        <div class="panel-heading">Allocated Items Bundle:</div> 
-        <div class="panel-body">
-            <div class="table-responsive">
-                <table class="table">
-                    <tr>
-                        <th>Candidate</th>
-                        <th>Bundle</th>
-                        <th>Value</th>
-                    </tr>
+        {% if selected_alloc_res_tables_sum|bitwise_and:2 != 0  %}
+            <div class="panel panel-default" style="margin: 20px;">
+                <div class="panel-heading">Allocated Items Bundle:</div> 
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tr>
+                                <th>Candidate</th>
+                                <th>Bundle</th>
+                                <th>Value</th>
+                            </tr>
 
-                    <tr>
-                        <td>{{ current_user_name }}</td>
-                        <td>{{ curr_user_bundle }}</td>
-                        <td>{{ curr_user_bundle_sum }}</td>
-                    </tr>
-                    
-                </table>
+                            <tr>
+                                <td>{{ current_user_name }}</td>
+                                <td>{{ curr_user_bundle }}</td>
+                                <td>{{ curr_user_bundle_sum }}</td>
+                            </tr>
+                            
+                        </table>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
+            <br><br>
+            {% endif %}
     {% endif %}
 
     
-    <br><br>
-    <div class="panel panel-default" style="margin: 20px;">
-        <div class="panel-heading">Allocation Results</div>
-        <div class="panel-body">
-            <div class="table-responsive">
-                <table class="table">
-                    <tr>
-                        <th></th>
-                        {% for item in items_obj %}
-                            <th>
-                                <div style="display: flex; padding-left: 25%; padding-right: 25%;">
-                                    {% if item.image %}
-                                    <img class="item" src='{{ item.image.url }}'/>
-                                    {% endif %}
-                                    <div style="margin: auto;">{{ item.item_text }}</div>
+    {% if selected_alloc_res_tables_sum|bitwise_and:4 != 0  %}
+        <div class="panel panel-default" style="margin: 20px;">
+            <div class="panel-heading">Allocation Results</div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <tr>
+                            <th></th>
+                            {% for item in items_obj %}
+                                <th>
+                                    <div style="display: flex; padding-left: 25%; padding-right: 25%;">
+                                        {% if item.image %}
+                                        <img class="item" src='{{ item.image.url }}'/>
+                                        {% endif %}
+                                        <div style="margin: auto;">{{ item.item_text }}</div>
+                                    </div>
+                                </th>
+                            {% endfor %}
+                        </tr>
+                        {% for row in allocation_matrix %}
+                        <tr>
+                            <td>
+                                <div>  
+                                <img src = "{{ profile_pics|index:forloop.counter0 }}" style="height: 40px; width: 40px;"></img>
+                                {{ candidates|index:forloop.counter0 }}
                                 </div>
-                            </th>
+                            </td>
+                            {% for entry in row %}
+                            <td style="text-align: center;">{{ entry }}</td>
+                            {% endfor %}
+                        </tr>
                         {% endfor %}
-                    </tr>
-                    {% for row in allocation_matrix %}
-                    <tr>
-                        <td>
-                            <div>  
-                            <img src = "{{ profile_pics|index:forloop.counter0 }}" style="height: 40px; width: 40px;"></img>
-                            {{ candidates|index:forloop.counter0 }}
-                            </div>
-                        </td>
-                        {% for entry in row %}
-                        <td style="text-align: center;">{{ entry }}</td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                </table>
+                    </table>
+                </div>
             </div>
-        </div>
 
-    </div>
+        </div>
+        <br><br>
+    {% endif %}
 
     <style>
 td,th{
@@ -139,7 +146,8 @@ td,th{
 }
     </style>
 
-    <br><br>
+    
+    {% if selected_alloc_res_tables_sum|bitwise_and:8 != 0  %}
     <div class="panel panel-default" style="margin: 20px;">
         <div class="panel-heading"> Envy matrix upto EF1 
             <div class="pull-right" style="display: flex;">
@@ -199,6 +207,7 @@ td,th{
             </div>
         </div>
     </div>
+    {% endif %}
 
 
    

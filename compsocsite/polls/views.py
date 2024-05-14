@@ -989,6 +989,12 @@ class PollInfoView(views.generic.DetailView):
             progressPercentage = progressPercentage * 100
             ctx['progressPercentage'] = progressPercentage
         ctx['request_list'] = self.object.signuprequest_set.filter(status=1)
+
+        # alloc_res_tables contains display options for results of an allocation
+        curr_question = self.object
+        selected_alloc_res_tables_sum = curr_question.alloc_res_tables
+        ctx['selected_alloc_res_tables_sum'] = selected_alloc_res_tables_sum
+
         return ctx
     def get_queryset(self):
         """
@@ -1263,6 +1269,11 @@ class AllocateResultsView(views.generic.DetailView):
         # compute pure EF1
         ef1_matrix = self.computePureEF1(preferences, allocated_items_with_values, preferences_with_values)
         ctx['ef1_matrix'] = ef1_matrix
+
+        # alloc_res_tables contains display options for results of an allocation
+        curr_question = self.object
+        selected_alloc_res_tables_sum = curr_question.alloc_res_tables
+        ctx['selected_alloc_res_tables_sum'] = selected_alloc_res_tables_sum
 
         return ctx
     
@@ -1981,6 +1992,14 @@ def setInitialSettings(request, question_id):
     else:
         question.allow_self_sign_up = 0
 
+    question.alloc_res_tables = 6
+    if question.question_type == 2 :
+        alloc_result_table_list = request.POST.getlist('alloc_res_tables')
+        alloc_res_tables = 0
+        for table_val in alloc_result_table_list:
+            alloc_res_tables+=int(table_val)
+        question.alloc_res_tables = alloc_res_tables
+
     question.save()
     return HttpResponseRedirect(reverse('polls:regular_polls'))
 
@@ -1996,7 +2015,8 @@ def setPollingSettings(request, question_id):
     # set the visibility settings, how much information should be shown to the user
     # options range from showing everything (most visibility) to showing only the user's vote
     #   (least visibility)
-    displayChoice = request.POST['viewpreferences']
+    displayChoice = "always"
+    if "viewpreferences" in request.POST.keys(): displayChoice = request.POST['viewpreferences']
     if displayChoice == "always":
         question.display_pref = 0
     elif displayChoice == "allpermit":
@@ -2021,6 +2041,14 @@ def setPollingSettings(request, question_id):
         if int(rule) != (2 ** (poll_alg - 1)):
             vr += int(rule)
     question.vote_rule = vr
+
+    if question.question_type == 2 :
+        alloc_result_table_list = request.POST.getlist('alloc_res_tables')
+        alloc_res_tables = 0
+        for table_val in alloc_result_table_list:
+            alloc_res_tables+=int(table_val)
+        question.alloc_res_tables = alloc_res_tables
+
     question.save()
     request.session['setting'] = 2
     messages.success(request, 'Your changes have been saved.')

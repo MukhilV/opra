@@ -16,6 +16,14 @@ def smallest(l):
 def index(sequence, position):
     return sequence[position]
 
+@register.filter(name='bitwise_and')
+def bitwise_and(value, arg):
+    return value & arg
+
+@register.filter(name='modulus')
+def modulus(value, arg):
+    return value % arg
+
 @register.filter
 @stringfilter
 def random_utility(original_value):
