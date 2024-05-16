@@ -1898,19 +1898,23 @@ def addVoter(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     creator_obj = User.objects.get(id=question.question_owner_id)
 
-    newVoters = request.GET.get('voters')
+    newVoters = request.POST.get('voters')
     # send an invitation email
-    email = request.GET.get('email') == 'email'
+    email = request.POST.get('email') == 'email'
     question.emailInvite = email
     question.save()
     if email:
         email_class = EmailThread(request, question_id, 'invite')
         email_class.start()
-    # add each voter to the question by username
-    voterObj = User.objects.get(username=newVoters)
-    question.question_voters.add(voterObj.id)
+    try:
+        # add each voter to the question by username
+        voterObj = User.objects.get(username=newVoters)
+        question.question_voters.add(voterObj.id)
+    except:
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     request.session['setting'] = 1
 
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     data = "{}"
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)

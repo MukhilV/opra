@@ -33,7 +33,7 @@ class addGroupView(generic.ListView):
         return ctx
     
     def get_queryset(self):
-        return Group.objects.order_by('-pub_date')  
+        return Group.objects.all() # .order_by('-pub_date')  
 
 def addgroup(request):
     context = RequestContext(request)
