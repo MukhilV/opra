@@ -65,6 +65,7 @@ class Question(models.Model):
     ui_number = models.IntegerField(default=6)
     vote_rule = models.IntegerField(default=4095)
     alloc_res_tables = models.IntegerField(default=6)
+    alloc_algorithms = models.IntegerField(default=1)
     first_tier = models.IntegerField(default=0)
     utility_model = models.IntegerField(default=0)
 

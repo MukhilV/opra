@@ -3,312 +3,80 @@
 {% load static%}
 
 {% block content %}
-<div class="col-md-12">
-        <h1 style="margin-top: 40px; margin-bottom: 25px;">{{ question.question_text }}</h1>
-
-        <ul>
-        {% for response in question.response_set.all %}
-            {% if response.allocation.item_text %}
-                {{ response.user.username }}: {{ response.allocation.item_text }} (last Updated: {{ response.timestamp }}) <br />
-                {% for dict in response.dictionary_set.all %}
-                    {% for item in dict.sorted_values %}
-                       <button type="button" class="btn btn-default">({{ item.1 }}) {{ item.0 }}</button>
-                    {% endfor %}
-                {% endfor %}
-                <br />
-            {% endif %}
-        {% endfor %}
-        </ul>
-
-
-    {% if false %}
-    <br><br>
-    <div class="col-md-12">
-    Bundles: 
-    <div class="panel-body">
-        <div class="table-responsive">
-            <table class="table">
-                <tr>
-                    <th>Candidates</th>
-                    <th>Bundles</th>
-                    <th>Value</th>
-                </tr>
-                {% for items in allocated_items %}
-                <tr>
-                    <td>{{ candidates|index:forloop.counter0 }}</td>
-                    <td>{{ items }}</td>
-                    <td>{{ sum_of_alloc_items_values|index:forloop.counter0 }}</td>
-                </tr>
-                {% endfor %}
-                
-            </table>
-        </div>
-    </div>
-    {% endif %}
-
-    {% if current_user_name != empty_string %}
-        {% if selected_alloc_res_tables_sum|bitwise_and:1 != 0 %}
-            <div class="panel panel-default" style="margin: 20px;">
-                <div class="panel-heading">My Preference:</div> 
-                <div class="panel-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <tr>
-                                <th>Item</th>
-                                <th>Value</th>
-                            </tr>
-
-                            {% for item in curr_user_pref %}
-                            <tr>
-                                <td>{{ item }}</td>
-                                <td>{{ curr_user_pref_values|index:forloop.counter0 }}</td>
-                            </tr>
-                            {% endfor %}
-                            
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <br><br>
-        {% endif %}
-
-        {% if selected_alloc_res_tables_sum|bitwise_and:2 != 0  %}
-            <div class="panel panel-default" style="margin: 20px;">
-                <div class="panel-heading">Allocated Items Bundle:</div> 
-                <div class="panel-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <tr>
-                                <th>Candidate</th>
-                                <th>Bundle</th>
-                                <th>Value</th>
-                            </tr>
-
-                            <tr>
-                                <td>{{ current_user_name }}</td>
-                                <td>{{ curr_user_bundle }}</td>
-                                <td>{{ curr_user_bundle_sum }}</td>
-                            </tr>
-                            
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <br><br>
-            {% endif %}
-    {% endif %}
-
-    
-    {% if selected_alloc_res_tables_sum|bitwise_and:4 != 0  %}
-        <div class="panel panel-default" style="margin: 20px;">
-            <div class="panel-heading">Allocation Results</div>
-            <div class="panel-body">
-                <div class="table-responsive">
-                    <table class="table">
-                        <tr>
-                            <th></th>
-                            {% for item in items_obj %}
-                                <th>
-                                    <div style="display: flex; padding-left: 25%; padding-right: 25%;">
-                                        {% if item.image %}
-                                        <img class="item" src='{{ item.image.url }}'/>
-                                        {% endif %}
-                                        <div style="margin: auto;">{{ item.item_text }}</div>
-                                    </div>
-                                </th>
-                            {% endfor %}
-                        </tr>
-                        {% for row in allocation_matrix %}
-                        <tr>
-                            <td>
-                                <div>  
-                                <img src = "{{ profile_pics|index:forloop.counter0 }}" style="height: 40px; width: 40px;"></img>
-                                {{ candidates|index:forloop.counter0 }}
-                                </div>
-                            </td>
-                            {% for entry in row %}
-                            <td style="text-align: center;">{{ entry }}</td>
-                            {% endfor %}
-                        </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-            </div>
-
-        </div>
-        <br><br>
-    {% endif %}
-
-    <style>
-td,th{
-    height: 7px;
-    width: 20px;
-}
-    </style>
-
-    
-    {% if selected_alloc_res_tables_sum|bitwise_and:8 != 0  %}
-    <div class="panel panel-default" style="margin: 20px;">
-        <div class="panel-heading"> Envy matrix upto EF1 
-            <div class="pull-right" style="display: flex;">
-                
-                    <div style="margin-right: 15px;">
-                        <button type="button" class="btn btn-default" style="background-color: #66B032"></button>&nbsp;<span>No Envy</span>
-                    </div>
-                    <div style="margin-right: 15px;">
-                        <button type="button" class="btn btn-default" style="background-color: #FBA90A"></button>&nbsp;<span>EF1</span>
-                    </div>
-                    <div style="margin-right: 15px;">
-                        <button type="button" class="btn btn-default" style="background-color: #FE8176"></button>&nbsp;<span>Envy</span>
-                    </div>
-
-            </div>
-        </div>
-        <div class="panel-body">
-            <div class="table-responsive">
-                <table class="table" id = "envy_matrix" style="border-spacing: 3px; border-collapse: separate;">
-                    <tr>
-                        <th></th>
-                        {% for candidate in candidates %}
-                            <th style="text-align: center;">
-                                <div>  
-                                    <img src = "{{ profile_pics|index:forloop.counter0 }}" style="height: 40px; width: 40px;"></img>
-                                    {{ candidate}}
-                                    </div>
-                            </th>
-                        {% endfor %}
-                    </tr>
-                    {% for row in envy_matrix %}
-                    <tr>
-                        <td>
-                            <div>  
-                            <img src = "{{ profile_pics|index:forloop.counter0 }}" style="height: 40px; width: 40px;"></img>
-                            {{ candidates|index:forloop.counter0 }}
-                            </div>
-                        </td>
-                        {% for envy,sum2 in row %}
-                        <td style="text-align: center;">
-                            <div style="height: 100%; width: 100%;" class="table-data" >
-                                <input type="hidden" value = "{{ envy }}"/>
-                                <span class= "hover-message">{{ sum2 }}</span>
-                                <span class="hide-sum">{{ sum2 }}</span>
-                            </div>
-                        </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                    <!-- <tr>
-                        <td>Dummy values</td>
-                        <td style="text-align: center;">-5</td>
-                        <td style="text-align: center;">10</td>
-                        <td style="text-align: center;">EF1</td>
-                    </tr> -->
-                </table>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-
-   
-    {% if false %}
-    <br><br>
-    EF1 matrix: 
-    <div class="panel-body">
-        <div class="table-responsive">
-            <table class="table">
-                <tr>
-                    <th>Candidates</th>
-                    {% for candidate in candidates %}
-                        <th>{{ candidate }}</th>
-                    {% endfor %}
-                </tr>
-                {% for row in ef1_matrix %}
-                <tr>
-                    <td>{{ candidates|index:forloop.counter0 }}</td>
-                    {% for entry in row %}
-                    <td>{{ entry }}</td>
-                    {% endfor %}
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-    </div>
-    {% endif %}
-
-    <br><br><br><br>
-  
-</div>
-</div>
-
 <style>
-.color-green{
-    background-color: #66B032;
-}
-
-.color-red{
-    background-color: #FE8176;
-}
-
-.color-grey{
-    background-color: #C4CCA7;
-}
-
-.color-yellow{
-    background-color: #FBA90A;
-}
-
-.show-sum{
-    display: block;
-}
-
-.hide-sum{
-    display: none;
-}
-</style>
-<script>
-
-$(window).load(function(){
-
-var table = document.getElementById("envy_matrix");
-
-for (var i = 0; i < table.rows.length; i++) {
-    for (var j = 0; j < table.rows[i].cells.length; j++) {
-        // var cellValue = table.rows[i].cells[j].innerText;
-        var cellValue = table.rows[i].cells[j]?.children[0]?.children[0]?.value;
-        if (!isNaN(parseFloat(cellValue)) && isFinite(cellValue)) {
-            if (parseFloat(cellValue) > 0) {
-                // green
-                table.rows[i].cells[j].classList.add("color-green");
-            } else if (parseFloat(cellValue) < 0) {
-                // red
-                table.rows[i].cells[j].classList.add("color-red");
-            }else if (parseFloat(cellValue) === 0) {
-                // grey
-                table.rows[i].cells[j].classList.add("color-grey");
+    .color-green{
+        background-color: #66B032;
+    }
+    
+    .color-red{
+        background-color: #FE8176;
+    }
+    
+    .color-grey{
+        background-color: #C4CCA7;
+    }
+    
+    .color-yellow{
+        background-color: #FBA90A;
+    }
+    
+    .show-sum{
+        display: block;
+    }
+    
+    .hide-sum{
+        display: none;
+    }
+    </style>
+    <script>
+    
+    $(window).load(function(){
+    
+    var table = document.getElementById("envy_matrix");
+    
+    for (var i = 0; i < table.rows.length; i++) {
+        for (var j = 0; j < table.rows[i].cells.length; j++) {
+            // var cellValue = table.rows[i].cells[j].innerText;
+            var cellValue = table.rows[i].cells[j]?.children[0]?.children[0]?.value;
+            if (!isNaN(parseFloat(cellValue)) && isFinite(cellValue)) {
+                if (parseFloat(cellValue) > 0) {
+                    // green
+                    table.rows[i].cells[j].classList.add("color-green");
+                } else if (parseFloat(cellValue) < 0) {
+                    // red
+                    table.rows[i].cells[j].classList.add("color-red");
+                }else if (parseFloat(cellValue) === 0) {
+                    // grey
+                    table.rows[i].cells[j].classList.add("color-grey");
+                }
+            } else if (cellValue === "EF1") {
+                // Cell value is "EF1" // yellow
+                table.rows[i].cells[j].classList.add("color-yellow");
             }
-        } else if (cellValue === "EF1") {
-            // Cell value is "EF1" // yellow
-            table.rows[i].cells[j].classList.add("color-yellow");
         }
     }
-}
-
-
-});
-
-function displaySum(element){
-    // console.log(element);
-    element.children[0].children[2].classList.remove('hide-sum');
-    element.children[0].children[2].classList.add('show-sum');
-}
-
-function hideSum(element){
-    // console.log(element);
-    element.children[0].children[2].classList.remove('show-sum');
-    element.children[0].children[2].classList.add('hide-sum');
-}
-
-</script>
+    
+    
+    });
+    
+    /*
+    function displaySum(element){
+        // console.log(element);
+        element.children[0].children[2].classList.remove('hide-sum');
+        element.children[0].children[2].classList.add('show-sum');
+    }
+    
+    function hideSum(element){
+        // console.log(element);
+        element.children[0].children[2].classList.remove('show-sum');
+        element.children[0].children[2].classList.add('hide-sum');
+    }
+    */
+    
+    </script>
+    
+{% if alloc_algorithms|bitwise_and:1 != 0%}
+    {% include 'polls/round_robin_results.html' %}
+{% endif %}
 
 {% endblock %}

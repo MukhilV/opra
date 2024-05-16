@@ -99,7 +99,7 @@
             <label for="viewpreferences">Information visible to voters</label><br />
                 {% for item in view_preferences %}
                 <input name="viewpreferences" type="radio" value="{{ forloop.counter0 }}" 
-                    name="ui" {% if forloop.counter == preference %} selected {% endif %}> {{ item }}<br />
+                    name="ui" {% if forloop.counter == preference %} checked {% endif %}> {{ item }}<br />
                 {% endfor %}
             <br />
 			
@@ -184,7 +184,7 @@
             {% if question.question_type == 2 %}
             <label>Allocation algorithms to show results</label>
             <div id="visible">
-                <label class="checkbox-inline"><input id="round_robin_alloc" type="checkbox" value="1" name="alloc_alg" checked disabled>Round Robin</label>
+                <label class="checkbox-inline"><input id="round_robin_alloc" type="checkbox" value="1" name="alloc_algorithms" checked disabled>Round Robin</label>
             </div>
             <br /><br />
             {% endif %}
@@ -194,8 +194,8 @@
             <label>Tables to show in Allocation Results Page</label>
             <div id="visible">
                 <label class="checkbox-inline"><input id="my_pref_table" type="checkbox" value="1" name="alloc_res_tables" >My Preferences</label>
-                <label class="checkbox-inline"><input id="alloc_items_bundle_table" type="checkbox" value="2" name="alloc_res_tables" >Items Bundle</label>
-                <label class="checkbox-inline"><input id="alloc_res_table" type="checkbox" value="4" name="alloc_res_tables" >Allocation Result Table</label>
+                <label class="checkbox-inline"><input id="alloc_items_bundle_table" type="checkbox" value="2" name="alloc_res_tables" checked>Items Bundle</label>
+                <label class="checkbox-inline"><input id="alloc_res_table" type="checkbox" value="4" name="alloc_res_tables" checked>Allocation Result Table</label>
                 <label class="checkbox-inline"><input id="EF1_matrix" type="checkbox" value="8" name="alloc_res_tables" >Envy Matrix Upto EF1 </label>
             </div>
             {% endif %}

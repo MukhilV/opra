@@ -1179,6 +1179,7 @@ class AllocateResultsView(views.generic.DetailView):
     def get_context_data(self, **kwargs):
 
         ctx = super(AllocateResultsView, self).get_context_data(**kwargs)
+        curr_question = self.object
         round_robin = MechanismRoundRobinAllocation()
 
         if len(list(self.object.response_set.all())) == 0:
@@ -1271,9 +1272,12 @@ class AllocateResultsView(views.generic.DetailView):
         ctx['ef1_matrix'] = ef1_matrix
 
         # alloc_res_tables contains display options for results of an allocation
-        curr_question = self.object
         selected_alloc_res_tables_sum = curr_question.alloc_res_tables
         ctx['selected_alloc_res_tables_sum'] = selected_alloc_res_tables_sum
+
+        # Allocation algorithms to show
+        alloc_algorithms = curr_question.alloc_algorithms
+        ctx['alloc_algorithms'] =  alloc_algorithms
 
         return ctx
     
@@ -1992,13 +1996,28 @@ def setInitialSettings(request, question_id):
     else:
         question.allow_self_sign_up = 0
 
+    # by default show the 2nd(Allocated bundle) and 3rd(Allocation result) tables
+    # 6 = 0110
     question.alloc_res_tables = 6
     if question.question_type == 2 :
         alloc_result_table_list = request.POST.getlist('alloc_res_tables')
         alloc_res_tables = 0
         for table_val in alloc_result_table_list:
-            alloc_res_tables+=int(table_val)
+            alloc_res_tables += int(table_val)
         question.alloc_res_tables = alloc_res_tables
+
+    # by default show Round robin
+    # 1 = 0001
+    question.alloc_algorithms = 1
+    if question.question_type == 2:
+        alloc_algorithms_list = request.POST.getlist('alloc_algorithms')
+        # Adding round robin value to the sum, 
+        # As it is disabled in the UI for User to select, the value is not captured in backend explicitly
+        # Hence, aloc_algorithms_sum = 1 instead of alloc_algorithms_sum = 0
+        alloc_algorithms_sum = 1
+        for alg in alloc_algorithms_list:
+            alloc_algorithms_sum += int(alg)
+        question.alloc_algorithms = alloc_algorithms_sum
 
     question.save()
     return HttpResponseRedirect(reverse('polls:regular_polls'))
@@ -2042,12 +2061,27 @@ def setPollingSettings(request, question_id):
             vr += int(rule)
     question.vote_rule = vr
 
+    # by default show the 2nd(Allocated bundle) and 3rd(Allocation result) tables
+    # 6 = 0110
     if question.question_type == 2 :
         alloc_result_table_list = request.POST.getlist('alloc_res_tables')
         alloc_res_tables = 0
         for table_val in alloc_result_table_list:
-            alloc_res_tables+=int(table_val)
+            alloc_res_tables += int(table_val)
         question.alloc_res_tables = alloc_res_tables
+
+    # by default show Round robin
+    # 1 = 0001
+    question.alloc_algorithms = 1
+    if question.question_type == 2:
+        alloc_algorithms_list = request.POST.getlist('alloc_algorithms')
+        # Adding round robin value to the sum, 
+        # As it is disabled in the UI for User to select, the value is not captured in backend explicitly
+        # Hence, aloc_algorithms_sum = 1 instead of alloc_algorithms_sum = 0
+        alloc_algorithms_sum = 1
+        for alg in alloc_algorithms_list:
+            alloc_algorithms_sum += int(alg)
+        question.alloc_algorithms = alloc_algorithms_sum
 
     question.save()
     request.session['setting'] = 2
