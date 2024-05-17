@@ -1175,6 +1175,14 @@ class AllocateResultsView(views.generic.DetailView):
                 return "EF1"
         return "Not EF1"
     
+    def getAllocatedItemObjects(self, item_objs, items_texts):
+        allocated_items_objs = []
+        for obj in item_objs:
+            for item_name in items_texts:
+                if item_name == obj.item_text:
+                    allocated_items_objs.append(obj)
+        return allocated_items_objs
+    
 
     def get_context_data(self, **kwargs):
 
@@ -1243,7 +1251,8 @@ class AllocateResultsView(views.generic.DetailView):
         ctx['current_user_name'] = current_user_name
         if current_user_name!=empty_string:
             curr_user_index = sorted(list(candidates.keys())).index(current_user_id)
-            ctx['curr_user_bundle'] = allocated_items_transformed[curr_user_index]
+            ctx['curr_user_bundle'] = self.getAllocatedItemObjects(items_obj, allocated_items_transformed[curr_user_index])
+            # ctx['curr_user_bundle'] = allocated_items_transformed[curr_user_index]
             ctx['curr_user_bundle_sum'] = sum_of_alloc_items_values[curr_user_index]
 
 

@@ -72,6 +72,31 @@
             <br><br>
         {% endif %}
 
+        <style>
+            .options-container {
+                display: inline-flex;
+                align-items: center;
+                border: 1px solid #ccc;
+                border-radius: 10px;
+                background-color: #f0f8ff; 
+                padding: 10px;
+                width: fit-content;
+                margin-right: 5px;
+                margin-bottom: 5px;
+            }
+    
+            .options-container img {
+                width: 40px;
+                height: 40px;
+                margin-right: 10px;
+            }
+    
+            .options-container span {
+                font-size: 16px;
+                color: #333;
+            }
+        </style>
+
         {% if selected_alloc_res_tables_sum|bitwise_and:2 != 0  %}
             <div class="panel panel-default" style="margin: 20px;">
                 <div class="panel-heading">Allocated Items Bundle:</div> 
@@ -86,7 +111,16 @@
 
                             <tr>
                                 <td>{{ current_user_name }}</td>
-                                <td>{{ curr_user_bundle }}</td>
+                                <td>
+                                    <div>
+                                        {% for item in curr_user_bundle %} 
+                                        <div class="options-container">
+                                            <img class="item" src='{{ item.image.url }}'/>
+                                            <span>{{ item.item_text }}</span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </td>
                                 <td>{{ curr_user_bundle_sum }}</td>
                             </tr>
                             
