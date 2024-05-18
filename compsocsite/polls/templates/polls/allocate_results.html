@@ -74,9 +74,17 @@
     */
     
     </script>
+
+<div id="tabs" class="row">
     
-{% if alloc_algorithms|bitwise_and:1 != 0%}
-    {% include 'polls/round_robin_results.html' %}
-{% endif %}
+    <ul>
+        <!-- {% if alloc_algorithms|bitwise_and:1 != 0%}<li><a href="#RoundRobinSection">Two Columns</a></li> {% endif %} -->
+    </ul>
+
+    {% if alloc_algorithms|bitwise_and:1 != 0%}{% include 'polls/allocationResults/round_robin_results.html' %}{% endif %}
+    
+</div>
+    
+
 
 {% endblock %}

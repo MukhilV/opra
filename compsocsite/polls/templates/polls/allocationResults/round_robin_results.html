@@ -115,7 +115,9 @@
                                     <div>
                                         {% for item in curr_user_bundle %} 
                                         <div class="options-container">
-                                            <img class="item" src='{{ item.image.url }}'/>
+                                            {% if item.image %}
+                                                <img class="item" src='{{ item.image.url }}'/>
+                                            {% endif %}
                                             <span>{{ item.item_text }}</span>
                                         </div>
                                         {% endfor %}
