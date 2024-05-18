@@ -2662,6 +2662,14 @@ def addFolder(request):
     else:
         print("Error: not post in addFolder function line 1993")
 
+def deleteFolder(request, folder_id):
+    try:
+        folder_obj = get_object_or_404(Folder, pk=folder_id)
+        folder_obj.delete()
+    except:
+        print("Problem in retrieving Folder object with id:" ,folder_id)
+    return HttpResponseRedirect(reverse('polls:regular_polls'))
+
 def getMturkPollList(request):
     # get all IRB polls from database
     list1 = [1,2,3,4,5,6,7,8,9,10,11]

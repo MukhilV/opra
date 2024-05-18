@@ -35,6 +35,9 @@ urlpatterns = [
 
     # Create a new folder
     re_path(r'^add_folder/$', views.addFolder, name='addFolder'),
+
+    # delete folder
+    re_path(r'^regular_polls/(?P<folder_id>[0-9]+)/delete_folder/$', views.deleteFolder, name='deleteFolder'),
         
     # choices
     re_path(r'^(?P<question_id>[0-9]+)/choice/add/$', views.addChoice, name='addchoice'),
