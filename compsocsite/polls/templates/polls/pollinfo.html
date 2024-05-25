@@ -141,12 +141,12 @@
             <li {% if request.session.setting == 2 %} class="active" {% endif %}><a data-toggle="tab" href="#algorithm">Algorithms and Visibility</a></li>
             <li {% if request.session.setting == 6 %} class="active" {% endif %}><a data-toggle="tab" href="#historyinfo">History</a></li>
 			<li {% if request.session.setting == 7 %} class="active" {% endif %}><a data-toggle="tab" href="#recycle">Manage Deleted Votes</a></li>
-            <li {% if request.session.setting == 9 %} class="active" {% endif %}><a data-toggle="tab" href="#approverequest">Self Sign Up</a></li>
+            <!-- <li {% if request.session.setting == 9 %} class="active" {% endif %}><a data-toggle="tab" href="#approverequest">Self Sign Up</a></li> -->
            
             {% if question.m_poll == False %}
                 <li {% if request.session.setting == 1 %} class="active" {% endif %}><a data-toggle="tab" href="#voters">Voters</a></li>
                 <li {% if request.session.setting == 5 %} class="active" {% endif %}><a data-toggle="tab" href="#emailsetting">Email</a></li>
-                <li {% if request.session.setting == 4 %} class="active" {% endif %}><a data-toggle="tab" href="#qr">Anonymous Voting</a></li>
+                <li {% if request.session.setting == 4 %} class="active" {% endif %}><a data-toggle="tab" href="#qr">Participant Management</a></li>
                 <li><a data-toggle="tab" href="#delete">Delete</a></li>
 				<li><a data-toggle="tab" href="#duplicate">Duplicate</a></li>
 				<li><a href="{% url 'polls:recordView' question.id %}">User Records</a></li>
@@ -237,6 +237,8 @@
 
         <input type="submit" value="Finish" class="btn btn-primary">
     </form>
+    <br><br><br><br>
+    {% include 'polls/_approve_request.html' %}
 </div>
 
 
@@ -364,9 +366,9 @@
 	{% include 'polls/_view_deleted_votes.html' %}
 </div>
 
-<div class="col-xs-9 col-xs-offset-3 col-md-10 col-md-offset-2 main tab-pane {% if request.session.setting == 9 %}active{% endif %}" id="approverequest">
+<!-- <div class="col-xs-9 col-xs-offset-3 col-md-10 col-md-offset-2 main tab-pane {% if request.session.setting == 9 %}active{% endif %}" id="approverequest">
     {% include 'polls/_approve_request.html' %}
-</div>
+</div> -->
     
 {% else %}
 <div class="col-xs-9 col-xs-offset-3 col-md-10 col-md-offset-2 main tab-pane" id="quit">
