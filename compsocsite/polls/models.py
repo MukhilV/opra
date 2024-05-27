@@ -32,6 +32,7 @@ class Question(models.Model):
     follow_up = models.OneToOneField('Question', on_delete=models.CASCADE, null = True, blank = True)
     question_owner = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     question_voters = models.ManyToManyField(User, related_name='poll_participated')
+    recentCSVText = models.TextField(null=True, blank=True, default=None)
     status = models.IntegerField(default=1)
     display_pref = models.IntegerField(default=1)
     creator_pref = models.IntegerField(default=1)

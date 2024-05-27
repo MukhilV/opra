@@ -1,0 +1,162 @@
+<script>
+    function add_voter(username){
+        $.ajax({
+            url: "{% url 'polls:addvoter' question.id %}",
+            data: {
+                'voters': username,
+                'email': $("#email1").val()
+            },
+            dataType: 'json',
+            success: function (data) {
+                $('#user-search').val("");
+                $('#currentVoters').html($('#currentVoters').html() + "<option value=\"" + username + "\">" + username + "</option>");
+            }
+        });
+    }
+
+    $(function() {
+        $("#user-search").autocomplete({
+            source: function(request, response) {
+                $.ajax({
+                    url: "/polls/api/get_voters/",
+                    dataType: "json",
+                    data: {
+                        term : request.term,
+                        poll_id : {{question.id}}
+                    },
+                    success: function(data) {
+                        response(data);
+                    }
+                });
+            },
+            minLength: 2,
+            select: function( event, ui ) {
+                add_voter(ui.item.value);
+            }
+        });
+    });
+</script>
+<br><br>
+<h2>Add multiple existing users/group</h2>
+<div class = "row">
+<div class="col-md-4">
+    <b>Current Voters: </b>
+    <form action="{% url 'polls:delvoter' question.id %}" method="post">
+        {% csrf_token %}
+        <select id="currentVoters" name="voters" class="form-control" multiple>
+            {% for user in question.question_voters.all %}
+                <option value="{{ user.username }}">{{ user.username }}</option>
+            {% endfor %}
+        </select>
+        <br />
+        {% if question.status == 1 %}
+            <label for="email2">Email announcement</label>
+            <input type="checkbox" name="email" id="email2" value="email" {% if question.emailDelete == True or question.emailDelete == None %} checked {% endif %} onchange="this.form.submit()">
+            <br />
+            <input type="submit" class="btn btn-danger" value="&#xf068;">
+        {% endif %}
+    </form> 
+</div>     
+<div class="col-md-4">
+    <b>Add Existing Voter: </b>
+    <form id="addUserForm" action="{% url 'polls:addvoter' question.id %}" method="post">
+        {% csrf_token %}
+        <!-- <input name="voters" type="text" class="form-control" id="user-search"> -->
+        <select name="voters" class="form-control multiple-select" multiple>
+            {% for user in users %}
+                <option value="{{ user.username }}">{{ user.username }}</option>
+            {% endfor %}
+        </select>
+        <br>
+
+        <br />
+        <label for="email1">Email announcement</label>
+        <input type="checkbox" name="email" id="email1" value="email" {% if question.emailInvite == True %} checked {% endif %}>
+        <br />
+
+        <br>
+        <input type="submit" value="Submit" class="btn btn-primary">
+    </form>     
+</div>
+<div class="col-md-4">
+    <b>Add Group: </b>
+    <form action="{% url 'groups:addgroupvoters' question.id %}" method="post">
+        {% csrf_token %}
+        <div class="input-group">
+            <select name="groups" class="form-control multiple-select" multiple>
+                {% for group in groups %}
+                    {% if group.owner == request.user %}
+                        <option value="{{ group.name }}">{{group.name}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <input type="submit" class="btn btn-success" value="&#xf067;"/>
+                {% if question.status == 1 %}
+                <input type="submit" class="btn btn-danger" value="&#xf068;" formaction="{% url 'groups:removegroupvoters' question.id %}">
+            {% endif %}
+        </div>
+        <br />
+        <label for="email">Email announcement</label>
+        <input type="checkbox" name="email" id="email" value="email" {% if question.emailInvite == True or question.emailInvite == None %} checked {% endif %} onchange="this.form.submit()">
+        <br />
+    </form>
+</div>
+</div>
+
+<br><br>
+<h2>Add voters with CSV</h2>
+<div class="row">
+    <div class="col-md-6">
+        <b>Registered Voters: </b>
+            <select id="registeredVoters" name="registeredVoters" class="form-control" multiple>
+                {% for username in registeredUsers %}
+                    <option value="{{ username }}">{{ username }}</option>
+                {% endfor %}
+            </select>
+            <br><br>
+            <b>Unregistered Voters: </b>
+            <select id="unregisteredVoters" name="unregisteredVoters" class="form-control" multiple>
+                {% for username in unRegisteredUsers %}
+                    <option value="{{ username }}">{{ username }}</option>
+                {% endfor %}
+            </select>
+            <br />
+            {% if question.status == 1 %}
+                <label for="email2">Email announcement</label>
+                <input type="checkbox" name="email" id="email3" value="email" {% if question.emailDelete == True or question.emailDelete == None %} checked {% endif %} onchange="this.form.submit()">
+                <br />
+                <input type="submit" class="btn btn-danger" value="&#xf068;">
+            {% endif %}
+    </div> 
+    <div class="col-md-6">
+        <form id="csvTextAreaForm" action="{% url 'polls:savelatestcsv' question.id %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="csvTextArea">Enter the CSV in the below text area</label>
+                <textarea class="form-control" id="csvTextArea" name="votersCSVText" rows="9">{{ recentCSVText }}</textarea>
+            </div>
+            <input type="submit" value="Submit" class="btn btn-primary">
+        </form>
+    </div>
+</div>
+
+<br><br><br>
+<h2>Optionally send E-mail to participants</h2>
+<div class="row">
+    <div class="col-md-12">
+        <form id="sendEmailInviteForm" action="{% url 'polls:sendemailinvite' question.id %}"  method="post">
+            {% csrf_token %}
+            <br>
+            <label>Recepients:</label> &nbsp;&nbsp;
+            <input type="radio" name="recepients" value="regVotersOnly"> Registered participants &nbsp;&nbsp;
+            <input type="radio" name="recepients" value="unregVotersOnly"> Unregistered participants &nbsp;&nbsp;
+            <input type="radio" name="recepients" value="allVoters" checked> Both &nbsp;&nbsp;
+            <br>
+            <input type="text" name="mailSubject" class="form-control" placeholder="Subject of the Mail" required>
+            <br><br>
+            <textarea class="form-control" id="mailBody" name="mailBody" rows="9" placeholder="Content of the E-mail..." required></textarea>
+            <br>
+            <input type="submit" value="Send E-mail" class="btn btn-primary">
+        </form>
+    </div>
+</div>
