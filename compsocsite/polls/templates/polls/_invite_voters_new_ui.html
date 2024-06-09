@@ -36,6 +36,22 @@
         });
     });
 
+
+    function toggleTextbox(){
+            const textAreaForCustomMails = document.getElementById("textAreaForCustomMails");
+            const customEmailsRadioButton = document.getElementById("customEmailsRadioButton");
+
+            if (customEmailsRadioButton.checked) {
+                // textAreaForCustomMails.style.display = 'block'; // Show the textbox
+                textAreaForCustomMails.classList.remove('hide');
+                textAreaForCustomMails.classList.add('show');
+            } else {
+                // textAreaForCustomMails.style.display = 'none'; // Hide the textbox
+                textAreaForCustomMails.classList.remove('show');
+                textAreaForCustomMails.classList.add('hide');
+            }
+        }
+
     $(window).load(function(){
         function toggleSelectAll(selectAllCheckbox, multiSelect) {
         const options = multiSelect.options;
@@ -54,6 +70,12 @@
         selectAllCheckbox.addEventListener('change', () => {
             toggleSelectAll(selectAllCheckbox, multiSelect);
         });
+
+        const radioButtons = document.querySelectorAll('input[name="recepients"]');
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', toggleTextbox);
+        });
+
     });
 
 
@@ -61,6 +83,14 @@
 <style>
 .height-100{
  height: 100px;
+}
+
+.hide{
+    display: none;
+}
+
+.show{
+    display: block;
 }
 
 </style>
@@ -203,9 +233,12 @@
                     <input type="radio" name="recepients" value="regVotersOnly"> Registered participants &nbsp;&nbsp;
                     <input type="radio" name="recepients" value="unregVotersOnly"> Unregistered participants &nbsp;&nbsp;
                     <input type="radio" name="recepients" value="allVoters" checked> Both &nbsp;&nbsp;
+                    <input type="radio" name="recepients" value="customEmails" id = "customEmailsRadioButton"> Custom &nbsp;&nbsp;
+                    <br>
+                    <textarea id="textAreaForCustomMails" class="form-control hide" placeholder="Emails sepereated by comma" style="height: 100px; margin-top: 20px;"></textarea>
                     <br>
                     <input type="text" id="mailSubject" name="mailSubject" class="form-control" placeholder="Subject of the Mail" required>
-                    <br><br>
+                    <br>
                     <textarea class="form-control" id="mailBody" name="mailBody" rows="9" placeholder="Content of the E-mail..." required></textarea>
                     <br>
                     <input type="submit" value="Send E-mail" class="btn btn-primary">
