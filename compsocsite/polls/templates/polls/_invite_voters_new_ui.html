@@ -38,19 +38,31 @@
 
 
     function toggleTextbox(){
-            const textAreaForCustomMails = document.getElementById("textAreaForCustomMails");
-            const customEmailsRadioButton = document.getElementById("customEmailsRadioButton");
+        const textAreaForCustomMails = document.getElementById("textAreaForCustomMails");
+        const customEmailsRadioButton = document.getElementById("customEmailsRadioButton");
 
-            if (customEmailsRadioButton.checked) {
-                // textAreaForCustomMails.style.display = 'block'; // Show the textbox
-                textAreaForCustomMails.classList.remove('hide');
-                textAreaForCustomMails.classList.add('show');
-            } else {
-                // textAreaForCustomMails.style.display = 'none'; // Hide the textbox
-                textAreaForCustomMails.classList.remove('show');
-                textAreaForCustomMails.classList.add('hide');
-            }
+        if (customEmailsRadioButton.checked) {
+            // textAreaForCustomMails.style.display = 'block'; // Show the textbox
+            textAreaForCustomMails.classList.remove('hide');
+            textAreaForCustomMails.classList.add('show');
+        } else {
+            // textAreaForCustomMails.style.display = 'none'; // Hide the textbox
+            textAreaForCustomMails.classList.remove('show');
+            textAreaForCustomMails.classList.add('hide');
         }
+    }
+
+    function toggleMailDiv(emailNotification, mailNotificationDiv){
+
+        if(emailNotification.checked) {
+            mailNotificationDiv.classList.remove('hide');
+            mailNotificationDiv.classList.add('show');
+        } else {
+            mailNotificationDiv.classList.remove('show');
+            mailNotificationDiv.classList.add('hide');
+        }
+    }
+
 
     $(window).load(function(){
         function toggleSelectAll(selectAllCheckbox, multiSelect) {
@@ -67,13 +79,25 @@
         const multiSelect = document.getElementById('currentVoters');
 
         // Add event listener to the "Select All" checkbox
-        selectAllCheckbox.addEventListener('change', () => {
+        selectAllCheckbox?.addEventListener('change', () => {
             toggleSelectAll(selectAllCheckbox, multiSelect);
         });
 
         const radioButtons = document.querySelectorAll('input[name="recepients"]');
-        radioButtons.forEach(radio => {
+        radioButtons?.forEach(radio => {
             radio.addEventListener('change', toggleTextbox);
+        });
+
+        const emailNotification = document.getElementById('emailNotification');
+        const mailNotificationDiv = document.getElementById("mailNotificationDiv");
+        emailNotification?.addEventListener('change', ()=>{
+            toggleMailDiv(emailNotification, mailNotificationDiv);
+        });
+
+        const emailNotificationToRemove = document.getElementById('emailNotificationToRemove');
+        const mailNotificationDivToRemove = document.getElementById("mailNotificationDivToRemove");
+        emailNotificationToRemove?.addEventListener('change', ()=>{
+            toggleMailDiv(emailNotificationToRemove, mailNotificationDivToRemove);
         });
 
     });
@@ -99,40 +123,84 @@
     <div class="panel-heading"><h4>Add multiple existing users/group:<h4></div>
     <div class="panel-body">
         <div class = "row">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div style="display: flex; width: 100%;">
                 <div style="width: 70%;">
                     <label>Current Participants: </label> 
                 </div> 
+                {% if question.status == 1 %}
                 <div style="width: 30%;">
                     <div style="float: right;">
                         <label for="selectAll" style="margin-right: 5px;">Select all</label> 
                         <input type="checkbox" id="selectAll">
                     </div>
                 </div>
+                {% endif %}
             </div>
             <form action="{% url 'polls:delvoter' question.id %}" method="post">
                 {% csrf_token %}
-                <select id="currentVoters" name="voters" class="form-control"  multiple>
+                <select id="currentVoters" name="voters" class="form-control"  multiple style="height: 150px;">
                     {% for user in question.question_voters.all %}
                         <option value="{{ user.username }}">{{ user.username }}</option>
                     {% endfor %}
                 </select>
                 <br />
                 {% if question.status == 1 %}
-                    <label for="email2">Email announcement</label>
-                    <input type="checkbox" name="email" id="email2" value="email" {% if question.emailDelete == True or question.emailDelete == None %} checked {% endif %} onchange="this.form.submit()">
+                    <label for="emailNotificationToRemove">Email announcement</label>
+                    <input type="checkbox" name="email" id="emailNotificationToRemove" value="email" {% if question.emailDelete == True or question.emailDelete == None %} checked {% endif %}>
                     <br />
+                    <div id="mailNotificationDivToRemove" class="hide">
+                        <input type="text" id="mailNotificationSubject" name="mailSubject" class="form-control" placeholder="Subject of the Mail" required>
+                        <br>
+                        <textarea class="form-control" id="mailNotificationBody" name="mailBody" rows="9" placeholder="Content of the E-mail..." required></textarea>
+                        <br>
+                    </div>
                     <input type="submit" class="btn btn-danger" value="Remove Participants">
                 {% endif %}
             </form> 
         </div>     
-        <div class="col-md-4">
-            <label>Add Existing Users: </label>
+        <div class="col-md-6">
+            <form id = "addUsersForm" action="{% url 'polls:addvoters' question.id %}" method="post">
+                <label>Add Existing Users: </label>
+                {% csrf_token %}
+                <select name="voters" class="form-control multiple-select"  multiple>
+                    {% for user in users %}
+                        <option value="{{ user.username }}">{{ user.username }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <input type="submit" value="Add Users" class="btn btn-success" style="margin-top: 15px;">
+                <br><br>
+                <label>Add Group: </label>
+                <select name="groups" class="form-control multiple-select" multiple >
+                    {% for group in groups %}
+                        {% if group.owner == request.user %}
+                            <option value="{{ group.name }}">{{group.name}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <br>
+                <input type="submit" class="btn btn-success" value="Add" style="margin-top: 15px;"/>
+                {% if question.status == 1 %}
+                    <input type="submit" class="btn btn-danger" value="Remove" style="margin-top: 15px;" formaction="{% url 'groups:removegroupvoters' question.id %}">
+                {% endif %}
+                <br><br>
+                <label for="email">Email announcement</label>
+                <input type="checkbox" name="email" id="emailNotification" value="email" {% if question.emailInvite == True or question.emailInvite == None %} checked {% endif %} >
+                <br>
+                <div id="mailNotificationDiv" class="hide">
+                    <input type="text" id="mailNotificationSubject" name="mailSubject" class="form-control" placeholder="Subject of the Mail" required>
+                    <br>
+                    <textarea class="form-control" id="mailNotificationBody" name="mailBody" rows="9" placeholder="Content of the E-mail..." required></textarea>
+                    <br>
+                </div>
+            </form>
+
+
+            <!-- <label>Add Existing Users: </label>
             <form id="addUserForm" action="{% url 'polls:addvoter' question.id %}" method="post">
                 {% csrf_token %}
-                <!-- <input name="voters" type="text" class="form-control" id="user-search"> -->
-                <select name="voters" class="form-control"  multiple>
+                <select name="voters" class="form-control multiple-select"  multiple>
                     {% for user in users %}
                         <option value="{{ user.username }}">{{ user.username }}</option>
                     {% endfor %}
@@ -143,25 +211,19 @@
                 <br />
                 <input type="submit" value="Add Users" class="btn btn-success">
                 
-            </form>     
-        </div>
-        <div class="col-md-4">
+            </form>  
+            
+            
             <label>Add Group: </label>
             <form action="{% url 'groups:addgroupvoters' question.id %}" method="post">
                 {% csrf_token %}
-                <!-- <div class="input-group"> -->
-                    <select name="groups" class="form-control" multiple >
+                    <select name="groups" class="form-control multiple-select" multiple >
                         {% for group in groups %}
                             {% if group.owner == request.user %}
                                 <option value="{{ group.name }}">{{group.name}}</option>
                             {% endif %}
-                        {% endfor %}
+                        {% endfor %} 
                     </select>
-                    <!-- <input type="submit" class="btn btn-success" value="&#xf067;"/>
-                        {% if question.status == 1 %}
-                        <input type="submit" class="btn btn-danger" value="&#xf068;" formaction="{% url 'groups:removegroupvoters' question.id %}">
-                    {% endif %} -->
-                <!-- </div> -->
                 <br />
                 <label for="email">Email announcement</label>
                 <input type="checkbox" name="email" id="email" value="email" {% if question.emailInvite == True or question.emailInvite == None %} checked {% endif %} onchange="this.form.submit()">
@@ -171,8 +233,10 @@
                     <input type="submit" class="btn btn-danger" value="Remove" formaction="{% url 'groups:removegroupvoters' question.id %}">
                 {% endif %}
                 <br />
-            </form>
+            </form> -->
+        
         </div>
+        
         </div>
     </div>
 </div>
