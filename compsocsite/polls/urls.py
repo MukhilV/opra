@@ -47,6 +47,7 @@ urlpatterns = [
     
     # voters
     re_path(r'^(?P<question_id>[0-9]+)/addvoter/$', views.addVoter, name='addvoter'),
+    re_path(r'^(?P<question_id>[0-9]+)/addvoters/$', views.addVoters, name='addvoters'),
     re_path(r'^(?P<question_id>[0-9]+)/delvoter/$', views.removeVoter, name='delvoter'),
 
     # save the uploaded csv text

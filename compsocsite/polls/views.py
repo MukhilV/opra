@@ -1956,6 +1956,36 @@ def addVoter(request, question_id):
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)
 
+def addVoters(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    creator_obj = User.objects.get(id=question.question_owner_id)
+
+    newVoters = request.POST.getlist('voters')
+    if newVoters: 
+        try:
+            for voter in newVoters:
+                voterObj = User.objects.get(username=voter)
+                question.question_voters.add(voterObj.id)
+        except:
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    
+    newGroups = request.POST.getlist('groups')
+    if newGroups:
+        for group in newGroups:
+            groupObj = Group.objects.get(name=group)
+            voters = groupObj.members.all()
+            question.question_voters.add(*voters)
+
+    request.session['setting'] = 1
+
+    email = request.POST.get('email') == 'email'
+    question.emailInvite = email
+    if email:
+        email_class = EmailThread(request, question_id, 'invite')
+        email_class.start()
+    question.save()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 # Save the recently uploaded csv text
 def saveLatestCSV(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
@@ -1972,7 +2002,7 @@ def saveLatestCSV(request, question_id):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-def sendEmail(userID):
+def sendEmail(userID, mailSubject, mailBody):
     # logic to send email from opra mail id
     return
 
@@ -1982,6 +2012,8 @@ def sendEmailInvite(request, question_id):
     creator_obj = User.objects.get(id=question.question_owner_id)
 
     recepients = request.POST.get('recepients')
+    mailSubject = request.POST.get('mailSubject')
+    mailBody = request.POST.get('mailBody')
     existingUsers = User.objects.all()
     existingUserIDs = [user.username for user in existingUsers]
 
@@ -1994,14 +2026,14 @@ def sendEmailInvite(request, question_id):
             if(recepients == "regVotersOnly"):
                 for userID in userIDsFromCSV:
                     if userID in existingUserIDs:
-                        sendEmail(userID)
+                        sendEmail(userID, mailSubject, mailBody)
             elif(recepients == "unregVotersOnly"):
                 for userID in userIDsFromCSV:
                     if userID not in existingUserIDs:
-                        sendEmail(userID)
+                        sendEmail(userID, mailSubject, mailBody)
             else:
                 for userID in userIDsFromCSV:
-                    sendEmail(userID)       
+                    sendEmail(userID, mailSubject, mailBody)       
     except:
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     
