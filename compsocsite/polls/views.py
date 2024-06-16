@@ -2720,7 +2720,7 @@ def mixtureAPI_test(request):
 
 #Poll search API
 def get_polls(request):
-    if request.is_ajax():
+    if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
         q = request.GET.get('term', '')
         polls = list(Question.objects.filter(question_owner=request.user,
                                                        m_poll=False,
@@ -3010,7 +3010,7 @@ class RGENView(views.generic.ListView):
         return ctx
 
 def get_voters(request):
-    if request.is_ajax():
+    if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
         q = request.GET.get('term', '')
         users = list(User.objects.filter(username__icontains=q))
         poll_id = request.GET.get('poll_id', '-1')
