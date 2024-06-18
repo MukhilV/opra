@@ -210,34 +210,40 @@
 <div class="col-xs-9 col-xs-offset-3 col-md-10 col-md-offset-2 main tab-pane {% if request.session.setting == 4 %}active{% endif %}" id="qr">
     <h3 class="page-header">Info and settings of {{ question.question_text }} </h3>
 
-    <div id="qrcode" style="margin-top:15px;">
-        {% with question.id|stringformat:"i" as question_id %}
-                {% qr_from_text "http://127.0.0.1:8000/polls"|add:question_id size="s" image_format="png" error_correction="L" %}
-        {% endwith %}
-    </div>
-    <a href="#" id="showQRLink">Show Link</a>
-    <a href="#" id="hideQRLink">Hide Link</a>
-    <br />
-    <h3 href="{% url 'polls:detail' question.id %}" id="QRLink">http://127.0.0.1:8000{% url 'polls:detail' question.id %}</h3>
-    <br />
-    <form class="form-group" method="post" action="{% url 'polls:changeType' question.id %}">
-        {% csrf_token %}
+    <div class="panel panel-default">
+        <div class="panel-heading">QR code:</div>
+        <div class="panel-body">
+            <div id="qrcode" style="margin-top:15px;">
+                {% with question.id|stringformat:"i" as question_id %}
+                        {% qr_from_text "http://127.0.0.1:8000/polls"|add:question_id size="s" image_format="png" error_correction="L" %}
+                {% endwith %}
+            </div>
+            <a href="#" id="showQRLink">Show Link</a>
+            <a href="#" id="hideQRLink">Hide Link</a>
+            <br />
+            <h3 href="{% url 'polls:detail' question.id %}" id="QRLink">http://127.0.0.1:8000{% url 'polls:detail' question.id %}</h3>
+            <br />
+            <form class="form-group" method="post" action="{% url 'polls:changeType' question.id %}">
+                {% csrf_token %}
 
-        <div class="btn-group" data-toggle="buttons">
-            <label class="btn btn-default {% if question.open == 1 %}active{% endif %}">
-            <input type="radio" name="openpoll" value="anon" {% if question.open == 1 %}checked{% endif %}>Anonymous</option>
-            </label>
-            <label class="btn btn-default {% if question.open == 0 %}active{% endif %}">
-            <input type="radio" name="openpoll" value="invite" {% if question.open == 0 %}checked{% endif %}>Invited</option>
-            </label>
-            <label class="btn btn-default {% if question.open == 2 %}active{% endif %}">
-            <input type="radio" name="openpoll" value="uninvite" {% if question.open == 2 %}checked{% endif %}>Users-Only</option>
-            </label>
+                <div class="btn-group" data-toggle="buttons">
+                    <label class="btn btn-default {% if question.open == 1 %}active{% endif %}">
+                    <input type="radio" name="openpoll" value="anon" {% if question.open == 1 %}checked{% endif %}>Anonymous</option>
+                    </label>
+                    <label class="btn btn-default {% if question.open == 0 %}active{% endif %}">
+                    <input type="radio" name="openpoll" value="invite" {% if question.open == 0 %}checked{% endif %}>Invited</option>
+                    </label>
+                    <label class="btn btn-default {% if question.open == 2 %}active{% endif %}">
+                    <input type="radio" name="openpoll" value="uninvite" {% if question.open == 2 %}checked{% endif %}>Users-Only</option>
+                    </label>
+                </div>
+
+                <input type="submit" value="Finish" class="btn btn-primary">
+            </form>
         </div>
+    </div>
 
-        <input type="submit" value="Finish" class="btn btn-primary">
-    </form>
-    <br><br><br><br><br><br> 
+    <br><br>
     {% include 'polls/_approve_request.html' %}
 </div>
 
