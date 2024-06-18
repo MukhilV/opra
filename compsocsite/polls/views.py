@@ -202,7 +202,6 @@ class MainView(views.generic.ListView):
         ctx['alloc_methods'] = getAllocMethods()
         ctx['view_preferences'] = getViewPreferences()
         ctx['active_polls'] = active_polls
-
         return ctx
 
 
@@ -1960,29 +1959,56 @@ def addVoters(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     creator_obj = User.objects.get(id=question.question_owner_id)
 
+    email = request.POST.get('email') == 'email'
+
+    mailSub = request.POST.get('mailNotificationSubject1')
+    mailBody = request.POST.get('mailNotificationBody1')
+
     newVoters = request.POST.getlist('voters')
     if newVoters: 
         try:
             for voter in newVoters:
                 voterObj = User.objects.get(username=voter)
                 question.question_voters.add(voterObj.id)
+            
+            if email:
+                print("Email sending logic here")
+                # mail.send_mail(mailSub,
+                #             mailBody,
+                #             'opra@cs.binghamton.edu',
+                #             ['mukhil1140@gmail.com'], # newVoters
+                #             html_message='')
+                
         except:
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     
     newGroups = request.POST.getlist('groups')
+    votersEmailIDsInGroups=[]
     if newGroups:
         for group in newGroups:
             groupObj = Group.objects.get(name=group)
             voters = groupObj.members.all()
             question.question_voters.add(*voters)
+            votersEmailIDsInGroups = votersEmailIDsInGroups + [voter.username for voter in voters] 
+        
+        for mailID in votersEmailIDsInGroups:
+            if mailID in newVoters:
+                votersEmailIDsInGroups.remove(mailID)
+
+        if email:
+            print("Email sending logic here")
+            # mail.send_mail(mailSub,
+            #                 mailBody,
+            #                 'opra@cs.binghamton.edu',
+            #                 ['mukhil1140@gmail.com'], # votersEmailIDsInGroups
+            #                 html_message='')
 
     request.session['setting'] = 1
 
-    email = request.POST.get('email') == 'email'
     question.emailInvite = email
-    if email:
-        email_class = EmailThread(request, question_id, 'invite')
-        email_class.start()
+    # if email:
+    #     email_class = EmailThread(request, question_id, 'invite')
+    #     email_class.start()
     question.save()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -2002,8 +2028,13 @@ def saveLatestCSV(request, question_id):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-def sendEmail(userID, mailSubject, mailBody):
-    # logic to send email from opra mail id
+def sendEmail(toEmails, mailSubject, mailBody):
+    # logic to send email from opra mail id 
+    mail.send_mail(mailSubject,
+                    mailBody,
+                    'opra@cs.binghamton.edu',
+                    ['mukhil1140@gmail.com'], # toEmails
+                    html_message='')
     return
 
 # Send email invite to Registered and Non registered Participants
@@ -2017,6 +2048,8 @@ def sendEmailInvite(request, question_id):
     existingUsers = User.objects.all()
     existingUserIDs = [user.username for user in existingUsers]
 
+    registersParticipants = []
+    UnRegisteredParticipants = []
     try: 
         recentCSVText = question.recentCSVText
         if(recentCSVText is not None): 
@@ -2026,14 +2059,19 @@ def sendEmailInvite(request, question_id):
             if(recepients == "regVotersOnly"):
                 for userID in userIDsFromCSV:
                     if userID in existingUserIDs:
-                        sendEmail(userID, mailSubject, mailBody)
+                        registersParticipants.append(userID)
+                sendEmail(registersParticipants, mailSubject, mailBody)
             elif(recepients == "unregVotersOnly"):
                 for userID in userIDsFromCSV:
                     if userID not in existingUserIDs:
-                        sendEmail(userID, mailSubject, mailBody)
-            else:
-                for userID in userIDsFromCSV:
-                    sendEmail(userID, mailSubject, mailBody)       
+                        UnRegisteredParticipants.append(userID)
+                sendEmail(UnRegisteredParticipants, mailSubject, mailBody)
+            elif(recepients == "customEmails"):
+                csvEmails = request.POST.get('textAreaForCustomMails')
+                customEmails = csvEmails.split(',')
+                sendEmail(customEmails, mailSubject, mailBody)
+            elif(recepients == "allVoters"):
+                sendEmail(userIDsFromCSV, mailSubject, mailBody)       
     except:
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     
@@ -2047,15 +2085,27 @@ def removeVoter(request, question_id):
 
     newVoters = request.POST.getlist('voters')
     email = request.POST.get('email') == 'email'
+
+    mailSub = request.POST.get('mailNotificationSubject')
+    mailBody = request.POST.get('mailNotificationBody')
+
     question.emailDelete = email
-    question.save()
-    if email:
-        email_class = EmailThread(request, question_id, 'remove')
-        email_class.start()
+    # if email:
+    #     email_class = EmailThread(request, question_id, 'remove')
+    #     email_class.start()
+    
     for voter in newVoters:
         voterObj = User.objects.get(username=voter)
         question.question_voters.remove(voterObj.id)
+    if email:
+        mail.send_mail(mailSub,
+                    mailBody,
+                    'opra@cs.binghamton.edu',
+                    ['mukhil1140@gmail.com'], # newVoters
+                    html_message='')
+        
     request.session['setting'] = 1
+    question.save()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 # called when creating the poll

@@ -63,6 +63,14 @@
         }
     }
 
+    function populateDefaultText(mailSubjectElementId, mailContentElementId, subjectText, mailText){
+        const mailSubEle = document.getElementById(mailSubjectElementId);
+        const mailBodyEle = document.getElementById(mailContentElementId);
+
+        mailSubEle.value = subjectText;
+        mailBodyEle.innerHTML = mailText;
+    }
+
 
     $(window).load(function(){
         function toggleSelectAll(selectAllCheckbox, multiSelect) {
@@ -100,6 +108,25 @@
             toggleMailDiv(emailNotificationToRemove, mailNotificationDivToRemove);
         });
 
+        // Populate default text into email body
+        populateDefaultText('mailNotificationSubject', 'mailNotificationBody', 
+        'You have been removed from {{ question.question_text }}', 'Some text');
+
+        populateDefaultText('mailNotificationSubject1', 'mailNotificationBody1', 
+        'You have been added to {{ question.question_text }}', 'Some text');
+        
+        var url = window.location;
+        var protocol = url.protocol;
+        var host = url.host; 
+        populateDefaultText('mailSubject', 'mailBody', 
+        'You have been added to {{ question.question_text }}', 'Sign up link: '+ protocol+host +'/auth/register/ \nLogin link: '+ protocol+host +'/polls/main');
+
+        const emailNotificationToInvite = document.getElementById("emailNotificationToInvite");
+        const emailDivForInvite = document.getElementById("emailDivForInvite");
+        emailNotificationToInvite?.addEventListener('change', ()=>{
+            toggleMailDiv(emailNotificationToInvite, emailDivForInvite);
+        });
+
     });
 
 
@@ -124,22 +151,23 @@
     <div class="panel-body">
         <div class = "row">
         <div class="col-md-6">
-            <div style="display: flex; width: 100%;">
-                <div style="width: 70%;">
-                    <label>Current Participants: </label> 
-                </div> 
-                {% if question.status == 1 %}
-                <div style="width: 30%;">
-                    <div style="float: right;">
-                        <label for="selectAll" style="margin-right: 5px;">Select all</label> 
-                        <input type="checkbox" id="selectAll">
-                    </div>
-                </div>
-                {% endif %}
-            </div>
+            
             <form action="{% url 'polls:delvoter' question.id %}" method="post">
+                <div style="display: flex; width: 100%;">
+                    <div style="width: 70%;">
+                        <label>Current Participants: </label> 
+                    </div> 
+                    {% if question.status == 1 %}
+                    <div style="width: 30%;">
+                        <div style="float: right;">
+                            <label for="selectAll" style="margin-right: 5px;">Select all</label> 
+                            <input type="checkbox" id="selectAll">
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
                 {% csrf_token %}
-                <select id="currentVoters" name="voters" class="form-control"  multiple style="height: 150px;">
+                <select id="currentVoters" name="voters" class="form-control"  multiple style="height: 163px;">
                     {% for user in question.question_voters.all %}
                         <option value="{{ user.username }}">{{ user.username }}</option>
                     {% endfor %}
@@ -147,12 +175,13 @@
                 <br />
                 {% if question.status == 1 %}
                     <label for="emailNotificationToRemove">Email announcement</label>
-                    <input type="checkbox" name="email" id="emailNotificationToRemove" value="email" {% if question.emailDelete == True or question.emailDelete == None %} checked {% endif %}>
+                    <input type="checkbox" name="email" id="emailNotificationToRemove" value="email" >
+                    <!-- {% if question.emailDelete == True or question.emailDelete == None %} checked {% endif %} -->
                     <br />
                     <div id="mailNotificationDivToRemove" class="hide">
-                        <input type="text" id="mailNotificationSubject" name="mailSubject" class="form-control" placeholder="Subject of the Mail" required>
+                        <input type="text" id="mailNotificationSubject" name="mailNotificationSubject" class="form-control" placeholder="Subject of the Mail" >
                         <br>
-                        <textarea class="form-control" id="mailNotificationBody" name="mailBody" rows="9" placeholder="Content of the E-mail..." required></textarea>
+                        <textarea class="form-control" id="mailNotificationBody" name="mailNotificationBody" rows="9" placeholder="Content of the E-mail..." ></textarea>
                         <br>
                     </div>
                     <input type="submit" class="btn btn-danger" value="Remove Participants">
@@ -161,79 +190,48 @@
         </div>     
         <div class="col-md-6">
             <form id = "addUsersForm" action="{% url 'polls:addvoters' question.id %}" method="post">
-                <label>Add Existing Users: </label>
-                {% csrf_token %}
-                <select name="voters" class="form-control multiple-select"  multiple>
-                    {% for user in users %}
-                        <option value="{{ user.username }}">{{ user.username }}</option>
-                    {% endfor %}
-                </select>
-                <br>
-                <input type="submit" value="Add Users" class="btn btn-success" style="margin-top: 15px;">
-                <br><br>
-                <label>Add Group: </label>
-                <select name="groups" class="form-control multiple-select" multiple >
-                    {% for group in groups %}
-                        {% if group.owner == request.user %}
-                            <option value="{{ group.name }}">{{group.name}}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-                <br>
-                <input type="submit" class="btn btn-success" value="Add" style="margin-top: 15px;"/>
-                {% if question.status == 1 %}
-                    <input type="submit" class="btn btn-danger" value="Remove" style="margin-top: 15px;" formaction="{% url 'groups:removegroupvoters' question.id %}">
-                {% endif %}
-                <br><br>
-                <label for="email">Email announcement</label>
-                <input type="checkbox" name="email" id="emailNotification" value="email" {% if question.emailInvite == True or question.emailInvite == None %} checked {% endif %} >
-                <br>
-                <div id="mailNotificationDiv" class="hide">
-                    <input type="text" id="mailNotificationSubject" name="mailSubject" class="form-control" placeholder="Subject of the Mail" required>
+                <div>
+                    <label style="width: 30%;">Add Existing Users: </label>
+                    {% csrf_token %}
+                    <select name="voters" class="form-control multiple-select"  style="width: 100%;" multiple>
+                        {% for user in users %}
+                            <option value="{{ user.username }}">{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
                     <br>
-                    <textarea class="form-control" id="mailNotificationBody" name="mailBody" rows="9" placeholder="Content of the E-mail..." required></textarea>
-                    <br>
+                    <input type="submit" value="Add Users" class="btn btn-success" style="margin-top: 15px;">
                 </div>
-            </form>
-
-
-            <!-- <label>Add Existing Users: </label>
-            <form id="addUserForm" action="{% url 'polls:addvoter' question.id %}" method="post">
-                {% csrf_token %}
-                <select name="voters" class="form-control multiple-select"  multiple>
-                    {% for user in users %}
-                        <option value="{{ user.username }}">{{ user.username }}</option>
-                    {% endfor %}
-                </select>
-                <br>
-                <label for="email1">Email announcement</label>
-                <input type="checkbox" name="email" id="email1" value="email" {% if question.emailInvite == True %} checked {% endif %}>
-                <br />
-                <input type="submit" value="Add Users" class="btn btn-success">
                 
-            </form>  
-            
-            
-            <label>Add Group: </label>
-            <form action="{% url 'groups:addgroupvoters' question.id %}" method="post">
-                {% csrf_token %}
-                    <select name="groups" class="form-control multiple-select" multiple >
+                <br>
+
+                <div>
+                    <label style="width: 30%;">Add Group: </label>
+                    <select name="groups" class="form-control multiple-select" style="width: 100%;" multiple >
                         {% for group in groups %}
                             {% if group.owner == request.user %}
                                 <option value="{{ group.name }}">{{group.name}}</option>
                             {% endif %}
-                        {% endfor %} 
+                        {% endfor %}
                     </select>
-                <br />
-                <label for="email">Email announcement</label>
-                <input type="checkbox" name="email" id="email" value="email" {% if question.emailInvite == True or question.emailInvite == None %} checked {% endif %} onchange="this.form.submit()">
+                    <br>
+                    <input type="submit" class="btn btn-success" value="Add" style="margin-top: 15px;"/>
+                    {% if question.status == 1 %}
+                        <input type="submit" class="btn btn-danger" value="Remove" style="margin-top: 15px;" formaction="{% url 'groups:removegroupvoters' question.id %}">
+                    {% endif %}
+                </div>
                 <br>
-                <input type="submit" class="btn btn-success" value="Add"/>
-                {% if question.status == 1 %}
-                    <input type="submit" class="btn btn-danger" value="Remove" formaction="{% url 'groups:removegroupvoters' question.id %}">
-                {% endif %}
-                <br />
-            </form> -->
+                <label for="email">Email announcement</label>
+                <input type="checkbox" name="email" id="emailNotification" value="email" >
+                <!-- {% if question.emailInvite == True or question.emailInvite == None %} checked {% endif %} -->
+                <br>
+                <div id="mailNotificationDiv" class="hide">
+                    <input type="text" id="mailNotificationSubject1" name="mailNotificationSubject1" class="form-control" placeholder="Subject of the Mail" >
+                    <br>
+                    <textarea class="form-control" id="mailNotificationBody1" name="mailNotificationBody1" rows="9" placeholder="Content of the E-mail..." ></textarea>
+                    <br>
+                </div>
+            </form>
+            
         
         </div>
         
@@ -254,7 +252,7 @@
                         <label for="csvTextArea">Enter the CSV in the below text area</label>
                         <textarea class="form-control" id="csvTextArea" name="votersCSVText" rows="9" style="height: 221px;">{{ recentCSVText }}</textarea>
                     </div>
-                    <input type="submit" value="Submit CSV" class="btn btn-primary" style="margin-top: 40px;">
+                    <input type="submit" value="Submit CSV" class="btn btn-primary" style="margin-top: 0px;">
                 </form>
             </div>
             <div class="col-md-6">
@@ -271,43 +269,46 @@
                             <option value="{{ username }}">{{ username }}</option>
                         {% endfor %}
                     </select>
-                    <br />
-                    {% if question.status == 1 %}
-                        <label for="email2">Email announcement</label>
-                        <input type="checkbox" name="email" id="email3" value="email" {% if question.emailDelete == True or question.emailDelete == None %} checked {% endif %} onchange="this.form.submit()">
-                        <br />
-                        <input type="submit" class="btn btn-danger" value="Remove Participants">
-                    {% endif %}
             </div> 
         </div>
     </div>
+
+    <div>
+        <label for="email2" style="margin-left: 20px; margin-bottom: 15px;">Email announcement</label>
+        <input type="checkbox" name="email" id="emailNotificationToInvite" value="email" >
+        <!-- {% if question.emailDelete == True or question.emailDelete == None %} checked {% endif %} onchange="this.form.submit()" -->
+        <br />
+    </div>
+
+    <div class="panel panel-default hide" id="emailDivForInvite" style="width: 90%; margin:auto; margin-bottom: 15px;">
+        <div class="panel-heading">Optionally send E-mail to participants:</div>
+        <div class="panel-body">      
+            <div class="row">
+                <div class="col-md-12">
+                    <form id="sendEmailInviteForm" action="{% url 'polls:sendemailinvite' question.id %}"  method="post">
+                        {% csrf_token %}
+                        <br>
+                        <label>Recepients:</label> &nbsp;&nbsp;
+                        <input type="radio" name="recepients" value="regVotersOnly"> Registered participants &nbsp;&nbsp;
+                        <input type="radio" name="recepients" value="unregVotersOnly"> Unregistered participants &nbsp;&nbsp;
+                        <input type="radio" name="recepients" value="allVoters" checked> Both &nbsp;&nbsp;
+                        <input type="radio" name="recepients" value="customEmails" id = "customEmailsRadioButton"> Custom &nbsp;&nbsp;
+                        <br>
+                        <textarea id="textAreaForCustomMails" name="textAreaForCustomMails" class="form-control hide" placeholder="Emails sepereated by comma" style="height: 100px; margin-top: 20px;"></textarea>
+                        <br>
+                        <input type="text" id="mailSubject" name="mailSubject" class="form-control" placeholder="Subject of the Mail" required>
+                        <br>
+                        <textarea class="form-control" id="mailBody" name="mailBody" rows="9" placeholder="Content of the E-mail..." required></textarea>
+                        <br>
+                        <input type="submit" value="Send E-mail" class="btn btn-primary">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <br><br><br>
 
-<div class="panel panel-default">
-    <div class="panel-heading">Optionally send E-mail to participants:</div>
-    <div class="panel-body">      
-        <div class="row">
-            <div class="col-md-12">
-                <form id="sendEmailInviteForm" action="{% url 'polls:sendemailinvite' question.id %}"  method="post">
-                    {% csrf_token %}
-                    <br>
-                    <label>Recepients:</label> &nbsp;&nbsp;
-                    <input type="radio" name="recepients" value="regVotersOnly"> Registered participants &nbsp;&nbsp;
-                    <input type="radio" name="recepients" value="unregVotersOnly"> Unregistered participants &nbsp;&nbsp;
-                    <input type="radio" name="recepients" value="allVoters" checked> Both &nbsp;&nbsp;
-                    <input type="radio" name="recepients" value="customEmails" id = "customEmailsRadioButton"> Custom &nbsp;&nbsp;
-                    <br>
-                    <textarea id="textAreaForCustomMails" class="form-control hide" placeholder="Emails sepereated by comma" style="height: 100px; margin-top: 20px;"></textarea>
-                    <br>
-                    <input type="text" id="mailSubject" name="mailSubject" class="form-control" placeholder="Subject of the Mail" required>
-                    <br>
-                    <textarea class="form-control" id="mailBody" name="mailBody" rows="9" placeholder="Content of the E-mail..." required></textarea>
-                    <br>
-                    <input type="submit" value="Send E-mail" class="btn btn-primary">
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+
