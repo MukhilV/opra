@@ -67,7 +67,7 @@
         const mailSubEle = document.getElementById(mailSubjectElementId);
         const mailBodyEle = document.getElementById(mailContentElementId);
 
-        mailSubEle.value = subjectText;
+        mailSubEle.value = subjectText || '';
         mailBodyEle.innerHTML = mailText;
     }
 
@@ -177,6 +177,7 @@
                     <label for="emailNotificationToRemove">Email announcement</label>
                     <input type="checkbox" name="email" id="emailNotificationToRemove" value="email" >
                     <!-- {% if question.emailDelete == True or question.emailDelete == None %} checked {% endif %} -->
+                {% endif %}
                     <br />
                     <div id="mailNotificationDivToRemove" class="hide">
                         <input type="text" id="mailNotificationSubject" name="mailNotificationSubject" class="form-control" placeholder="Subject of the Mail" >
@@ -184,8 +185,10 @@
                         <textarea class="form-control" id="mailNotificationBody" name="mailNotificationBody" rows="9" placeholder="Content of the E-mail..." ></textarea>
                         <br>
                     </div>
+                    {% if question.status == 1 %}
                     <input type="submit" class="btn btn-danger" value="Remove Participants">
-                {% endif %}
+                    {% endif %}
+                
             </form> 
         </div>     
         <div class="col-md-6">
@@ -241,22 +244,23 @@
 <br><br>
 
 <div class="panel panel-default">
+    
     <div class="panel-heading">Add voters with CSV:</div>
     <div class="panel-body">
-        
-        <div class="row">
-            <div class="col-md-6">
-                <form id="csvTextAreaForm" action="{% url 'polls:savelatestcsv' question.id %}" method="post">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="csvTextArea">Enter the CSV in the below text area</label>
-                        <textarea class="form-control" id="csvTextArea" name="votersCSVText" rows="9" style="height: 221px;">{{ recentCSVText }}</textarea>
-                    </div>
-                    <input type="submit" value="Submit CSV" class="btn btn-primary" style="margin-top: 0px;">
-                </form>
-            </div>
-            <div class="col-md-6">
-                <label>Participants registered with OPRA: </label>
+        <form id="csvTextAreaForm" action="{% url 'polls:savelatestcsv' question.id %}" method="post">
+            <div class="row">
+                <div class="col-md-6">
+                    
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="csvTextArea">Enter the CSV in the below text area</label>
+                            <textarea class="form-control" id="csvTextArea" name="votersCSVText" rows="9" style="height: 221px;">{{ recentCSVText }}</textarea>
+                        </div>
+                        <input type="submit" value="Submit CSV" class="btn btn-primary" style="margin-top: 0px;">
+                    
+                </div>
+                <div class="col-md-6">
+                    <label>Participants registered with OPRA: </label>
                     <select id="registeredVoters" name="registeredVoters" class="form-control" multiple>
                         {% for username in registeredUsers %}
                             <option value="{{ username }}">{{ username }}</option>
@@ -269,44 +273,47 @@
                             <option value="{{ username }}">{{ username }}</option>
                         {% endfor %}
                     </select>
-            </div> 
-        </div>
-    </div>
+                </div> 
+            </div>
 
-    <div>
-        <label for="email2" style="margin-left: 20px; margin-bottom: 15px;">Email announcement</label>
-        <input type="checkbox" name="email" id="emailNotificationToInvite" value="email" >
-        <!-- {% if question.emailDelete == True or question.emailDelete == None %} checked {% endif %} onchange="this.form.submit()" -->
-        <br />
-    </div>
+            <br>
 
-    <div class="panel panel-default hide" id="emailDivForInvite" style="width: 90%; margin:auto; margin-bottom: 15px;">
-        <div class="panel-heading">Optionally send E-mail to participants:</div>
-        <div class="panel-body">      
-            <div class="row">
-                <div class="col-md-12">
-                    <form id="sendEmailInviteForm" action="{% url 'polls:sendemailinvite' question.id %}"  method="post">
-                        {% csrf_token %}
-                        <br>
-                        <label>Recepients:</label> &nbsp;&nbsp;
-                        <input type="radio" name="recepients" value="regVotersOnly"> Registered participants &nbsp;&nbsp;
-                        <input type="radio" name="recepients" value="unregVotersOnly"> Unregistered participants &nbsp;&nbsp;
-                        <input type="radio" name="recepients" value="allVoters" checked> Both &nbsp;&nbsp;
-                        <input type="radio" name="recepients" value="customEmails" id = "customEmailsRadioButton"> Custom &nbsp;&nbsp;
-                        <br>
-                        <textarea id="textAreaForCustomMails" name="textAreaForCustomMails" class="form-control hide" placeholder="Emails sepereated by comma" style="height: 100px; margin-top: 20px;"></textarea>
-                        <br>
-                        <input type="text" id="mailSubject" name="mailSubject" class="form-control" placeholder="Subject of the Mail" required>
-                        <br>
-                        <textarea class="form-control" id="mailBody" name="mailBody" rows="9" placeholder="Content of the E-mail..." required></textarea>
-                        <br>
-                        <input type="submit" value="Send E-mail" class="btn btn-primary">
-                    </form>
+            <div>
+                <label for="email2" style="margin-left: 20px; margin-bottom: 15px;">Email announcement</label>
+                <input type="checkbox" name="email" id="emailNotificationToInvite" value="email" >
+                <!-- {% if question.emailDelete == True or question.emailDelete == None %} checked {% endif %} onchange="this.form.submit()" -->
+                <br />
+            </div>
+
+            <div class="panel panel-default hide" id="emailDivForInvite" style="width: 90%; margin:auto; margin-bottom: 15px;">
+                <div class="panel-heading">Optionally send E-mail to participants:</div>
+                <div class="panel-body">      
+                    <div class="row">
+                        <div class="col-md-12">
+                            
+                                {% csrf_token %}
+                                <br>
+                                <label>Recepients:</label> &nbsp;&nbsp;
+                                <input type="radio" name="recepients" value="regVotersOnly"> Registered participants &nbsp;&nbsp;
+                                <input type="radio" name="recepients" value="unregVotersOnly"> Unregistered participants &nbsp;&nbsp;
+                                <input type="radio" name="recepients" value="allVoters" checked> Both &nbsp;&nbsp;
+                                <input type="radio" name="recepients" value="customEmails" id = "customEmailsRadioButton"> Custom &nbsp;&nbsp;
+                                <br>
+                                <textarea id="textAreaForCustomMails" name="textAreaForCustomMails" class="form-control hide" placeholder="Emails sepereated by comma" style="height: 100px; margin-top: 20px;"></textarea>
+                                <br>
+                                <input type="text" id="mailSubject" name="mailSubject" class="form-control" placeholder="Subject of the Mail" required>
+                                <br>
+                                <textarea class="form-control" id="mailBody" name="mailBody" rows="9" placeholder="Content of the E-mail..." required></textarea>
+                                <br>
+                                <!-- <input type="submit" value="Send E-mail" class="btn btn-primary"> -->
+                            
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
-
+    
 </div>
 
 <br><br><br>

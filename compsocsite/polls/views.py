@@ -944,7 +944,7 @@ class PollInfoView(views.generic.DetailView):
     model = Question
     template_name = 'polls/pollinfo.html'
 
-    def addVotersFromLatestCSV(self, recentCSVText, existingUsers):
+    def getUsersFromLatestCSV(self, recentCSVText, existingUsers):
         registeredUsers, unRegisteredUsers=[],[]
         if(recentCSVText is not None): 
             userIDsFromCSV = recentCSVText.split(",")
@@ -957,10 +957,6 @@ class PollInfoView(views.generic.DetailView):
                     registeredUsers.append(userID)
                 else:
                     unRegisteredUsers.append(userID)
-
-            for voter in registeredUsers:
-                voterObj = User.objects.get(username=voter)
-                self.object.question_voters.add(voterObj.id)
 
         return registeredUsers, unRegisteredUsers
 
@@ -1016,7 +1012,7 @@ class PollInfoView(views.generic.DetailView):
         ctx['selected_alloc_res_tables_sum'] = selected_alloc_res_tables_sum
 
         # Registered and unRegisteredUsers
-        registeredUsers, unRegisteredUsers = self.addVotersFromLatestCSV(curr_question.recentCSVText, ctx['users'])
+        registeredUsers, unRegisteredUsers = self.getUsersFromLatestCSV(curr_question.recentCSVText, ctx['users'])
         ctx['registeredUsers'] = registeredUsers
         ctx['unRegisteredUsers'] = unRegisteredUsers
         ctx['recentCSVText'] = curr_question.recentCSVText
@@ -2022,6 +2018,7 @@ def saveLatestCSV(request, question_id):
     try:
         question.recentCSVText = recentCSVText
         question.save();
+        addUsersAndSendEmailInvite(request, question_id)
     except:
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     request.session['setting'] = 1
@@ -2038,7 +2035,7 @@ def sendEmail(toEmails, mailSubject, mailBody):
     return
 
 # Send email invite to Registered and Non registered Participants
-def sendEmailInvite(request, question_id):
+def addUsersAndSendEmailInvite(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     creator_obj = User.objects.get(id=question.question_owner_id)
 
@@ -2056,26 +2053,37 @@ def sendEmailInvite(request, question_id):
             userIDsFromCSV = recentCSVText.split(",")
             userIDsFromCSV = [userID.strip() for userID in userIDsFromCSV]
 
+            for userID in userIDsFromCSV:
+                if userID in existingUserIDs:
+                    registersParticipants.append(userID)
+                else:
+                    UnRegisteredParticipants.append(userID)
+            
+            # Logic to add registered Voters to poll
+            for voter in registersParticipants:
+                voterObj = User.objects.get(username=voter)
+                question.question_voters.add(voterObj.id)
+
+            # Logic for Unregistered Voters : to-do
+
+            csvEmails = request.POST.get('textAreaForCustomMails')
+            customEmails = csvEmails.split(',')
+
             if(recepients == "regVotersOnly"):
-                for userID in userIDsFromCSV:
-                    if userID in existingUserIDs:
-                        registersParticipants.append(userID)
-                sendEmail(registersParticipants, mailSubject, mailBody)
+                print("Email sending logic for regVotersOnly")
+                # sendEmail(registersParticipants, mailSubject, mailBody)
             elif(recepients == "unregVotersOnly"):
-                for userID in userIDsFromCSV:
-                    if userID not in existingUserIDs:
-                        UnRegisteredParticipants.append(userID)
-                sendEmail(UnRegisteredParticipants, mailSubject, mailBody)
+                print("Email sending logic for unregVotersOnly")
+                # sendEmail(UnRegisteredParticipants, mailSubject, mailBody)
             elif(recepients == "customEmails"):
-                csvEmails = request.POST.get('textAreaForCustomMails')
-                customEmails = csvEmails.split(',')
-                sendEmail(customEmails, mailSubject, mailBody)
+                print("Email sending logic for customEmails")
+                # sendEmail(customEmails, mailSubject, mailBody)
             elif(recepients == "allVoters"):
-                sendEmail(userIDsFromCSV, mailSubject, mailBody)       
+                print("Email sending logic for All voters")
+                # sendEmail(userIDsFromCSV, mailSubject, mailBody) 
+            return     
     except:
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-    
-    request.session['setting'] = 1
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 # remove voters from a poll.

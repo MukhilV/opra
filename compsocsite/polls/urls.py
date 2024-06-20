@@ -54,7 +54,7 @@ urlpatterns = [
     re_path(r'^(?P<question_id>[0-9]+)/savelatestcsv/$', views.saveLatestCSV, name='savelatestcsv'),
 
     # send email invite to participants
-    re_path(r'^(?P<question_id>[0-9]+)/sendemailinvite/$', views.sendEmailInvite, name='sendemailinvite'),
+    # re_path(r'^(?P<question_id>[0-9]+)/addUsersAndSendEmailInvite/$', views.addUsersAndSendEmailInvite, name='addUsersAndSendEmailInvite'),
     
     # vote
     re_path(r'^(?P<pk>[0-9]+)/$', views.DetailView.as_view(), name='detail'),
