@@ -2064,8 +2064,30 @@ def addUsersAndSendEmailInvite(request, question_id):
                 voterObj = User.objects.get(username=voter)
                 question.question_voters.add(voterObj.id)
 
-            # Logic for Unregistered Voters : to-do
 
+            # Logic for Unregistered Voters : to-do
+            all_invited_voter_obj = UnregisteredUser.objects.all()
+            for email in UnRegisteredParticipants:
+                already_invited = False
+                existing_voter_obj = None
+                for invited_voter_obj in all_invited_voter_obj:
+                    if invited_voter_obj.email == email:
+                        already_invited = True 
+                        existing_voter_obj = invited_voter_obj
+                        break 
+                if already_invited is True:
+                    existing_voter_obj.polls_invited.add(question)
+                else: 
+                    newVoterObj = UnregisteredUser()
+                    newVoterObj.email = email
+                    newVoterObj.save()
+                    question.save()
+                    newVoterObj.polls_invited.add(question)
+                
+            # all_invited_voter_obj = UnregisteredUser.objects.all()
+            # for invited_voter_obj in all_invited_voter_obj:
+            #     print(invited_voter_obj.email, invited_voter_obj.polls_invited.count())
+               
             csvEmails = request.POST.get('textAreaForCustomMails')
             customEmails = csvEmails.split(',')
 
@@ -2082,7 +2104,8 @@ def addUsersAndSendEmailInvite(request, question_id):
                 print("Email sending logic for All voters")
                 # sendEmail(userIDsFromCSV, mailSubject, mailBody) 
             return     
-    except:
+    except Exception as e:
+        print(e) 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 

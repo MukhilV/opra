@@ -20,7 +20,6 @@ class Classes(models.Model):
     teachingAssistants = models.ManyToManyField(User, related_name='tas')
     students = models.ManyToManyField(User, related_name='students')
 
-
 # question that will receive responses
 @python_2_unicode_compatible
 class Question(models.Model):
@@ -81,10 +80,15 @@ class Question(models.Model):
     def get_voters(self):
         return ",".join([str(voter) for voter in self.question_voters.all()])
 
+
+class UnregisteredUser(models.Model):
+    email = models.EmailField(unique=True)
+    polls_invited = models.ManyToManyField(Question, related_name='invited_unregistered_users')
+
 # email to be sent
 @python_2_unicode_compatible
 class Folder(models.Model):
-    questions = models.ManyToManyField(Question)
+    questions = models.ManyToManyField(Question, related_name='unregistered_users')
     user      = models.ForeignKey(User, on_delete=models.CASCADE)
     title     = models.CharField(max_length=500)
     edit_date = models.DateTimeField()
