@@ -20,6 +20,7 @@ class Classes(models.Model):
     teachingAssistants = models.ManyToManyField(User, related_name='tas')
     students = models.ManyToManyField(User, related_name='students')
 
+
 # question that will receive responses
 @python_2_unicode_compatible
 class Question(models.Model):
@@ -88,7 +89,7 @@ class UnregisteredUser(models.Model):
 # email to be sent
 @python_2_unicode_compatible
 class Folder(models.Model):
-    questions = models.ManyToManyField(Question, related_name='unregistered_users')
+    questions = models.ManyToManyField(Question)
     user      = models.ForeignKey(User, on_delete=models.CASCADE)
     title     = models.CharField(max_length=500)
     edit_date = models.DateTimeField()
