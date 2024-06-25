@@ -84,7 +84,7 @@ class RegularPollsView(views.generic.ListView):
                                                        m_poll=False, question_type = 1).order_by('-pub_date'))
         ctx['active_polls'] = list(Question.objects.filter(question_type = 1).order_by('-pub_date'))
         # get all polls current user participates in and filter out those she is the owner of
-        polls = self.request.user.poll_participated.filter(m_poll=False)
+        polls = self.request.user.poll_participated.filter(m_poll=False, question_type = 1)
         polls = polls.exclude(question_owner=self.request.user).order_by('-pub_date')
         ctx['polls_participated'] = list(polls) # .filter(question_type = 1)
         
@@ -127,7 +127,7 @@ class RegularAllocationView(views.generic.ListView):
                                                        m_poll=False, question_type = 2).order_by('-pub_date'))
         ctx['active_polls'] = list(Question.objects.filter(question_type = 2).order_by('-pub_date'))
         # get all polls current user participates in and filter out those she is the owner of
-        polls = self.request.user.poll_participated.filter(m_poll=False)
+        polls = self.request.user.poll_participated.filter(m_poll=False, question_type = 2)
         polls = polls.exclude(question_owner=self.request.user).order_by('-pub_date')
         ctx['polls_participated'] = list(polls) # # .filter(question_type = 2)
         
