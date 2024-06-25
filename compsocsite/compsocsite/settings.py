@@ -214,6 +214,21 @@ STATICFILES_DIRS = (
     os.path.join(os.path.abspath(BASE_DIR), 'static'),
 )
 
+# ACCOUNT_ADAPTER = 'appauth.adapters.CustomSocialAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'appauth.adapters.CustomSocialAccountAdapter'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email']
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+    }
+}
 
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # SESSION_COOKIE_SECURE = True
