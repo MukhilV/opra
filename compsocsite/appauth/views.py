@@ -24,7 +24,7 @@ from django.core.validators import validate_email
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth import get_user_model
 
-from polls.models import Message, Question, RandomUtilityPool
+from polls.models import Message, Question, RandomUtilityPool, UnregisteredUser
 from polls import opra_crypto
 from django.contrib.auth.forms import UserCreationForm
 import bcrypt
@@ -60,6 +60,16 @@ def register(request):
             user.password = bcrypt.hashpw(bytes(user_form.cleaned_data['password'],'utf-8'), salt).decode('utf-8')
 
             user.is_active = False
+
+            # If the registering user is invited for any poll, register him automatically to that poll.
+            all_invited_voter_obj = UnregisteredUser.objects.all()
+            for invited_voter_obj in all_invited_voter_obj:
+                if invited_voter_obj.email == data["email"]:
+                    user.poll_participated.set(invited_voter_obj.polls_invited.all())
+                    invited_voter_obj.delete() 
+                    break
+            # all_invited_voter_obj = UnregisteredUser.objects.all()
+
             user.save()
             profile = UserProfile(user=user, displayPref = 1, time_creation=timezone.now(), salt = salt.decode('utf-8'))
             profile.save()
