@@ -108,18 +108,42 @@
             toggleMailDiv(emailNotificationToRemove, mailNotificationDivToRemove);
         });
 
-        // Populate default text into email body
-        populateDefaultText('mailNotificationSubject', 'mailNotificationBody', 
-        'You have been removed from {{ question.question_text }}', 'Some text');
-
-        populateDefaultText('mailNotificationSubject1', 'mailNotificationBody1', 
-        'You have been added to {{ question.question_text }}', 'Some text');
-        
         var url = window.location;
         var protocol = url.protocol;
         var host = url.host; 
-        populateDefaultText('mailSubject', 'mailBody', 
-        'You have been added to {{ question.question_text }}', 'Sign up link: '+ protocol+host +'/auth/register/ \nLogin link: '+ protocol+host +'/polls/main');
+        let instanceURL = protocol + "//" + host + "{% url 'polls:detail' question.id %}";
+        let question_text = ""+ "{{ question.question_text | safe }}";
+
+        //Pre-populate default text into E-mail subject and body
+        var mailSubEleID = "mailNotificationSubject";
+        var mailBodyEleID = "mailNotificationBody";
+        var mailSubjectContent = "You have been removed from {{ question.question_text | safe }}";
+        var mailBodyContent = "You have been removed from {{ question.question_text | safe }}."+ 
+        "\nInstance link: "+instanceURL;
+        populateDefaultText(mailSubEleID, mailBodyEleID, mailSubjectContent, mailBodyContent);
+
+        mailSubEleID = "mailNotificationSubject1";
+        mailBodyEleID = "mailNotificationBody1";
+        mailSubjectContent = "You have been added to {{ question.question_text | safe }}";
+        mailBodyContent = "You have been added to {{ question.question_text | safe }}. "+
+        "\nTo access it, follow the link : "+ instanceURL;
+        populateDefaultText(mailSubEleID, mailBodyEleID, mailSubjectContent, mailBodyContent);
+        
+
+        var loginLink = protocol + "//" + host + "/polls/main";
+        var signUpLink = protocol + "//" + host + "/auth/register/";
+        mailSubEleID = "mailSubject";
+        mailBodyEleID = "mailBody";
+        mailSubjectContent = "You have been added to {{ question.question_text | safe }}";
+        mailBodyContent = "You have been added to {{ question.question_text | safe }}."+
+        "\n\nIf you already have an OPRA account, login in into the account using the below link. "+ 
+        "\nLogin link: "+protocol+"//"+host +"/polls/main"+
+        "\n\nIf you do not have an account registered with OPRA, sign up with the below link."+
+        "\nSign up link: "+ protocol+"//"+host +"/auth/register/"+
+        "\nNote: Please sign in with the same E-mail ID with which you are invited.";
+        // mailBodyContent = `\n<p>Login link: <a href="${loginLink}">${loginLink}</a></p> some new text`;
+        populateDefaultText(mailSubEleID, mailBodyEleID, mailSubjectContent, mailBodyContent);
+
 
         const emailNotificationToInvite = document.getElementById("emailNotificationToInvite");
         const emailDivForInvite = document.getElementById("emailDivForInvite");
@@ -147,7 +171,7 @@
 </style>
 
 <div class="panel panel-default">
-    <div class="panel-heading"><h4>Add multiple existing users/group:<h4></div>
+    <div class="panel-heading"><h4>Add Multiple Pre-Registered Users/Groups:<h4></div>
     <div class="panel-body">
         <div class = "row">
         <div class="col-md-6">
@@ -155,7 +179,7 @@
             <form action="{% url 'polls:delvoter' question.id %}" method="post">
                 <div style="display: flex; width: 100%;">
                     <div style="width: 70%;">
-                        <label>Current Participants: </label> 
+                        <label>Users added to the instance: </label> 
                     </div> 
                     {% if question.status == 1 %}
                     <div style="width: 30%;">
@@ -194,7 +218,7 @@
         <div class="col-md-6">
             <form id = "addUsersForm" action="{% url 'polls:addvoters' question.id %}" method="post">
                 <div>
-                    <label style="width: 30%;">Add Existing Users: </label>
+                    <label style="width: 100%;">Add users registered with OPRA: </label>
                     {% csrf_token %}
                     <select name="voters" class="form-control multiple-select"  style="width: 100%;" multiple>
                         {% for user in users %}
@@ -208,7 +232,7 @@
                 <br>
 
                 <div>
-                    <label style="width: 30%;">Add Group: </label>
+                    <label style="width: 100%;">Add groups of users registered with OPRA: </label>
                     <select name="groups" class="form-control multiple-select" style="width: 100%;" multiple >
                         {% for group in groups %}
                             {% if group.owner == request.user %}
@@ -227,7 +251,17 @@
                 <input type="checkbox" name="email" id="emailNotification" value="email" >
                 <!-- {% if question.emailInvite == True or question.emailInvite == None %} checked {% endif %} -->
                 <br>
+                
                 <div id="mailNotificationDiv" class="hide">
+
+                    {% if question.status == 1 %}
+                    <div class="alert alert-danger">
+                        <p><strong>Note:</strong> The text for this E-mail is pre-populated for adding users into the instance. 
+                            Please modify the text accordingly if you decide to remove the users from the instance.
+                        </p>
+                    </div>
+                    {% endif %}
+
                     <input type="text" id="mailNotificationSubject1" name="mailNotificationSubject1" class="form-control" placeholder="Subject of the Mail" >
                     <br>
                     <textarea class="form-control" id="mailNotificationBody1" name="mailNotificationBody1" rows="9" placeholder="Content of the E-mail..." ></textarea>
@@ -245,7 +279,7 @@
 
 <div class="panel panel-default">
     
-    <div class="panel-heading">Add voters with CSV:</div>
+    <div class="panel-heading">Add Users with CSV:</div>
     <div class="panel-body">
         <form id="csvTextAreaForm" action="{% url 'polls:savelatestcsv' question.id %}" method="post">
             <div class="row">
@@ -253,21 +287,27 @@
                     
                         {% csrf_token %}
                         <div class="form-group">
-                            <label for="csvTextArea">Enter the CSV in the below text area</label>
+                            <label for="csvTextArea">Enter the comma seperated email-IDs to add/invite users:</label>
                             <textarea class="form-control" id="csvTextArea" name="votersCSVText" rows="9" style="height: 221px;">{{ recentCSVText }}</textarea>
+                        </div>
+                        <div>
+                            <label for="email2">Email announcement</label>
+                            <input type="checkbox" name="email" id="emailNotificationToInvite" value="email" >
+                            <!-- {% if question.emailDelete == True or question.emailDelete == None %} checked {% endif %} onchange="this.form.submit()" -->
+                            <br />
                         </div>
                         <input type="submit" value="Submit CSV" class="btn btn-primary" style="margin-top: 0px;">
                     
                 </div>
                 <div class="col-md-6">
-                    <label>Participants registered with OPRA: </label>
+                    <label>Users registered with OPRA: </label>
                     <select id="registeredVoters" name="registeredVoters" class="form-control" multiple>
                         {% for username in registeredUsers %}
                             <option value="{{ username }}">{{ username }}</option>
                         {% endfor %}
                     </select>
                     <br>
-                    <label>Participants not registered with OPRA: </label>
+                    <label>Users not registered with OPRA: </label>
                     <select id="unregisteredVoters" name="unregisteredVoters" class="form-control" multiple>
                         {% for username in unRegisteredUsers %}
                             <option value="{{ username }}">{{ username }}</option>
@@ -278,32 +318,26 @@
 
             <br>
 
-            <div>
-                <label for="email2" style="margin-left: 20px; margin-bottom: 15px;">Email announcement</label>
-                <input type="checkbox" name="email" id="emailNotificationToInvite" value="email" >
-                <!-- {% if question.emailDelete == True or question.emailDelete == None %} checked {% endif %} onchange="this.form.submit()" -->
-                <br />
-            </div>
-
             <div class="panel panel-default hide" id="emailDivForInvite" style="width: 90%; margin:auto; margin-bottom: 15px;">
-                <div class="panel-heading">Optionally send E-mail to participants:</div>
+                <div class="panel-heading">Send E-mail to added/invited users: </div>
                 <div class="panel-body">      
                     <div class="row">
                         <div class="col-md-12">
                             
                                 {% csrf_token %}
                                 <br>
-                                <label>Recepients:</label> &nbsp;&nbsp;
-                                <input type="radio" name="recepients" value="regVotersOnly"> Registered participants &nbsp;&nbsp;
-                                <input type="radio" name="recepients" value="unregVotersOnly"> Unregistered participants &nbsp;&nbsp;
-                                <input type="radio" name="recepients" value="allVoters" checked> Both &nbsp;&nbsp;
-                                <input type="radio" name="recepients" value="customEmails" id = "customEmailsRadioButton"> Custom &nbsp;&nbsp;
+                                <label>Recepients:</label> 
+                                <input type="radio" name="recepients" value="regVotersOnly" style="margin-left: 15px;"> Users registered with OPRA
+                                <input type="radio" name="recepients" value="unregVotersOnly" style="margin-left: 15px;"> Users not registered with OPRA 
+                                <input type="radio" name="recepients" value="allVoters" style="margin-left: 15px;" checked> Both 
+                                <input type="radio" name="recepients" value="customEmails" id = "customEmailsRadioButton" style="margin-left: 15px;"> Custom 
                                 <br>
                                 <textarea id="textAreaForCustomMails" name="textAreaForCustomMails" class="form-control hide" placeholder="Emails sepereated by comma" style="height: 100px; margin-top: 20px;"></textarea>
                                 <br>
                                 <input type="text" id="mailSubject" name="mailSubject" class="form-control" placeholder="Subject of the Mail" required>
                                 <br>
                                 <textarea class="form-control" id="mailBody" name="mailBody" rows="9" placeholder="Content of the E-mail..." required></textarea>
+                                <!-- <div class="form-control" id="mailBody" name="mailBody" contenteditable="true"  style="height: 200px; overflow: auto;" ></div> -->
                                 <br>
                                 <!-- <input type="submit" value="Send E-mail" class="btn btn-primary"> -->
                             
