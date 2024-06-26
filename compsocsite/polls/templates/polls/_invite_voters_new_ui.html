@@ -232,7 +232,7 @@
                 <br>
 
                 <div>
-                    <label style="width: 100%;">Add groups of users registered with OPRA: </label>
+                    <label style="width: 100%;">Add{% if question.status == 1 %}/Remove{% endif %} groups of users registered with OPRA: </label>
                     <select name="groups" class="form-control multiple-select" style="width: 100%;" multiple >
                         {% for group in groups %}
                             {% if group.owner == request.user %}
@@ -337,7 +337,6 @@
                                 <input type="text" id="mailSubject" name="mailSubject" class="form-control" placeholder="Subject of the Mail" required>
                                 <br>
                                 <textarea class="form-control" id="mailBody" name="mailBody" rows="9" placeholder="Content of the E-mail..." required></textarea>
-                                <!-- <div class="form-control" id="mailBody" name="mailBody" contenteditable="true"  style="height: 200px; overflow: auto;" ></div> -->
                                 <br>
                                 <!-- <input type="submit" value="Send E-mail" class="btn btn-primary"> -->
                             

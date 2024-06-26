@@ -119,10 +119,24 @@ def addgroupvoters(request, question_id):
     request.session['setting'] = 1
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+def sendEmail(toEmails, mailSubject, mailBody):
+    # logic to send email from opra mail id 
+    mail.send_mail(mailSubject,
+                    mailBody,
+                    'opra@cs.binghamton.edu',
+                    ['mukhil1140@gmail.com'], # toEmails
+                    html_message='')
+    return
 
 def removegroupvoters(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     removeGroups = request.POST.getlist('groups')
+
+    email = request.POST.get('email') == 'email'
+    recepients = []
+    mailSub = request.POST.get('mailNotificationSubject1')
+    mailBody = request.POST.get('mailNotificationBody1')
+
     for group in removeGroups:
         for cur in Group.objects.all():
             if cur.owner == request.user and cur.name == group:
@@ -131,6 +145,10 @@ def removegroupvoters(request, question_id):
                     if voter in question.question_voters.all():
                         voterObj = User.objects.get(username=voter)
                         question.question_voters.remove(voterObj.id)
+                        recepients.append(voterObj.username)
+    if email : 
+        print("Email sending logic to remove group")
+        # sendEmail(recepients, mailSub, mailBody)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     
 def joingroup(request, group_id):
