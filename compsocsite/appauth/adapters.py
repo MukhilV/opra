@@ -28,7 +28,8 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         user.username = email
         user.save()
         
-        # Check if the email exists in UnregisteredUser
+        # If the registering user is invited for any poll, register him automatically to that poll.
+        # Do nothing, if the registering user is not invited to any polls
         try:
             invited_user = UnregisteredUser.objects.get(email=email)
 

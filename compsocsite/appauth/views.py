@@ -62,13 +62,16 @@ def register(request):
             user.is_active = False
 
             # If the registering user is invited for any poll, register him automatically to that poll.
-            all_invited_voter_obj = UnregisteredUser.objects.all()
-            for invited_voter_obj in all_invited_voter_obj:
-                if invited_voter_obj.email == data["email"]:
-                    user.poll_participated.set(invited_voter_obj.polls_invited.all())
-                    invited_voter_obj.delete() 
-                    break
-            # all_invited_voter_obj = UnregisteredUser.objects.all()
+            # On Exception when UnregisteredUser not found, do nothing. It means the user is not invited to any polls
+            try:
+                invited_user = UnregisteredUser.objects.get(email=data["email"])
+                user.poll_participated.set(invited_user.polls_invited.all())
+                user.save()
+                invited_user.delete()
+            except Exception as e:
+                print(e)
+                pass
+
 
             user.save()
             profile = UserProfile(user=user, displayPref = 1, time_creation=timezone.now(), salt = salt.decode('utf-8'))

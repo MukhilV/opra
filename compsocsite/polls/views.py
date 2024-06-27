@@ -2045,8 +2045,8 @@ def addUsersAndSendEmailInvite(request, question_id):
     existingUsers = User.objects.all()
     existingUserIDs = [user.username for user in existingUsers]
 
-    registersParticipants = []
-    UnRegisteredParticipants = []
+    registers_users_of_current_poll = []
+    UnRegistered_users_of_current_poll = []
     try: 
         recentCSVText = question.recentCSVText
         if(recentCSVText is not None): 
@@ -2055,37 +2055,47 @@ def addUsersAndSendEmailInvite(request, question_id):
 
             for userID in userIDsFromCSV:
                 if userID in existingUserIDs:
-                    registersParticipants.append(userID)
+                    registers_users_of_current_poll.append(userID)
                 else:
-                    UnRegisteredParticipants.append(userID)
+                    UnRegistered_users_of_current_poll.append(userID)
             
             # Logic to add registered Voters to poll
-            for voter in registersParticipants:
+            for voter in registers_users_of_current_poll:
                 voterObj = User.objects.get(username=voter)
                 question.question_voters.add(voterObj.id)
 
+            '''
+            Logic for adding Unregistered Voters : 
 
-            # Logic for Unregistered Voters : to-do
-            all_invited_voter_obj = UnregisteredUser.objects.all()
-            for email in UnRegisteredParticipants:
-                already_invited = False
-                existing_voter_obj = None
-                for invited_voter_obj in all_invited_voter_obj:
-                    if invited_voter_obj.email == email:
-                        already_invited = True 
-                        existing_voter_obj = invited_voter_obj
-                        break 
-                if already_invited is True:
-                    existing_voter_obj.polls_invited.add(question)
-                else: 
-                    newVoterObj = UnregisteredUser()
-                    newVoterObj.email = email
-                    newVoterObj.save()
-                    question.save()
-                    newVoterObj.polls_invited.add(question)
+            Case 1:
+            Get the list of emails of unregistered users for the current poll, after submitting the csv.
+            Create an UnregisteredUser Object for every email in unregistered users for the current poll.
+            Add the question to the list of polls invited to the newly created UnregisteredUser Object.
+
+            Case 2:
+            When the unregistered user has already been invited to registred with OPRA via other polls, 
+            but still the user had not registred with OPRA. In this case, no new object for the UnregisteredUser has to 
+            be created. Just add the question to the list of polls invited of the reterieved UnregisteredUser Object.
+
+            '''
+
+            # UnRegistered_users_of_current_poll - UnRegistered Participants/users of the current poll after submitting csv
+            for email in UnRegistered_users_of_current_poll:
+                # the voter_obj will be retrieved if the user is invited via other polls, 
+                # but not registered with OPRA yet.
+                try:
+                    voter_obj = UnregisteredUser.objects.get(email = email)
+                    voter_obj.polls_invited.add(question)
                 
-            # all_invited_voter_obj = UnregisteredUser.objects.all()
-            # for invited_voter_obj in all_invited_voter_obj:
+                # the voter_obj will be created if the user is invited to get registered with OPRA for first time
+                except UnregisteredUser.DoesNotExist:
+                    voter_obj = UnregisteredUser.objects.create(email=email)
+                    voter_obj.save(); question.save();
+                    voter_obj.polls_invited.add(question)
+
+                
+            # invited_users_across_all_polls = UnregisteredUser.objects.all()
+            # for invited_voter_obj in invited_users_across_all_polls:
             #     print(invited_voter_obj.email, invited_voter_obj.polls_invited.count())
                
             csvEmails = request.POST.get('textAreaForCustomMails')
@@ -2093,10 +2103,10 @@ def addUsersAndSendEmailInvite(request, question_id):
 
             if(recepients == "regVotersOnly"):
                 print("Email sending logic for regVotersOnly")
-                # sendEmail(registersParticipants, mailSubject, mailBody)
+                # sendEmail(registers_users_of_current_poll, mailSubject, mailBody)
             elif(recepients == "unregVotersOnly"):
                 print("Email sending logic for unregVotersOnly")
-                # sendEmail(UnRegisteredParticipants, mailSubject, mailBody)
+                # sendEmail(UnRegistered_users_of_current_poll, mailSubject, mailBody)
             elif(recepients == "customEmails"):
                 print("Email sending logic for customEmails")
                 # sendEmail(customEmails, mailSubject, mailBody)
