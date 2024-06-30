@@ -651,6 +651,10 @@ def stopPoll(request, question_id):
         getFinalAllocation(question)
     question.save()
 
+    if question.emailStart:
+        email_class = EmailThread(request, question_id, 'stop')
+        email_class.start()
+
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 # find the winner(s) using the polling algorithm selected earlier

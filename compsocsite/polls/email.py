@@ -41,7 +41,7 @@ def setupEmail(question):
     emailInvite = Email(question=question, type=1,
         subject="You have been invited to vote on " + title,
         message='Hello [user_name],\n\n' + creator
-                + ' has invited you to vote on a poll. Please login at [url] to check it out.\n\nSincerely,\nOPRAH Staff')
+                + ' has invited you to vote on a poll. Please login at [url] to check it out.\n\nSincerely,\nOPRA Staff')
     emailRemove = Email(question=question, type=2,
         subject="You have been removed from " + title,
         message='Hello [user_name],\n\n' + creator
@@ -49,11 +49,11 @@ def setupEmail(question):
     emailStart = Email(question=question, type=3,
         subject=title + ' has started!',
         message='Hello [user_name],\n\n' + creator
-                + ' has started a poll. It is now available to vote on at [url] \n\nSincerely,\nOPRAH Staff')
+                + ' has started a poll. It is now available to vote on at [url] \n\nSincerely,\nOPRA Staff')
     emailStop = Email(question=question, type=4,
         subject=title + ' has stopped',
         message='Hello [user_name],\n\n' + creator
-                + ' has ended a poll. Please visit [url] to view the decision.\n\nSincerely,\nOPRAH Staff')
+                + ' has ended a poll. Please visit [url] to view the decision.\n\nSincerely,\nOPRA Staff')
     emailInvite.save()
     emailRemove.save()
     emailStart.save()
@@ -182,15 +182,15 @@ class EmailThread(threading.Thread):
                 items = Item.objects.all().filter(question=self.question)
                 item_array = getOptions(items)
                 options = ''
-                for i in items:
-                    rand = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(20))
-                    response = EmailResponse(item=i, user=voter, identity=rand)
-                    response.save()
-                    options += '<p><a href=\'' + self.request.build_absolute_uri(reverse('polls:index') + str(response.pk) + "/" + rand + "/voteEmail/") + '\'>' + i.item_text + '</a></p>'
+                # for i in items:
+                #     rand = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(20))
+                #     response = EmailResponse(item=i, user=voter, identity=rand)
+                #     response.save()
+                #     options += '<p><a href=\'' + self.request.build_absolute_uri(reverse('polls:index') + str(response.pk) + "/" + rand + "/voteEmail/") + '\'>' + i.item_text + '</a></p>'
             if voter.first_name != "":
                 name = voter.first_name + " " + voter.last_name
             url = self.request.build_absolute_uri(reverse('appauth:login')+'?name='+uname)
             mail.send_mail(translateEmail(self.email[0], name, url),
                 translateEmail(self.email[1], name, url),
-                'oprahprogramtest@gmail.com',[voter.email],
+                'opra@cs.binghamton.edu',[voter.email],
                 html_message=translateHTML(self.email[1], name, url, options))
