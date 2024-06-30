@@ -326,10 +326,34 @@ class AddStep3View(views.generic.DetailView):
 
     model = Question
     template_name = 'polls/add_step3.html'
+
+    def getUsersFromLatestCSV(self, recentCSVText, existingUsers):
+        registeredUsers, unRegisteredUsers=[],[]
+        if(recentCSVText is not None): 
+            userIDsFromCSV = recentCSVText.split(",")
+            userIDsFromCSV = [userID.strip() for userID in userIDsFromCSV]
+
+            existingUserIDs = [user.username for user in existingUsers]
+
+            for userID in userIDsFromCSV:
+                if userID in existingUserIDs:
+                    registeredUsers.append(userID)
+                else:
+                    unRegisteredUsers.append(userID)
+
+        return registeredUsers, unRegisteredUsers
+
     def get_context_data(self, **kwargs):
         ctx = super(AddStep3View, self).get_context_data(**kwargs)
         ctx['users'] = User.objects.all()
         ctx['groups'] = Group.objects.all()
+        
+        curr_question = ctx['question']
+        ctx['recentCSVText'] = curr_question.recentCSVText
+        registeredUsers, unRegisteredUsers = self.getUsersFromLatestCSV(curr_question.recentCSVText, ctx['users'])
+        ctx['registeredUsers'] = registeredUsers
+        ctx['unRegisteredUsers'] = unRegisteredUsers
+
         return ctx
     def get_queryset(self):
         return Question.objects.filter(pub_date__lte=timezone.now())
