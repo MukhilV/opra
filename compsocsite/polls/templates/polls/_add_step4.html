@@ -86,7 +86,7 @@
             {% endif %}
             
             {% if question.question_type == 1 %}
-            <!-- <label for="viewpreferences">Information visible to voters</label>
+            <label for="viewpreferences">Information visible to voters</label>
             <select name="viewpreferences" class="form-control">
                 {% for item in view_preferences %}
                 <option value="{{ forloop.counter0 }}" {% if forloop.counter == preference %} selected {% endif %}>
@@ -94,26 +94,26 @@
                 </option>
                 {% endfor %}
             </select>
-            <br /> -->
+            <br />
 
-            <label for="viewpreferences">Information visible to voters</label><br />
+            <!-- <label for="viewpreferences">Information visible to voters</label><br />
                 {% for item in view_preferences %}
                 <input name="viewpreferences" type="radio" value="{{ forloop.counter0 }}" 
                     name="ui" {% if forloop.counter == preference %} checked {% endif %}> {{ item }}<br />
                 {% endfor %}
-            <br />
+            <br /> -->
 			
-			<!-- <label for="creatorpreferences">Information visible to the creator</label>
+			<label for="creatorpreferences">Information visible to the creator</label>
             <select name="creatorpreferences" class="form-control">
                 <option value="1" selected>Creator can see everyone's vote</option>
 				<option value="2">Creator has the same visibility setting as all voters</option>
             </select>
-            <br /> -->
+            <br />
 
-            <label for="creatorpreferences">Information visible to the creator</label><br />
+            <!-- <label for="creatorpreferences">Information visible to the creator</label><br />
             <input name="creatorpreferences" type="radio" value="1" checked> Creator can see everyone's vote <br>
             <input name="creatorpreferences" type="radio" value="2" checked> Creator has the same visibility setting as all voters <br>
-            <br />
+            <br /> -->
 
             {% endif %}
 
