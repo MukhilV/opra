@@ -1489,10 +1489,14 @@ def getAllocMethods():
 # get a list of visibility settings
 # return List<String>
 def getViewPreferences():
-    return ["Everyone can see all votes at all times",
-            "Everyone can see all votes", "Only show the names of voters",
-            "Only show number of voters", "Everyone can only see his/her own vote",
-            "All votes will be shown, but usernames will be hidden"]
+    return [
+        # "Everyone can see all votes at all times",
+        "Everyone can see all votes", 
+        "Only show the names of voters",
+        "Only show number of voters", 
+        "Everyone can only see his/her own vote",
+        "All votes will be shown, but usernames will be hidden"
+            ]
 
 def getViewPreferencesForAllocation():
     return ["This is Duplicate view pref"]
@@ -2633,7 +2637,7 @@ def getFinalAllocation(question):
 # return List<List<String>> prefOrder
 def getPrefOrder(orderStr, question):
     # empty string
-    if orderStr == "":
+    if orderStr == "" or orderStr is None:
         return None
     if ";;|;;" in orderStr:
         current_array = orderStr.split(";;|;;")
@@ -2713,6 +2717,8 @@ def vote(request, question_id):
 def buildResponseDict(response, question, prefOrder):
     d = {}
 
+    if prefOrder is None:
+        return d
     # find ranking user gave for each item under the question
     item_num = 1
     for item in question.item_set.all():
