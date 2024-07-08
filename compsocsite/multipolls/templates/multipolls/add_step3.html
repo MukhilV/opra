@@ -39,7 +39,7 @@
             <div class="row">
                 <div class="col-md-6">
                 {% if question.question_type == 1 %}
-                    <label for="pollpreferences">Select a voting algorithm</label>
+                    <label for="pollpreferences">Select an algorithm</label>
                     <select name="pollpreferences" class="form-control">
                     {% for item in poll_algorithms %}
                         <option value="{{ forloop.counter }}">
@@ -61,7 +61,7 @@
                 {% endif %}
                 </div>
                 <div class="col-md-6">
-                    <label for="viewpreferences">Control the amount of information that is visible to voters.</label>
+                    <label for="viewpreferences">Control the amount of information that is visible to users.</label>
                     <select name="viewpreferences" class="form-control">
                         {% for item in view_preferences %}
                         <option value="{{ forloop.counter }}" {% if forloop.counter == preference %} selected {% endif %}>

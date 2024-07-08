@@ -4,20 +4,20 @@
               {% if question.display_pref == 1 %}
                     <p> Everyone can see all information about this vote. </p>
               {% elif question.display_pref == 2 %}
-                    <p> Only username of voters will be shown. </p>
+                    <p> Only username of users will be shown. </p>
               {% elif question.display_pref == 3 %}
-                    <p> Only numbers of voters will be shown. </p>
+                    <p> Only numbers of users will be shown. </p>
               {% elif question.display_pref == 4 %}
-                    <p> Everyone can only see his/her own votes </p>
+                    <p> Everyone can only see his/her own preferences </p>
 			  {% elif question.display_pref == 5 %}
-				    <p> All votes will be shown, but usernames will be hidden. </p>
+				    <p> All preferences will be shown, but usernames will be hidden. </p>
               {% else %}
                     <p> No visibility was selected.</p>
               {% endif %}
 
 <hr />
-              <h4>Voter info<h4>
-            <!-- Everyone can see all votes -->
+              <h4>User info<h4>
+            <!-- Everyone can see all preferences -->
               {% if question.display_pref == 1 %}
                 <!-- <table class="table table-bordered">
                     {% for user in users %}
@@ -71,9 +71,9 @@
                 {% endif %} <!-- no response-->
 
             
-            <!-- Only username of voters will be shown -->
+            <!-- Only username of users will be shown -->
               {% elif question.display_pref == 2 %}
-                <b> Voter Names: </b>
+                <b> User Names: </b>
                 <ul class="list-group">
                     {% for user in users %}
                         {% if user in question.question_voters.all %}
@@ -82,9 +82,9 @@
                     {% endfor %}
                 </ul>
 
-            <!-- Only numbers of voters will be shown -->
+            <!-- Only numbers of users will be shown -->
             {% elif question.display_pref == 3 %}
-                <!-- Only numbers of voters will be shown. -->
+                <!-- Only numbers of users will be shown. -->
                 <p>There are a total of {{question.question_voters.count}} unique voters.</p>
               
 
@@ -142,7 +142,7 @@
                 {% endif %} <!-- no response-->
 
             
-            <!-- All votes will be shown, but usernames will be hidden -->
+            <!-- All preferences will be shown, but usernames will be hidden -->
             {% elif question.display_pref == 5 %}
                 {% if latest_responses|length > 0 %}
                     {% for response, currentSelection in latest_responses %}

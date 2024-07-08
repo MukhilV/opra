@@ -136,20 +136,20 @@
 <div class="col-xs-3 col-md-2 sidebar">
     <ul class="nav nav-sidebar">
         {% if question.question_owner == request.user %}
-            <li {% if request.session.setting == 8 %} class="active" {% endif %}><a data-toggle="tab" href="#title">Basic Info</a></li>
-            <li {% if request.session.setting == 0 %} class="active" {% endif %}><a data-toggle="tab" href="#choices" >Choices</a></li>
+            <li {% if request.session.setting == 8 %} class="active" {% endif %}><a data-toggle="tab" href="#title">General Info</a></li>
+            <li {% if request.session.setting == 0 %} class="active" {% endif %}><a data-toggle="tab" href="#choices" >Alternatives</a></li>
             <li {% if request.session.setting == 2 %} class="active" {% endif %}><a data-toggle="tab" href="#algorithm">Algorithms and Visibility</a></li>
-            <li {% if request.session.setting == 6 %} class="active" {% endif %}><a data-toggle="tab" href="#historyinfo">History</a></li>
-			<li {% if request.session.setting == 7 %} class="active" {% endif %}><a data-toggle="tab" href="#recycle">Manage Deleted Votes</a></li>
+            <li {% if request.session.setting == 6 %} class="active" {% endif %}><a data-toggle="tab" href="#historyinfo">Preference Management</a></li>
+			<li {% if request.session.setting == 7 %} class="active" {% endif %}><a data-toggle="tab" href="#recycle">Deleted Preference Management</a></li>
             <!-- <li {% if request.session.setting == 9 %} class="active" {% endif %}><a data-toggle="tab" href="#approverequest">Self Sign Up</a></li> -->
            
             {% if question.m_poll == False %}
-                <li {% if request.session.setting == 1 %} class="active" {% endif %}><a data-toggle="tab" href="#voters">Participants Management</a></li>
+                <li {% if request.session.setting == 1 %} class="active" {% endif %}><a data-toggle="tab" href="#voters">User Management</a></li>
                 <li {% if request.session.setting == 5 %} class="active" {% endif %}><a data-toggle="tab" href="#emailsetting">Email</a></li>
                 <li {% if request.session.setting == 4 %} class="active" {% endif %}><a data-toggle="tab" href="#qr">Access Management</a></li>
-                <li><a data-toggle="tab" href="#delete">Delete</a></li>
-				<li><a data-toggle="tab" href="#duplicate">Duplicate</a></li>
-				<li><a href="{% url 'polls:recordView' question.id %}">User Records</a></li>
+				<li><a data-toggle="tab" href="#duplicate">Duplicate Insatnce</a></li>
+                <li><a data-toggle="tab" href="#delete" style="color: #a94442;">Delete Instance</a></li>
+                <li><a href="{% url 'polls:recordView' question.id %}">User Records</a></li>
             {% endif %}
             
         {% else %}  
@@ -269,7 +269,7 @@
                                 <label for="inviteMessage">Email body:</label> <br />
                                 <textarea type="text" class="form-control" id="inviteMessage" name="inviteMessage" value="" maxlength="500">{{emailInvite.message}}</textarea> <br />
                             </div>
-                            <label for="emailInvite">Send email when inviting voters</label>
+                            <label for="emailInvite">Send email when inviting users</label>
                             <input type="checkbox" name="emailInvite" id="emailInvite" value="email" {% if question.emailInvite == True %} checked {% endif %} onchange="this.form.submit()">
                         </div>
                         <div class="col-md-6">
@@ -282,7 +282,7 @@
                                 <label for="deleteMessage">Email body:</label> <br />
                                 <textarea type="text" class="form-control" id="deleteMessage" name="deleteMessage" value="" maxlength="500">{{emailDelete.message}}</textarea> <br />
                             </div>
-                            <label for="emailDelete">Send email when deleting voters</label>
+                            <label for="emailDelete">Send email when deleting users</label>
                             <input type="checkbox" name="emailDelete" id="emailDelete" value="email" {% if question.emailDelete %} checked {% endif %} onchange="this.form.submit()">
                         </div>
                     </div> -->

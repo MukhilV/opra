@@ -177,7 +177,7 @@
                                         Confirm Start Poll {{ question.question_text }}
                                     </div>
                                     <div class="modal-body">
-                                        Are you sure you want to start poll {{ question.question_text }}? Once a poll is started, you cannot modify the settings or remove voters.
+                                        Are you sure you want to start poll {{ question.question_text }}? Once a poll is started, you cannot modify the settings or remove users.
                                     </div>
                                     <div class="modal-footer">
                                         <a href="{% url 'polls:start' question.id %}">
@@ -206,7 +206,7 @@
                                         Confirm Stop Poll
                                     </div>
                                     <div class="modal-body">
-                                        Are you sure you want to stop this poll? Once a poll is stopped, no more votes can be changed.
+                                        Are you sure you want to stop this poll? Once a poll is stopped, no more preferences can be changed.
                                     </div>
                                     <div class="modal-footer">
                                         <a href="{% url 'polls:stop' question.id %}">

@@ -1,6 +1,6 @@
-<h3 class="page-header">History votes of {{ question.question_text }} </h3>
+<h3 class="page-header">History preferences of {{ question.question_text }} </h3>
 
-        <!-- ################## Creator can see/delete all the votes ##################### -->   
+        <!-- ################## Creator can see/delete all the preferences ##################### -->   
         {% if question.question_owner == request.user and question.creator_pref == 1 %}
 			<div class="progress">
 				    <div class="progress-bar" role="progressbar" aria-valuenow="{{progressPercentage}}"aria-valuemin="0" aria-valuemax="100" style="width:{{progressPercentage}}%">
@@ -92,13 +92,13 @@
 
 
 
-        <!-- ################## Creator has same visibility as all voters ##################### -->  
+        <!-- ################## Creator has same visibility as all users ##################### -->  
         {% if question.question_owner == request.user and question.creator_pref == 2 %}
 
-            <!-- Everyone can see all votes -->
+            <!-- Everyone can see all preferences -->
             {% if question.display_pref == 1 %}
                 <p>{{latest_responses|length}} / {{question.question_voters.count}} have voted.</p>
-                <p>The owner allows everyone to see all votes cast.</p>
+                <p>The owner allows everyone to see all preferences cast.</p>
                 {% for response, currentSelection in latest_responses %}
                 {% if response.user %}
                     {% if response.user != request.user %}
@@ -188,10 +188,10 @@
                 {% endif %} <!-- no response-->
 			
 
-            <!-- All votes will be shown, but usernames will be hidden -->
+            <!-- All preferences will be shown, but usernames will be hidden -->
 			{% elif question.display_pref == 5 %}
 				<p>{{latest_responses|length}} / {{question.question_voters.count}} have voted.</p>
-                <p>The following votes have been cast on this poll (excluding yours):</p>
+                <p>The following preferences have been cast on this poll (excluding yours):</p>
                 <ul>
                     {% for response, currentSelection in latest_responses %}
 						{% if response.user != request.user %}

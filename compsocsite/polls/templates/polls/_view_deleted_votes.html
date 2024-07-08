@@ -1,4 +1,4 @@
-<h3 class="page-header">Deleted votes of {{ question.question_text }} </h3>
+<h3 class="page-header">Deleted preferences of {{ question.question_text }} </h3>
 
 {% if latest_deleted_resps|length > 0 %}
 	{% for response, currentSelection in latest_deleted_resps %}
@@ -39,5 +39,5 @@
 		</div>
 	{% endif %} <!--previous responses-->
 {% else %} 
-	<p>No votes are deleted.</p>
+	<p>No preferences are deleted.</p>
 {% endif %} <!-- no response-->

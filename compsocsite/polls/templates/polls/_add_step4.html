@@ -23,7 +23,7 @@
             {% csrf_token %}
             
             {% if question.question_type == 1 %}
-                <label for="pollpreferences">Select a voting algorithm <i class="fa fa-question-circle" aria-hidden="true" data-toggle="modal" data-target=".bs-example-modal-lg" style="color:GoldenRod;"></i></label>
+                <label for="pollpreferences">Select an algorithm <i class="fa fa-question-circle" aria-hidden="true" data-toggle="modal" data-target=".bs-example-modal-lg" style="color:GoldenRod;"></i></label>
                 <select id="pollpreferences" name="pollpreferences" class="form-control">
                 {% for item in poll_algorithms %}
                     <option value="{{ forloop.counter }}">
@@ -86,7 +86,7 @@
             {% endif %}
             
             {% if question.question_type == 1 %}
-            <label for="viewpreferences">Information visible to voters</label>
+            <label for="viewpreferences">Information visible to users</label>
             <select name="viewpreferences" class="form-control">
                 {% for item in view_preferences %}
                 <option value="{{ forloop.counter0 }}" {% if forloop.counter == preference %} selected {% endif %}>
@@ -96,7 +96,7 @@
             </select>
             <br />
 
-            <!-- <label for="viewpreferences">Information visible to voters</label><br />
+            <!-- <label for="viewpreferences">Information visible to users</label><br />
                 {% for item in view_preferences %}
                 <input name="viewpreferences" type="radio" value="{{ forloop.counter0 }}" 
                     name="ui" {% if forloop.counter == preference %} checked {% endif %}> {{ item }}<br />
@@ -106,13 +106,13 @@
 			<label for="creatorpreferences">Information visible to the creator</label>
             <select name="creatorpreferences" class="form-control">
                 <option value="1" selected>Creator can see everyone's vote</option>
-				<option value="2">Creator has the same visibility setting as all voters</option>
+				<option value="2">Creator has the same visibility setting as all users</option>
             </select>
             <br />
 
             <!-- <label for="creatorpreferences">Information visible to the creator</label><br />
             <input name="creatorpreferences" type="radio" value="1" checked> Creator can see everyone's vote <br>
-            <input name="creatorpreferences" type="radio" value="2" checked> Creator has the same visibility setting as all voters <br>
+            <input name="creatorpreferences" type="radio" value="2" checked> Creator has the same visibility setting as all users <br>
             <br /> -->
 
             {% endif %}
@@ -161,7 +161,7 @@
             <br /><br />
             
             {% if question.question_type == 1 %}
-            <label>Visible Voting Rules</label>
+            <label>Visible Algorithms</label>
             <div id="visible">
                 <label class="checkbox-inline"><input id="vis1" type="checkbox" value="1" name="vr" checked disabled>Plurality</label>
                 <label class="checkbox-inline"><input id="vis2" type="checkbox" value="2" name="vr" checked>Borda</label>

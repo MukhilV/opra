@@ -27,11 +27,11 @@
             title += va_mid + "<div class=\"start-icon\"><i class=\"fa fa-play\" aria-hidden=\"true\" data-toggle=\"modal\" data-target=\"#confirm-start" + item.id + "\"></i></div></td>"
             title +="<div class=\"modal fade\" id=\"confirm-start" + item.id + "\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\">"
             title += "<div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\">Confirm Start Poll " + item.value + "</div>"
-            title += "<div class=\"modal-body\">Are you sure you want to start poll " + item.value + "? Once a poll is started, you cannot modify the settings or remove voters.</div>"
+            title += "<div class=\"modal-body\">Are you sure you want to start poll " + item.value + "? Once a poll is started, you cannot modify the settings or remove users.</div>"
             title += "<div class=\"modal-footer\"><a href=\"/polls/" + item.id + "/start/\"><button type=\"button\" class=\"btn-large btn-success btn-ok\">Yes</button></a><button type=\"button\" class=\"btn-large btn-default\" data-dismiss=\"modal\">Cancel</button></div></div></div></div>";
         }else if(item.status == 2 && item.created){
             title += "<td style=\"vertical-align:middle\"><div class=\"stop-icon pull-right\"><i class=\"fa fa-stop\" aria-hidden=\"true\" data-toggle=\"modal\" data-target=\"#confirm-stop" + item.id + "\"></i></div><div class=\"pause-icon pull-right\" style=\"position:relative; right:10%;\"><a href=\"/polls/" + item.id + "/pause/\"><i class=\"fa fa-pause\" aria-hidden=\"true\"></i></a></div></td>"
-            title += "<div class=\"modal fade\" id=\"confirm-stop" + item.id + "\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\">Confirm Stop Poll</div><div class=\"modal-body\">Are you sure you want to stop this poll? Once a poll is stopped, no more votes can be changed.</div>";
+            title += "<div class=\"modal fade\" id=\"confirm-stop" + item.id + "\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\">Confirm Stop Poll</div><div class=\"modal-body\">Are you sure you want to stop this poll? Once a poll is stopped, no more preferences can be changed.</div>";
             title += "<div class=\"modal-footer\"><a href=\"/polls/" + item.id + "/stop/\"><button type=\"button\" class=\"btn-large  btn-ok btn-danger\" style=\"font-size:100%;\">Yes</button></a><button type=\"button\" class=\"btn-large btn-default\" data-dismiss=\"modal\">Cancel</button></div></div></div></div>";
         }else if(item.status == 3 && item.created){
             title += "<td>";
@@ -223,7 +223,7 @@
                                         Confirm Start Poll {{ question.question_text }}
                                     </div>
                                     <div class="modal-body">
-                                        Are you sure you want to start poll {{ question.question_text }}? Once a poll is started, you cannot modify the settings or remove voters.
+                                        Are you sure you want to start poll {{ question.question_text }}? Once a poll is started, you cannot modify the settings or remove users.
                                     </div>
                                     <div class="modal-footer">
                                         <a href="{% url 'polls:start' question.id %}">
@@ -252,7 +252,7 @@
                                         Confirm Stop Poll
                                     </div>
                                     <div class="modal-body">
-                                        Are you sure you want to stop this poll? Once a poll is stopped, no more votes can be changed.
+                                        Are you sure you want to stop this poll? Once a poll is stopped, no more preferences can be changed.
                                     </div>
                                     <div class="modal-footer">
                                         <a href="{% url 'polls:stop' question.id %}">
