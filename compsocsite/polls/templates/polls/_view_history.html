@@ -6,7 +6,7 @@
 				    <div class="progress-bar" role="progressbar" aria-valuenow="{{progressPercentage}}"aria-valuemin="0" aria-valuemax="100" style="width:{{progressPercentage}}%">
 					    <span style="color:white;">{{latest_responses|length}} / {{question.question_voters.count}}</span>
 				    </div>
-				</div>
+			</div>
 			<p>{{latest_responses|length}} / {{question.question_voters.count}} have voted.</p>
             <!-- Display most recent vote -->
             {% if latest_responses|length > 0 %}
@@ -55,41 +55,7 @@
                 <p>No one has voted on this poll yet.</p>
             {% endif %} <!-- no response-->
             </div>
-        <!-- {% elif question.question_owner != request.user and question.creator_pref == 1 %} 
-			<div class="progress">
-				    <div class="progress-bar" role="progressbar" aria-valuenow="{{progressPercentage}}"aria-valuemin="0" aria-valuemax="100" style="width:{{progressPercentage}}%">
-					    <span style="color:white;">{{latest_responses|length}} / {{question.question_voters.count}}</span>
-				    </div>
-				</div>
-            {% if user_latest_responses %}
-                {% for response, currentSelection in user_latest_responses %}
-                    <b>{{ response.user.username }}</b> (last voted on {{ response.timestamp }}) <br /> 
-                    
-                    {% include 'polls/_display_vote.html' %}
-                {% endfor %}
-                <br />
-                <br />
-                {% if user_previous_responses %}
-                <button data-toggle="collapse" data-target="#history" class="btn btn-info">Show/Hide History</button>
-                <div id="history" class="collapse">
-                    <div class="well">
-                    {% for response, currentSelection in user_previous_responses %}
-                    <div class="btn-group">
-                        <b>{{ response.user.username }}</b> (last voted on {{ response.timestamp }}) <br /> 
-
-                        {% include 'polls/_display_vote.html' %}
-                    </div>
-                    <br>
-                    {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-            {% else %}
-                <p>You haven't voted on this poll yet.</p>
-            {% endif %} -->
         {% endif %}
-            
-
 
 
         <!-- ################## Creator has same visibility as all users ##################### -->  
@@ -209,4 +175,38 @@
         
         <br/>
 
-    </div>
+            <!-- When the requested User is not owner i.e) "History" tab of non owner-->
+            {% if question.question_owner != request.user  %}  
+            <!-- and question.creator_pref == 1 -->
+                <div class="progress">
+                        <div class="progress-bar" role="progressbar" aria-valuenow="{{progressPercentage}}"aria-valuemin="0" aria-valuemax="100" style="width:{{progressPercentage}}%">
+                            <span style="color:white;">{{latest_responses|length}} / {{question.question_voters.count}}</span>
+                        </div>
+                    </div>
+                {% if user_latest_responses %}
+                    {% for response, currentSelection in user_latest_responses %}
+                        <b>{{ response.user.username }}</b> (last voted on {{ response.timestamp }}) <br /> 
+                        
+                        {% include 'polls/_display_vote.html' %}
+                    {% endfor %}
+                    <br />
+                    <br />
+                    {% if user_previous_responses %}
+                    <button data-toggle="collapse" data-target="#history" class="btn btn-info">Show/Hide History</button>
+                    <div id="history" class="collapse">
+                        <div class="well">
+                        {% for response, currentSelection in user_previous_responses %}
+                        <div class="btn-group">
+                            <b>{{ response.user.username }}</b> (last voted on {{ response.timestamp }}) <br /> 
+    
+                            {% include 'polls/_display_vote.html' %}
+                        </div>
+                        <br>
+                        {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <p>You haven't voted on this poll yet.</p>
+                {% endif %} 
+            {% endif %}
