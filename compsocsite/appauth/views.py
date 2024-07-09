@@ -62,14 +62,14 @@ def register(request):
             user.is_active = False
 
             # If the registering user is invited for any poll, register him automatically to that poll.
-            # On Exception when UnregisteredUser not found, do nothing. It means the user is not invited to any polls
             try:
                 invited_user = UnregisteredUser.objects.get(email=data["email"])
                 user.poll_participated.set(invited_user.polls_invited.all())
                 user.save()
                 invited_user.delete()
-            except Exception as e:
-                print(e)
+            
+            # On Exception when UnregisteredUser not found, do nothing. It means the user is not invited to any polls
+            except UnregisteredUser.DoesNotExist:
                 pass
 
 

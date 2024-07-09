@@ -29,7 +29,6 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         user.save()
         
         # If the registering user is invited for any poll, register him automatically to that poll.
-        # Do nothing, if the registering user is not invited to any polls
         try:
             invited_user = UnregisteredUser.objects.get(email=email)
 
@@ -41,9 +40,9 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
 
             # Delete the invited user record
             invited_user.delete()
-            
-        except Exception as e:
-            print(e)
+        
+        # Do nothing, if the registering user is not invited to any polls
+        except UnregisteredUser.DoesNotExist:
             pass
         
         return user
