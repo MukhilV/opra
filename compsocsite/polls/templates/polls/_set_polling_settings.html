@@ -10,6 +10,7 @@
             </option>
         {% endfor %}
         </select>
+        <br />
     {% elif question.question_type == 2 %}
         <label for="pollpreferences">Select an allocation method to calculate result</label>
         <select name="pollpreferences" class="form-control" {% if question.status != 1 %} disabled {% endif %}>
@@ -32,12 +33,10 @@
                 <a href="{% url 'polls:viewAllocationOrder' question.id %}" class ="btn btn-dark" role="button">Set Allocation Order</a> <br />
             {% endif %}
         {% endif %}
-        <br />
     {% endif %}
     
-    {% if question.question_type == 1 %}
-    <br />
-    <label for="viewpreferences">Visibility setting for users for this specific poll</label>
+    
+    <label for="viewpreferences">Visibility setting for users of this instance</label>
     <select name="viewpreferences" class="form-control">
         <!-- <option value="always" {% if question.display_pref == 0 %} selected {% endif %} >Everyone can see all votes at all times</option> -->
         <option value="allpermit" {% if question.display_pref == 1 %} selected {% endif %} >Everyone can see all preferences</option>
@@ -48,14 +47,14 @@
     </select>
     <br />
 
-	<label for="creatorpreferences">Visibility setting for creator for this specific poll</label>
+	<label for="creatorpreferences">Visibility setting for creator of this instance</label>
     <select name="creatorpreferences" class="form-control" {% if question.status != 1 %} disabled {% endif %}>
         <option value="1" {% if question.creator_pref == 1 %} selected {% endif %}>Creator can see everyone's vote</option>
         <option value="2" {% if question.creator_pref == 2 %} selected {% endif %}>Creator has the same visibility setting as all users</option>
     </select>
     
     <br/>
-    {% endif %}
+    
 
     {% if question.question_type == 1 %}
     <fieldset class="form-group">
@@ -69,12 +68,12 @@
     {% endif %}
 
     {% if question.question_type == 2 %}
-    <fieldset class="form-group"></fieldset>
+    <fieldset class="form-group">
             <label>Allocation algorithms to show results</label>
             <div id="visible">
                 <label class="checkbox-inline"><input id="round_robin_alloc" type="checkbox" value="1" name="alloc_algorithms" checked disabled>Round Robin</label>
             </div>
-        </fieldset>
+    </fieldset>
     {% endif %}
 
     {% if question.question_type == 2 %}
