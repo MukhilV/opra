@@ -967,6 +967,31 @@ class DetailView(views.generic.DetailView):
         """
         return Question.objects.filter(pub_date__lte=timezone.now())
 
+def addPreferenceValueToResp(objs):
+    for i in range(len(objs)):
+        response, prefOrder = objs[i]
+
+        # convert behavior_data to json and extract submitted_ranking
+        submitted_rankings = json.loads(response.behavior_data)["submitted_ranking"]
+
+        # Initialize empty set
+        scores = set()
+
+        # Extract the scores from submitted_rankings and add it to the scores set
+        for tier in submitted_rankings:
+            for jsonObj in tier:
+                scores.add(jsonObj['score'])
+
+        scores = sorted(list(scores))[-1::-1]
+
+        # Add score as the first element in the tier-list
+        for i in range(len(scores)):
+            prefOrder[i].insert(0, scores[i])
+
+        # print(prefOrder, scores)
+
+    return objs
+
 # view for settings detail
 class PollInfoView(views.generic.DetailView):
     model = Question
@@ -990,6 +1015,7 @@ class PollInfoView(views.generic.DetailView):
 
     def get_context_data(self, **kwargs):
         ctx = super(PollInfoView, self).get_context_data(**kwargs)
+        curr_question = self.object
         emailInvite = Email.objects.filter(question=self.object, type=1)
         if len(emailInvite) == 1:
             setupEmail(self.object)
@@ -1014,19 +1040,29 @@ class PollInfoView(views.generic.DetailView):
                                                                active=1).order_by('-timestamp')
         if len(currentUserResponses) > 0:
             ctx['user_latest_responses'] = getSelectionList([currentUserResponses[0]])
+            if(curr_question.question_type == 2): ctx['user_latest_responses'] = addPreferenceValueToResp(ctx['user_latest_responses'])
+
         ctx['user_previous_responses'] = getSelectionList(currentUserResponses[1:])
+        if(curr_question.question_type == 2): 
+            ctx['user_previous_responses'] = addPreferenceValueToResp(ctx['user_previous_responses'])
 
         # get history of all users
         all_responses = self.object.response_set.filter(active=1).order_by('-timestamp')
         (latest_responses, previous_responses) = categorizeResponses(all_responses)
         ctx['latest_responses'] = getSelectionList(latest_responses)
         ctx['previous_responses'] = getSelectionList(previous_responses)
+        if(curr_question.question_type == 2): 
+            ctx['latest_responses'] = addPreferenceValueToResp(ctx['latest_responses'])
+            ctx['previous_responses'] = addPreferenceValueToResp(ctx['previous_responses'])
 
         # get deleted votes
         deleted_resps = self.object.response_set.filter(active=0).order_by('-timestamp')
         (latest_deleted_resps,previous_deleted_resps) = categorizeResponses(deleted_resps)
         ctx['latest_deleted_resps'] = getSelectionList(latest_deleted_resps)
         ctx['previous_deleted_resps'] = getSelectionList(previous_deleted_resps)
+        if(curr_question.question_type == 2):
+            ctx['latest_deleted_resps'] = addPreferenceValueToResp(ctx['latest_deleted_resps'])
+            ctx['previous_deleted_resps'] = addPreferenceValueToResp(ctx['previous_deleted_resps'])
 
         if self.object.question_voters.all().count() > 0:
             progressPercentage = len(latest_responses) / self.object.question_voters.all().count()
@@ -1035,7 +1071,6 @@ class PollInfoView(views.generic.DetailView):
         ctx['request_list'] = self.object.signuprequest_set.filter(status=1)
 
         # alloc_res_tables contains display options for results of an allocation
-        curr_question = self.object
         selected_alloc_res_tables_sum = curr_question.alloc_res_tables
         ctx['selected_alloc_res_tables_sum'] = selected_alloc_res_tables_sum
 

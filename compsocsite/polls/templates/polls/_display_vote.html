@@ -1,13 +1,26 @@
-{% for s in currentSelection %}
-    {% if s.0 %}
-    <div class="btn btn-default disabled">
-        ({{ forloop.counter }})
 
-        {% for selection in s %}
-            <span class="btn btn-default disabled">
-            {{ selection }}
-            </span>
-        {% endfor %}
+{% for tier in currentSelection %}
+    {% if tier.0 %}
+    <div class="btn btn-default disabled">
+        {% if question.question_type == 1  %}
+            ({{ forloop.counter }})
+            {% for item in tier %}
+                <span class="btn btn-default disabled">
+                {{ item }}
+                </span>
+            {% endfor %}
+        
+        {% elif question.question_type == 2 %}
+        ({{ tier.0 }})
+            {% for item in tier %}
+                {% if not forloop.first %}
+                    <span class="btn btn-default disabled">
+                    {{ item }}
+                    </span>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
     </div>
     {% endif %}
 {% endfor %}
