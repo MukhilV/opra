@@ -75,7 +75,7 @@ def emailSettings(request, question_id):
         emailDelete.save()
         question.emailDelete = request.POST.get('email') == 'email'
     
-    if(request.POST.get('startSubject')is not None): 
+    if(request.POST.get('startSubject') is not None): 
         emailStart = Email.objects.filter(question=question, type=3)[0]
         emailStart.subject = request.POST.get('startSubject')
         emailStart.message = request.POST.get('startMessage')

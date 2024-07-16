@@ -2108,6 +2108,17 @@ def sendEmail(toEmails, mailSubject, mailBody):
                     html_message='')
     return
 
+def getRegAndUnRegUsers(userIDsFromCSV):
+    regUsers, UnregUsers = [], []
+    for userID in userIDsFromCSV:
+        try:
+            _user = User.objects.get(email = userID)
+            regUsers.append(userID)
+        except: 
+            UnregUsers.append(userID)
+
+    return regUsers, UnregUsers
+
 # Send email invite to Registered and Non registered Participants
 # added using csv
 def addUsersAndSendEmailInvite(request, question_id):
@@ -2117,22 +2128,29 @@ def addUsersAndSendEmailInvite(request, question_id):
     recepients = request.POST.get('recepients')
     mailSubject = request.POST.get('mailSubject')
     mailBody = request.POST.get('mailBody')
-    existingUsers = User.objects.all()
-    existingUserIDs = [user.username for user in existingUsers]
+    # existingUsers = User.objects.all()
+    # existingUserIDs = [user.username for user in existingUsers]
 
     registers_users_of_current_poll = []
     UnRegistered_users_of_current_poll = []
+
+    email = request.POST.get('email') == 'email'
+
     try: 
         recentCSVText = question.recentCSVText
         if(recentCSVText is not None): 
             userIDsFromCSV = recentCSVText.split(",")
             userIDsFromCSV = [userID.strip() for userID in userIDsFromCSV]
 
-            for userID in userIDsFromCSV:
-                if userID in existingUserIDs:
-                    registers_users_of_current_poll.append(userID)
-                else:
-                    UnRegistered_users_of_current_poll.append(userID)
+            # The invited user to this poll might be already registered with OPRA
+            # for userID in userIDsFromCSV:
+            #     if userID in existingUserIDs:
+            #         registers_users_of_current_poll.append(userID)
+            #     else:
+            #         UnRegistered_users_of_current_poll.append(userID)
+
+            # modified Logic to segregate Reg/Unreg Users
+            registers_users_of_current_poll, UnRegistered_users_of_current_poll = getRegAndUnRegUsers(userIDsFromCSV)
             
             # Logic to add registered Voters to poll
             for voter in registers_users_of_current_poll:
@@ -2175,19 +2193,20 @@ def addUsersAndSendEmailInvite(request, question_id):
                
             csvEmails = request.POST.get('textAreaForCustomMails')
             customEmails = csvEmails.split(',')
-
-            if(recepients == "regVotersOnly"):
-                print("Email sending logic for regVotersOnly")
-                # sendEmail(registers_users_of_current_poll, mailSubject, mailBody)
-            elif(recepients == "unregVotersOnly"):
-                print("Email sending logic for unregVotersOnly")
-                # sendEmail(UnRegistered_users_of_current_poll, mailSubject, mailBody)
-            elif(recepients == "customEmails"):
-                print("Email sending logic for customEmails")
-                # sendEmail(customEmails, mailSubject, mailBody)
-            elif(recepients == "allVoters"):
-                print("Email sending logic for All voters")
-                # sendEmail(userIDsFromCSV, mailSubject, mailBody) 
+            
+            if email:
+                if(recepients == "regVotersOnly"):
+                    print("Email sending logic for regVotersOnly")
+                    # sendEmail(registers_users_of_current_poll, mailSubject, mailBody)
+                elif(recepients == "unregVotersOnly"):
+                    print("Email sending logic for unregVotersOnly")
+                    # sendEmail(UnRegistered_users_of_current_poll, mailSubject, mailBody)
+                elif(recepients == "customEmails"):
+                    print("Email sending logic for customEmails")
+                    # sendEmail(customEmails, mailSubject, mailBody)
+                elif(recepients == "allVoters"):
+                    print("Email sending logic for All voters")
+                    # sendEmail(userIDsFromCSV, mailSubject, mailBody) 
             return     
     except Exception as e:
         print(e) 
