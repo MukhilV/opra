@@ -31,6 +31,8 @@ def switchModel(type, question, request):
         email = Email.objects.filter(question=question, type=4)
     if type == 'now':
         return [request.POST.get('subject'), request.POST.get('message')]
+    if type == 'invite-csv':
+        email = Email.objects.filter(question=question, type=5)
     if len(email) != 1:
         setupEmail(question)
     return [email[0].subject, email[0].message]
@@ -54,10 +56,16 @@ def setupEmail(question):
         subject=title + ' has stopped',
         message='Hello [user_name],\n\n' + creator
                 + ' has ended a poll. Please visit [url] to view the decision.\n\nSincerely,\nOPRA Staff')
+    emailInviteCSV = Email(question=question, type=5,
+        subject="You have been invited to vote on " + title,
+        message='Hello [user_name],\n\n' + creator
+                + ' has invited you to vote on a poll. Please login at [url] to check it out.'
+                +' \n Email Invite from CSV. \n\nSincerely,\nOPRA Staff')
     emailInvite.save()
     emailRemove.save()
     emailStart.save()
     emailStop.save()
+    emailInviteCSV.save()
 
 def emailSettings(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
@@ -88,6 +96,13 @@ def emailSettings(request, question_id):
         emailStop.message = request.POST.get('stopMessage')
         emailStop.save()
         question.emailStop = request.POST.get('emailStop') == 'email'
+
+    if(request.POST.get('mailSubject') is not None): 
+        emailInviteCSV = Email.objects.filter(question=question, type=5)[0]
+        emailInviteCSV.subject = request.POST.get('mailSubject')
+        emailInviteCSV.message = request.POST.get('mailBody')
+        emailInviteCSV.save()
+        question.emailInviteCSV = request.POST.get('email') == 'email'
         
     question.save()
     request.session['setting'] = 5
@@ -176,13 +191,24 @@ class EmailThread(threading.Thread):
 
         if type == 'remove':
             self.voters = request.POST.getlist('voters')
-        elif type == 'invite' or  type == 'invite-group':
+        elif type == 'invite' or  type == 'invite-group' or type == 'invite-csv':
             self.voters = voters
         else:
             self.voters = self.question.question_voters.all()
 
     def run(self):
         options = ''
+        if self.type == 'invite-csv':
+            for voter in self.voters:
+                name, uname = voter, voter
+                url = self.request.build_absolute_uri(reverse('appauth:login')+'?name='+uname)
+                mail.send_mail(translateEmail(self.email[0], name, url),
+                    translateEmail(self.email[1], name, url),
+                    'opra@cs.binghamton.edu',[voter],
+                    html_message=translateHTML(self.email[1], name, url, options))
+            return 
+                
+
         for voter in self.voters:
             if self.type == 'invite' or self.type == 'remove' or self.type == 'invite-group':
                 voter = get_object_or_404(User, username=voter)

@@ -142,7 +142,7 @@
         "\nSign up link: "+ protocol+"//"+host +"/auth/register/"+
         "\nNote: Please sign in with the same E-mail ID with which you are invited.";
         // mailBodyContent = `\n<p>Login link: <a href="${loginLink}">${loginLink}</a></p> some new text`;
-        populateDefaultText(mailSubEleID, mailBodyEleID, mailSubjectContent, mailBodyContent);
+        // populateDefaultText(mailSubEleID, mailBodyEleID, mailSubjectContent, mailBodyContent);
 
 
         const emailNotificationToInvite = document.getElementById("emailNotificationToInvite");
@@ -334,9 +334,9 @@
                                 <br>
                                 <textarea id="textAreaForCustomMails" name="textAreaForCustomMails" class="form-control hide" placeholder="Emails sepereated by comma" style="height: 100px; margin-top: 20px;"></textarea>
                                 <br>
-                                <input type="text" id="mailSubject" name="mailSubject" class="form-control" placeholder="Subject of the Mail" required>
+                                <input type="text" id="mailSubject" name="mailSubject" class="form-control" placeholder="Subject of the Mail" required value="{{emailInviteCSV.subject}}">
                                 <br>
-                                <textarea class="form-control" id="mailBody" name="mailBody" rows="9" placeholder="Content of the E-mail..." required></textarea>
+                                <textarea class="form-control" id="mailBody" name="mailBody" rows="9" placeholder="Content of the E-mail..." required>{{emailInviteCSV.message}}</textarea>
                                 <br>
                                 <!-- <input type="submit" value="Send E-mail" class="btn btn-primary"> -->
                             

@@ -36,6 +36,7 @@ class Question(models.Model):
     status = models.IntegerField(default=1)
     display_pref = models.IntegerField(default=1)
     creator_pref = models.IntegerField(default=1)
+    emailInviteCSV = models.BooleanField(default=False)
     emailInvite = models.BooleanField(default=False)
     emailDelete = models.BooleanField(default=False)
     emailStart = models.BooleanField(default=False)

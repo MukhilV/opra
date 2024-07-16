@@ -354,6 +354,13 @@ class AddStep3View(views.generic.DetailView):
         ctx['registeredUsers'] = registeredUsers
         ctx['unRegisteredUsers'] = unRegisteredUsers
 
+        if Email.objects.filter(question=self.object).count() > 0:
+            ctx['emailInvite'] = Email.objects.filter(question=self.object, type=1)[0]
+            ctx['emailDelete'] = Email.objects.filter(question=self.object, type=2)[0]
+            ctx['emailStart'] = Email.objects.filter(question=self.object, type=3)[0]
+            ctx['emailStop'] = Email.objects.filter(question=self.object, type=4)[0]
+            ctx['emailInviteCSV'] = Email.objects.filter(question=self.object, type=5)[0]
+
         return ctx
     def get_queryset(self):
         return Question.objects.filter(pub_date__lte=timezone.now())
@@ -1024,6 +1031,7 @@ class PollInfoView(views.generic.DetailView):
             ctx['emailDelete'] = Email.objects.filter(question=self.object, type=2)[0]
             ctx['emailStart'] = Email.objects.filter(question=self.object, type=3)[0]
             ctx['emailStop'] = Email.objects.filter(question=self.object, type=4)[0]
+            ctx['emailInviteCSV'] = Email.objects.filter(question=self.object, type=5)[0]
         ctx['users'] = User.objects.all()
         ctx['items'] = self.object.item_set.all()
         ctx['groups'] = Group.objects.all()
@@ -2197,16 +2205,25 @@ def addUsersAndSendEmailInvite(request, question_id):
             if email:
                 if(recepients == "regVotersOnly"):
                     print("Email sending logic for regVotersOnly")
+                    email_class = EmailThread(request, question_id, 'invite-csv', registers_users_of_current_poll)
+                    email_class.start()
                     # sendEmail(registers_users_of_current_poll, mailSubject, mailBody)
                 elif(recepients == "unregVotersOnly"):
                     print("Email sending logic for unregVotersOnly")
+                    email_class = EmailThread(request, question_id, 'invite-csv', UnRegistered_users_of_current_poll)
+                    email_class.start()
                     # sendEmail(UnRegistered_users_of_current_poll, mailSubject, mailBody)
                 elif(recepients == "customEmails"):
                     print("Email sending logic for customEmails")
+                    email_class = EmailThread(request, question_id, 'invite-csv', customEmails)
+                    email_class.start()
                     # sendEmail(customEmails, mailSubject, mailBody)
                 elif(recepients == "allVoters"):
                     print("Email sending logic for All voters")
+                    email_class = EmailThread(request, question_id, 'invite-csv', userIDsFromCSV)
+                    email_class.start()
                     # sendEmail(userIDsFromCSV, mailSubject, mailBody) 
+                emailSettings(request, question_id)
             return     
     except Exception as e:
         print(e) 
