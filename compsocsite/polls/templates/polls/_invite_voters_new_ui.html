@@ -120,14 +120,14 @@
         var mailSubjectContent = "You have been removed from {{ question.question_text | safe }}";
         var mailBodyContent = "You have been removed from {{ question.question_text | safe }}."+ 
         "\nInstance link: "+instanceURL;
-        populateDefaultText(mailSubEleID, mailBodyEleID, mailSubjectContent, mailBodyContent);
+        // populateDefaultText(mailSubEleID, mailBodyEleID, mailSubjectContent, mailBodyContent);
 
         mailSubEleID = "mailNotificationSubject1";
         mailBodyEleID = "mailNotificationBody1";
         mailSubjectContent = "You have been added to {{ question.question_text | safe }}";
         mailBodyContent = "You have been added to {{ question.question_text | safe }}. "+
         "\nTo access it, follow the link : "+ instanceURL;
-        populateDefaultText(mailSubEleID, mailBodyEleID, mailSubjectContent, mailBodyContent);
+        // populateDefaultText(mailSubEleID, mailBodyEleID, mailSubjectContent, mailBodyContent);
         
 
         var loginLink = protocol + "//" + host + "/polls/main";
@@ -199,14 +199,14 @@
                 <br />
                 {% if question.status == 1 %}
                     <label for="emailNotificationToRemove">Email announcement</label>
-                    <input type="checkbox" name="email" id="emailNotificationToRemove" value="email" >
+                    <input type="checkbox" name="email" id="emailNotificationToRemove" value="email" {% if question.emailDelete == True %} checked {% endif %} >
                     <!-- {% if question.emailDelete == True or question.emailDelete == None %} checked {% endif %} -->
                 {% endif %}
                     <br />
                     <div id="mailNotificationDivToRemove" class="hide">
-                        <input type="text" id="mailNotificationSubject" name="mailNotificationSubject" class="form-control" placeholder="Subject of the Mail" >
+                        <input type="text" id="mailNotificationSubject" name="mailNotificationSubject" class="form-control" placeholder="Subject of the Mail" value="{{emailDelete.subject}}">
                         <br>
-                        <textarea class="form-control" id="mailNotificationBody" name="mailNotificationBody" rows="9" placeholder="Content of the E-mail..." ></textarea>
+                        <textarea class="form-control" id="mailNotificationBody" name="mailNotificationBody" rows="9" placeholder="Content of the E-mail..." >{{emailDelete.message}}</textarea>
                         <br>
                     </div>
                     {% if question.status == 1 %}
@@ -248,7 +248,7 @@
                 </div>
                 <br>
                 <label for="email">Email announcement</label>
-                <input type="checkbox" name="email" id="emailNotification" value="email" >
+                <input type="checkbox" name="email" id="emailNotification" value="email" {% if question.emailInvite == True %} checked {% endif %}>
                 <!-- {% if question.emailInvite == True or question.emailInvite == None %} checked {% endif %} -->
                 <br>
                 
@@ -262,9 +262,9 @@
                     </div>
                     {% endif %}
 
-                    <input type="text" id="mailNotificationSubject1" name="mailNotificationSubject1" class="form-control" placeholder="Subject of the Mail" >
+                    <input type="text" id="mailNotificationSubject1" name="mailNotificationSubject1" class="form-control" placeholder="Subject of the Mail" value="{{emailInvite.subject}}">
                     <br>
-                    <textarea class="form-control" id="mailNotificationBody1" name="mailNotificationBody1" rows="9" placeholder="Content of the E-mail..." ></textarea>
+                    <textarea class="form-control" id="mailNotificationBody1" name="mailNotificationBody1" rows="9" placeholder="Content of the E-mail..." >{{emailInvite.message}}</textarea>
                     <br>
                 </div>
             </form>

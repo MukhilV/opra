@@ -21,7 +21,7 @@ import string
 import threading
 
 def switchModel(type, question, request):
-    if type == 'invite':
+    if type == 'invite' or type == 'invite-group':
         email = Email.objects.filter(question=question, type=1)
     if type == 'remove':
         email = Email.objects.filter(question=question, type=2)
@@ -61,26 +61,34 @@ def setupEmail(question):
 
 def emailSettings(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    emailInvite = Email.objects.filter(question=question, type=1)[0]
-    emailInvite.subject = request.POST.get('inviteSubject')
-    emailInvite.message = request.POST.get('inviteMessage')
-    emailInvite.save()
-    emailDelete = Email.objects.filter(question=question, type=2)[0]
-    emailDelete.subject = request.POST.get('deleteSubject')
-    emailDelete.message = request.POST.get('deleteMessage')
-    emailDelete.save()
-    emailStart = Email.objects.filter(question=question, type=3)[0]
-    emailStart.subject = request.POST.get('startSubject')
-    emailStart.message = request.POST.get('startMessage')
-    emailStart.save()
-    emailStop = Email.objects.filter(question=question, type=4)[0]
-    emailStop.subject = request.POST.get('stopSubject')
-    emailStop.message = request.POST.get('stopMessage')
-    emailStop.save()
-    question.emailInvite = request.POST.get('emailInvite') == 'email'
-    question.emailDelete = request.POST.get('emailDelete') == 'email'
-    question.emailStart = request.POST.get('emailStart') == 'email'
-    question.emailStop = request.POST.get('emailStop') == 'email'
+    if(request.POST.get('mailNotificationSubject1') is not None): 
+        emailInvite = Email.objects.filter(question=question, type=1)[0]
+        emailInvite.subject = request.POST.get('mailNotificationSubject1')
+        emailInvite.message = request.POST.get('mailNotificationBody1')
+        emailInvite.save()
+        question.emailInvite = request.POST.get('email') == 'email'
+    
+    if(request.POST.get('mailNotificationSubject') is not None): 
+        emailDelete = Email.objects.filter(question=question, type=2)[0]
+        emailDelete.subject = request.POST.get('mailNotificationSubject')
+        emailDelete.message = request.POST.get('mailNotificationBody')
+        emailDelete.save()
+        question.emailDelete = request.POST.get('email') == 'email'
+    
+    if(request.POST.get('startSubject')is not None): 
+        emailStart = Email.objects.filter(question=question, type=3)[0]
+        emailStart.subject = request.POST.get('startSubject')
+        emailStart.message = request.POST.get('startMessage')
+        emailStart.save()
+        question.emailStart = request.POST.get('emailStart') == 'email'
+    
+    if(request.POST.get('stopSubject') is not None): 
+        emailStop = Email.objects.filter(question=question, type=4)[0]
+        emailStop.subject = request.POST.get('stopSubject')
+        emailStop.message = request.POST.get('stopMessage')
+        emailStop.save()
+        question.emailStop = request.POST.get('emailStop') == 'email'
+        
     question.save()
     request.session['setting'] = 5
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -154,7 +162,7 @@ def getOptions(items):
     return arr
 
 class EmailThread(threading.Thread):
-    def __init__(self, request, question_id, type):
+    def __init__(self, request, question_id, type, voters=None):
         threading.Thread.__init__(self)
         self.question = get_object_or_404(Question, pk=question_id)
         self.type = type
@@ -166,27 +174,29 @@ class EmailThread(threading.Thread):
         if self.creator_obj.first_name != "":
             self.creator = self.creator_obj.first_name + " " + self.creator_obj.last_name
 
-        if type == 'invite' or type == 'remove':
+        if type == 'remove':
             self.voters = request.POST.getlist('voters')
+        elif type == 'invite' or  type == 'invite-group':
+            self.voters = voters
         else:
             self.voters = self.question.question_voters.all()
 
     def run(self):
         options = ''
         for voter in self.voters:
-            if self.type == 'invite' or self.type == 'remove':
+            if self.type == 'invite' or self.type == 'remove' or self.type == 'invite-group':
                 voter = get_object_or_404(User, username=voter)
             name = voter.username
             uname = voter.username
-            if self.question.poll_algorithm == 1 and self.type == 'start':
-                items = Item.objects.all().filter(question=self.question)
-                item_array = getOptions(items)
-                options = ''
-                # for i in items:
-                #     rand = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(20))
-                #     response = EmailResponse(item=i, user=voter, identity=rand)
-                #     response.save()
-                #     options += '<p><a href=\'' + self.request.build_absolute_uri(reverse('polls:index') + str(response.pk) + "/" + rand + "/voteEmail/") + '\'>' + i.item_text + '</a></p>'
+            # if self.question.poll_algorithm == 1 and self.type == 'start':
+            #     items = Item.objects.all().filter(question=self.question)
+            #     item_array = getOptions(items)
+            #     options = ''
+            #     for i in items:
+            #         rand = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(20))
+            #         response = EmailResponse(item=i, user=voter, identity=rand)
+            #         response.save()
+            #         options += '<p><a href=\'' + self.request.build_absolute_uri(reverse('polls:index') + str(response.pk) + "/" + rand + "/voteEmail/") + '\'>' + i.item_text + '</a></p>'
             if voter.first_name != "":
                 name = voter.first_name + " " + voter.last_name
             url = self.request.build_absolute_uri(reverse('appauth:login')+'?name='+uname)

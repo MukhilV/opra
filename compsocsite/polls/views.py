@@ -23,7 +23,7 @@ from prefpy.mechanism import *
 from prefpy.allocation_mechanism import *
 from prefpy.gmm_mixpl import *
 from prefpy.egmm_mixpl import *
-from .email import EmailThread, setupEmail
+from .email import EmailThread, emailSettings, setupEmail
 from django.conf import settings
 from multipolls.models import *
 
@@ -2035,7 +2035,10 @@ def addVoters(request, question_id):
                 question.question_voters.add(voterObj.id)
             
             if email:
-                print("Email sending logic here")
+                print("Email sending logic here to invite users")
+                email_class = EmailThread(request, question_id, 'invite', newVoters)
+                email_class.start()
+
                 # mail.send_mail(mailSub,
                 #             mailBody,
                 #             'opra@cs.binghamton.edu',
@@ -2059,7 +2062,10 @@ def addVoters(request, question_id):
                 votersEmailIDsInGroups.remove(mailID)
 
         if email:
-            print("Email sending logic here")
+            print("Email sending logic here to invite group users")
+            email_class = EmailThread(request, question_id, 'invite-group', votersEmailIDsInGroups)
+            email_class.start()
+
             # mail.send_mail(mailSub,
             #                 mailBody,
             #                 'opra@cs.binghamton.edu',
@@ -2073,6 +2079,7 @@ def addVoters(request, question_id):
     #     email_class = EmailThread(request, question_id, 'invite')
     #     email_class.start()
     question.save()
+    emailSettings(request, question_id)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 # Save the recently uploaded csv text
@@ -2102,6 +2109,7 @@ def sendEmail(toEmails, mailSubject, mailBody):
     return
 
 # Send email invite to Registered and Non registered Participants
+# added using csv
 def addUsersAndSendEmailInvite(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     creator_obj = User.objects.get(id=question.question_owner_id)
@@ -2183,8 +2191,8 @@ def addUsersAndSendEmailInvite(request, question_id):
             return     
     except Exception as e:
         print(e) 
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        return 
+    return 
 
 # remove voters from a poll.
 # should only be done before a poll starts
@@ -2198,22 +2206,23 @@ def removeVoter(request, question_id):
     mailBody = request.POST.get('mailNotificationBody')
 
     question.emailDelete = email
-    # if email:
-    #     email_class = EmailThread(request, question_id, 'remove')
-    #     email_class.start()
+    if email:
+        email_class = EmailThread(request, question_id, 'remove')
+        email_class.start()
     
     for voter in newVoters:
         voterObj = User.objects.get(username=voter)
         question.question_voters.remove(voterObj.id)
-    if email:
-        mail.send_mail(mailSub,
-                    mailBody,
-                    'opra@cs.binghamton.edu',
-                    ['mukhil1140@gmail.com'], # newVoters
-                    html_message='')
+    # if email:
+    #     mail.send_mail(mailSub,
+    #                 mailBody,
+    #                 'opra@cs.binghamton.edu',
+    #                 ['mukhil1140@gmail.com'], # newVoters
+    #                 html_message='')
         
     request.session['setting'] = 1
     question.save()
+    emailSettings(request, question_id)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 # called when creating the poll
