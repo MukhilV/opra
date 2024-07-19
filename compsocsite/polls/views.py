@@ -359,7 +359,9 @@ class AddStep3View(views.generic.DetailView):
             ctx['emailDelete'] = Email.objects.filter(question=self.object, type=2)[0]
             ctx['emailStart'] = Email.objects.filter(question=self.object, type=3)[0]
             ctx['emailStop'] = Email.objects.filter(question=self.object, type=4)[0]
-            ctx['emailInviteCSV'] = Email.objects.filter(question=self.object, type=5)[0]
+            ctx['emailInviteCSV'] = Email.objects.filter(question=self.object, type=4)[0]
+            if len(Email.objects.filter(question=self.object, type=5)) > 0:
+                ctx['emailInviteCSV'] = Email.objects.filter(question=self.object, type=5)[0]
 
         return ctx
     def get_queryset(self):
@@ -1031,7 +1033,9 @@ class PollInfoView(views.generic.DetailView):
             ctx['emailDelete'] = Email.objects.filter(question=self.object, type=2)[0]
             ctx['emailStart'] = Email.objects.filter(question=self.object, type=3)[0]
             ctx['emailStop'] = Email.objects.filter(question=self.object, type=4)[0]
-            ctx['emailInviteCSV'] = Email.objects.filter(question=self.object, type=5)[0]
+            ctx['emailInviteCSV'] = Email.objects.filter(question=self.object, type=4)[0]
+            if len(Email.objects.filter(question=self.object, type=5)) > 0:
+                ctx['emailInviteCSV'] = Email.objects.filter(question=self.object, type=5)[0]
         ctx['users'] = User.objects.all()
         ctx['items'] = self.object.item_set.all()
         ctx['groups'] = Group.objects.all()
