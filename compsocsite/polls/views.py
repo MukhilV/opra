@@ -94,6 +94,8 @@ class RegularPollsView(views.generic.ListView):
                 ctx['polls_created'].remove(poll)
             elif poll in ctx['polls_participated']:
                 ctx['polls_participated'].remove(poll)
+
+        self.request.session['questionType'] = 1
         return ctx
     
 class RegularAllocationView(views.generic.ListView):
@@ -137,6 +139,8 @@ class RegularAllocationView(views.generic.ListView):
                 ctx['polls_created'].remove(poll)
             elif poll in ctx['polls_participated']:
                 ctx['polls_participated'].remove(poll)
+
+        self.request.session['questionType'] = 2
         return ctx
 
 class RegularPollsFolderView(views.generic.DetailView):
@@ -2363,30 +2367,7 @@ def setPollingSettings(request, question_id):
         poll_alg = int(request.POST['pollpreferences'])
         question.poll_algorithm = poll_alg
 
-    # set the visibility settings, how much information should be shown to the user
-    # options range from showing everything (most visibility) to showing only the user's vote
-    #   (least visibility)
-    displayChoice = "always"
-    if "viewpreferences" in request.POST.keys(): displayChoice = request.POST['viewpreferences']
-    if displayChoice == "always":
-        question.display_pref = 0
-    elif displayChoice == "allpermit":
-        question.display_pref = 1
-    elif displayChoice == "voternames":
-        question.display_pref = 2
-    elif displayChoice == "justnumber":
-        question.display_pref = 3
-    elif displayChoice == "nothing":
-        question.display_pref = 4
-    else:
-        question.display_pref = 5
-    creatorChoice = str(question.creator_pref)
-    if 'creatorpreferences' in request.POST:
-        creatorChoice = request.POST['creatorpreferences']
-    if creatorChoice == "1":
-        question.creator_pref = 1
-    else:
-        question.creator_pref = 2
+
     vr = (2 ** (poll_alg - 1))
     for rule in request.POST.getlist('vr'):
         if int(rule) != (2 ** (poll_alg - 1)):
@@ -2419,6 +2400,42 @@ def setPollingSettings(request, question_id):
     request.session['setting'] = 2
     messages.success(request, 'Your changes have been saved.')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+def setVisibilitySettings(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+
+    # set the visibility settings, how much information should be shown to the user
+    # options range from showing everything (most visibility) to showing only the user's vote
+    #   (least visibility)
+    displayChoice = "always"
+    if "viewpreferences" in request.POST.keys(): displayChoice = request.POST['viewpreferences']
+    if displayChoice == "always":
+        question.display_pref = 0
+    elif displayChoice == "allpermit":
+        question.display_pref = 1
+    elif displayChoice == "voternames":
+        question.display_pref = 2
+    elif displayChoice == "justnumber":
+        question.display_pref = 3
+    elif displayChoice == "nothing":
+        question.display_pref = 4
+    else:
+        question.display_pref = 5
+        
+    creatorChoice = str(question.creator_pref)
+    if 'creatorpreferences' in request.POST:
+        creatorChoice = request.POST['creatorpreferences']
+    if creatorChoice == "1":
+        question.creator_pref = 1
+    else:
+        question.creator_pref = 2
+
+
+    question.save()
+    request.session['setting'] = 10
+    messages.success(request, 'Your changes have been saved.')
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 
 # poll is open to anonymous voters
 def changeType(request, question_id):

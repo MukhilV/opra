@@ -32,24 +32,46 @@
                 {% endfor %}
                 </select>
                 <br />
-            <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
-              <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Voting Algorithms</h4>
+                <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Voting Algorithms</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Plurality: </strong><br/>
+                        Plurality selects the top ranked candidate. Select this if unsure.<br/>
+                        <strong>Bordas:</strong><br/>
+                        Bordas is xxxx<br/>
+                        <strong>Veto: </strong><br/>
+                        Veto is xxxxxxx<br/></p>
+                    </div>
+                    </div> <!--modal content-->
                 </div>
-                <div class="modal-body">
-                    <p><strong>Plurality: </strong><br/>
-                    Plurality selects the top ranked candidate. Select this if unsure.<br/>
-                    <strong>Bordas:</strong><br/>
-                    Bordas is xxxx<br/>
-                    <strong>Veto: </strong><br/>
-                    Veto is xxxxxxx<br/></p>
                 </div>
-                </div> <!--modal content-->
-              </div>
-            </div>
+
+                
+                    <label>Visible Algorithms</label>
+                    <div id="visible">
+                        <label class="checkbox-inline"><input id="vis1" type="checkbox" value="1" name="vr" checked disabled>Plurality</label>
+                        <label class="checkbox-inline"><input id="vis2" type="checkbox" value="2" name="vr" checked>Borda</label>
+                        <label class="checkbox-inline"><input id="vis4" type="checkbox" value="4" name="vr" checked>Veto</label>
+                        <label class="checkbox-inline"><input id="vis8" type="checkbox" value="8" name="vr" checked>K-Approval (K=3)</label>
+                        <label class="checkbox-inline"><input id="vis16" type="checkbox" value="16" name="vr" checked>Simplified Bucklin</label>
+                        <label class="checkbox-inline"><input id="vis32" type="checkbox" value="32" name="vr" checked>Copeland</label>
+                        <label class="checkbox-inline"><input id="vis64" type="checkbox" value="64" name="vr" checked>Maximin</label>
+                        <label class="checkbox-inline"><input id="vis128" type="checkbox" value="128" name="vr" checked>STV</label>
+                        <label class="checkbox-inline"><input id="vis256" type="checkbox" value="256" name="vr" checked>Baldwin</label>
+                        <label class="checkbox-inline"><input id="vis512" type="checkbox" value="512" name="vr" checked>Coombs</label>
+                        <label class="checkbox-inline"><input id="vis1024" type="checkbox" value="1024" name="vr" checked>Black</label>
+                        <label class="checkbox-inline"><input id="vis2048" type="checkbox" value="2048" name="vr" checked>Ranked Pairs</label>
+                        <label class="checkbox-inline"><input id="vis4096" type="checkbox" value="4096" name="vr" checked>Plurality With Runoff</label>
+                        <label class="checkbox-inline"><input id="vis8192" type="checkbox" value="8192" name="vr" checked>Borda Mean</label>
+                        <label class="checkbox-inline"><input id="vis16384" type="checkbox" value="16384" name="vr" checked>Simulated Approval</label>
+                    </div>
+                    <br>
+               
             {% elif question.question_type == 2 %}
                 <label for="pollpreferences">Select an allocation method to calculate results
                     <!-- <i class="fa fa-question-circle" aria-hidden="true" data-toggle="modal" data-target=".bs-example-modal-lg" style="color:GoldenRod;"></i> -->
@@ -62,6 +84,14 @@
                 {% endfor %}
                 </select>
                 <br />
+
+
+                <label>Allocation algorithms to show results</label>
+                <div id="visible">
+                    <label class="checkbox-inline"><input id="round_robin_alloc" type="checkbox" value="1" name="alloc_algorithms" checked disabled>Round Robin</label>
+                </div>
+                <br /><br />
+
                 <!--Explaination Model-->
             <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
               <div class="modal-dialog modal-lg" role="document">
@@ -159,39 +189,9 @@
                 {% endif %}
             </div>
             <br /><br />
-            
-            {% if question.question_type == 1 %}
-            <label>Visible Algorithms</label>
-            <div id="visible">
-                <label class="checkbox-inline"><input id="vis1" type="checkbox" value="1" name="vr" checked disabled>Plurality</label>
-                <label class="checkbox-inline"><input id="vis2" type="checkbox" value="2" name="vr" checked>Borda</label>
-                <label class="checkbox-inline"><input id="vis4" type="checkbox" value="4" name="vr" checked>Veto</label>
-                <label class="checkbox-inline"><input id="vis8" type="checkbox" value="8" name="vr" checked>K-Approval (K=3)</label>
-                <label class="checkbox-inline"><input id="vis16" type="checkbox" value="16" name="vr" checked>Simplified Bucklin</label>
-                <label class="checkbox-inline"><input id="vis32" type="checkbox" value="32" name="vr" checked>Copeland</label>
-                <label class="checkbox-inline"><input id="vis64" type="checkbox" value="64" name="vr" checked>Maximin</label>
-                <label class="checkbox-inline"><input id="vis128" type="checkbox" value="128" name="vr" checked>STV</label>
-                <label class="checkbox-inline"><input id="vis256" type="checkbox" value="256" name="vr" checked>Baldwin</label>
-                <label class="checkbox-inline"><input id="vis512" type="checkbox" value="512" name="vr" checked>Coombs</label>
-                <label class="checkbox-inline"><input id="vis1024" type="checkbox" value="1024" name="vr" checked>Black</label>
-                <label class="checkbox-inline"><input id="vis2048" type="checkbox" value="2048" name="vr" checked>Ranked Pairs</label>
-				<label class="checkbox-inline"><input id="vis4096" type="checkbox" value="4096" name="vr" checked>Plurality With Runoff</label>
-				<label class="checkbox-inline"><input id="vis8192" type="checkbox" value="8192" name="vr" checked>Borda Mean</label>
-				<label class="checkbox-inline"><input id="vis16384" type="checkbox" value="16384" name="vr" checked>Simulated Approval</label>
-            </div>
-            {% endif %}
 
             {% if question.question_type == 2 %}
-            <label>Allocation algorithms to show results</label>
-            <div id="visible">
-                <label class="checkbox-inline"><input id="round_robin_alloc" type="checkbox" value="1" name="alloc_algorithms" checked disabled>Round Robin</label>
-            </div>
-            <br /><br />
-            {% endif %}
-
-
-            {% if question.question_type == 2 %}
-            <label>Tables to show in Allocation Results Page</label>
+            <label>Information to show in Allocation Results Page</label>
             <div id="visible">
                 <label class="checkbox-inline"><input id="my_pref_table" type="checkbox" value="1" name="alloc_res_tables" >My Preferences</label>
                 <label class="checkbox-inline"><input id="alloc_items_bundle_table" type="checkbox" value="2" name="alloc_res_tables" checked>Items Bundle</label>

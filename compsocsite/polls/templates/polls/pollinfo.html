@@ -138,7 +138,8 @@
         {% if question.question_owner == request.user %}
             <li {% if request.session.setting == 8 %} class="active" {% endif %}><a data-toggle="tab" href="#title">General Info</a></li>
             <li {% if request.session.setting == 0 %} class="active" {% endif %}><a data-toggle="tab" href="#choices" >Alternatives</a></li>
-            <li {% if request.session.setting == 2 %} class="active" {% endif %}><a data-toggle="tab" href="#algorithm">Algorithms and Visibility</a></li>
+            <li {% if request.session.setting == 2 %} class="active" {% endif %}><a data-toggle="tab" href="#algorithm">Algorithms</a></li>
+            <li {% if request.session.setting == 10 %} class="active" {% endif %}><a data-toggle="tab" href="#visibility">Visibility</a></li>
             <li {% if request.session.setting == 6 %} class="active" {% endif %}><a data-toggle="tab" href="#historyinfo">Preference Management</a></li>
 			<li {% if request.session.setting == 7 %} class="active" {% endif %}><a data-toggle="tab" href="#recycle">Deleted Preference Management</a></li>
             <!-- <li {% if request.session.setting == 9 %} class="active" {% endif %}><a data-toggle="tab" href="#approverequest">Self Sign Up</a></li> -->
@@ -196,6 +197,12 @@
     <h3 class="page-header">Info and settings of {{ question.question_text }} </h3>
     
     {% include 'polls/_set_polling_settings.html' %}
+</div>
+
+<div class="col-xs-9 col-xs-offset-3 col-md-10 col-md-offset-2 main tab-pane {% if request.session.setting == 10 %}active{% endif %}" id="visibility">
+    <h3 class="page-header">Info and settings of {{ question.question_text }} </h3>
+    
+    {% include 'polls/_visibility.html' %}
 </div>
             
 <div class="col-xs-9 col-xs-offset-3 col-md-10 col-md-offset-2 main tab-pane {% if request.session.setting == 8 %}active{% endif %}" id="title">

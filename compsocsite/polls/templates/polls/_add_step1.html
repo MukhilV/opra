@@ -50,11 +50,11 @@
         </div>
 
         <div class="btn-group" data-toggle="buttons">
-            <label class="btn btn-default active">
-            <input type="radio" name="questiontype" value="1" checked>Poll</option>
+            <label class="btn btn-default {% if request.session.questionType == 1 %} active {% endif %}">
+            <input type="radio" name="questiontype" value="1" {% if request.session.questionType == 1 %} checked {% endif %}>Poll</option>
             </label>
-            <label class="btn btn-default">
-            <input type="radio" name="questiontype" value="2">Allocation</option>
+            <label class="btn btn-default {% if request.session.questionType == 2 %} active {% endif %}">
+            <input type="radio" name="questiontype" value="2" {% if request.session.questionType == 2 %} checked {% endif %}>Allocation</option>
             </label>
         </div>
         <br /><br />

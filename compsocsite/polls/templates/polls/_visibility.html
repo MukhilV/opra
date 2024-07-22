@@ -1,0 +1,25 @@
+{% load poll_extra %}
+<form class="form-group" method="post" action="{% url 'polls:setVisibilitySettings' question.id %}" align="center">
+    {% csrf_token %}
+    <label for="viewpreferences">Visibility setting for users of this instance</label>
+    <select name="viewpreferences" class="form-control">
+        <!-- <option value="always" {% if question.display_pref == 0 %} selected {% endif %} >Everyone can see all votes at all times</option> -->
+        <option value="allpermit" {% if question.display_pref == 1 %} selected {% endif %} >Everyone can see all preferences</option>
+        <option value="voternames" {% if question.display_pref == 2 %} selected {% endif %} >Only username of users will be shown</option>
+        <option value="justnumber" {% if question.display_pref == 3 %} selected {% endif %}>Only numbers of users will be shown</option>
+        <option value="nothing" {% if question.display_pref == 4 %} selected {% endif %}>Everyone can only see own vote</option>
+		<option value="5" {% if question.display_pref == 5 %} selected {% endif %}>All preferences will be shown, but usernames will be hidden</option>
+    </select>
+    <br />
+
+	<label for="creatorpreferences">Visibility setting for creator of this instance</label>
+    <select name="creatorpreferences" class="form-control" {% if question.status != 1 %} disabled {% endif %}>
+        <option value="1" {% if question.creator_pref == 1 %} selected {% endif %}>Creator can see everyone's vote</option>
+        <option value="2" {% if question.creator_pref == 2 %} selected {% endif %}>Creator has the same visibility setting as all users</option>
+    </select>
+    
+    <br/>
+
+    <br />
+    <input type="submit" value="Submit" class="btn btn-success">
+</form>
