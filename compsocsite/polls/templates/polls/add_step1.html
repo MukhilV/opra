@@ -19,7 +19,7 @@ function validateForm() {
 </style>
 
 <div class="col-md-10 col-md-offset-1">
-    <h2  align="center">Create a New Poll</h2>
+    <h2  align="center">Create a New {% if request.session.questionType == 1 %} Poll {% elif request.session.questionType == 2 %} Allocation {% endif %}</h2>
     <br/>
      {% include 'polls/_add_step1.html' %}
       <div class="col-md-6 col-md-offset-3" align="center" style='font-size:100%'>
