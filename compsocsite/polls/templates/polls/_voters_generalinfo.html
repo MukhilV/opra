@@ -1,24 +1,33 @@
  <h3 class="page-header">General info of {{ question.question_text }} </h3>
 
-              <h4>Visibility Info</h4>
+              <h4>Visibility Info for Preferences:</h4>
               {% if question.display_pref == 1 %}
-                    <p> Everyone can see all information about this vote. </p>
+                    <p> Everyone can see all preferences</p>
               {% elif question.display_pref == 2 %}
-                    <p> Only username of users will be shown. </p>
+                    <p> Everyone can only see own preference. </p>
               {% elif question.display_pref == 3 %}
+                    <p> No submitted preferences will be shown. </p>
+              {% else %}
+                    <p> No visibility was selected.</p>
+              {% endif %}
+
+              <br>
+
+              <h4>Visibility Info for Users:</h4>
+              {% if question.display_user_info == 1 %}
+                    <p> Username of users will be shown</p>
+              {% elif question.display_user_info == 2 %}
                     <p> Only numbers of users will be shown. </p>
-              {% elif question.display_pref == 4 %}
-                    <p> Everyone can only see his/her own preferences </p>
-			  {% elif question.display_pref == 5 %}
-				    <p> All preferences will be shown, but usernames will be hidden. </p>
+              {% elif question.display_user_info == 3 %}
+                    <p> No user information will be shown. </p>
               {% else %}
                     <p> No visibility was selected.</p>
               {% endif %}
 
 <hr />
-              <h4>Users Preference info<h4>
+              <h4>Users Preference info:<h4>
             <!-- Everyone can see all preferences -->
-              {% if question.display_pref == 1 %}
+            {% if question.display_pref == 1 and question.display_user_info == 1 %}
                 <!-- <table class="table table-bordered">
                     {% for user in users %}
                         {% if user in question.question_voters.all %}
@@ -69,10 +78,11 @@
                 {% else %} 
                     <p>No one has voted on this poll yet.</p>
                 {% endif %} <!-- no response-->
-
+            {% endif %}
             
+
             <!-- Only username of users will be shown -->
-              {% elif question.display_pref == 2 %}
+            {% if question.display_pref == 3  and question.display_user_info == 1 %}
                 <b> User Names: </b>
                 <ul class="list-group">
                     {% for user in users %}
@@ -81,15 +91,17 @@
                         {% endif %}
                     {% endfor %}
                 </ul>
+            {% endif %}
+
 
             <!-- Only numbers of users will be shown -->
-            {% elif question.display_pref == 3 %}
+            {% if question.display_user_info == 2 %}
                 <!-- Only numbers of users will be shown. -->
-                <p>There are a total of {{question.question_voters.count}} unique voters.</p>
-              
+                <p>There are a total of {{question.question_voters.count}} unique users.</p>
+            {% endif %}
 
             <!-- Everyone can only see own vote -->
-            {% elif question.display_pref == 4 %}
+            {% if question.display_pref == 2 %}
                 <!-- You can only see your own vote.-->
                 <!-- <table class="table table-bordered">
                     <tr>
@@ -140,10 +152,10 @@
                 {% else %} 
                     <p>No one has voted on this poll yet.</p>
                 {% endif %} <!-- no response-->
-
+            {% endif %}
             
             <!-- All preferences will be shown, but usernames will be hidden -->
-            {% elif question.display_pref == 5 %}
+            {% if question.display_pref == 1 and question.display_user_info == 2 or question.display_pref == 1 and question.display_user_info == 3 %}
                 {% if latest_responses|length > 0 %}
                     {% for response, currentSelection in latest_responses %}
                         {% if response.user %}

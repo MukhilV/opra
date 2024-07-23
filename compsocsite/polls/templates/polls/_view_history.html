@@ -7,7 +7,7 @@
 					    <span style="color:white;">{{latest_responses|length}} / {{question.question_voters.count}}</span>
 				    </div>
 			</div>
-			<p>{{latest_responses|length}} / {{question.question_voters.count}} have voted.</p>
+			<p>{{latest_responses|length}} / {{question.question_voters.count}} have given their preference.</p>
             <!-- Display most recent vote -->
             {% if latest_responses|length > 0 %}
                 {% for response, currentSelection in latest_responses %}
@@ -62,8 +62,9 @@
         {% if question.question_owner == request.user and question.creator_pref == 2 %}
 
             <!-- Everyone can see all preferences -->
-            {% if question.display_pref == 1 %}
-                <p>{{latest_responses|length}} / {{question.question_voters.count}} have voted.</p>
+            <!-- Everyone + usernames -->
+            {% if question.display_pref == 1 and question.display_user_info == 1 %}
+                <p>{{latest_responses|length}} / {{question.question_voters.count}} have given their preference.</p>
                 <p>The owner allows everyone to see all preferences cast.</p>
                 {% for response, currentSelection in latest_responses %}
                 {% if response.user %}
@@ -88,27 +89,34 @@
                     </div>
                 {% endif %}
                 {% endfor %}
+            {% endif %}
+
+
 
             <!-- Only username of voters will be shown -->
-            {% elif question.display_pref == 2 %}
-                <p>{{latest_responses|length}} / {{question.question_voters.count}} have voted.</p>
+            {% if question.display_pref == 3  and question.display_user_info == 1 %}
+                <p>{{latest_responses|length}} / {{question.question_voters.count}} have given their preference.</p>
                 <p>The following voters have voted on this poll:</p>
                 <ul>
                     {% for response, currentSelection in latest_responses %}
                         <li>{{response.user.username}} (last voted on {{ response.timestamp }})</li>
                     {% endfor %}
                 </ul>
-
+            {% endif %}
             
+
+
             <!-- Only numbers of voters will be shown -->
-            {% elif question.display_pref == 3 %}
+            {% if question.display_user_info == 2 %}
 				<!-- </div> -->
-                <p>{{latest_responses|length}} / {{question.question_voters.count}} have voted.</p>
+                <p>{{latest_responses|length}} / {{question.question_voters.count}} have given their preference.</p>
+            {% endif %}
+
+
 
             <!-- Everyone can only see own vote -->
-            {% elif question.display_pref == 4 %}
-                    {% if latest_responses|length > 0 %}
-                    from latest resp
+            {% if question.display_pref == 2 %}
+                {% if latest_responses|length > 0 %}
                         {% for response, currentSelection in latest_responses %}
                             {% if response.user.username == request.user.username %}
                                 {% if response.user %}
@@ -152,11 +160,13 @@
                 {% else %} 
                     <p>No one has voted on this poll yet.</p>
                 {% endif %} <!-- no response-->
-			
+            {% endif %}
+
+
 
             <!-- All preferences will be shown, but usernames will be hidden -->
-			{% elif question.display_pref == 5 %}
-				<p>{{latest_responses|length}} / {{question.question_voters.count}} have voted.</p>
+			{% if question.display_pref == 1 and question.display_user_info == 2 or question.display_pref == 1 and question.display_user_info == 3 %}
+				<p>Number of total users: {{question.question_voters.count}}.</p>
                 <p>The following preferences have been cast on this poll (excluding yours):</p>
                 <ul>
                     {% for response, currentSelection in latest_responses %}
@@ -171,7 +181,9 @@
                     {% endfor %}
                 </ul>
             {% endif %}
+
         {% endif %}
+        
         
         <br/>
 

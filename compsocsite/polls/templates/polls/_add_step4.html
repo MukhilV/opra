@@ -115,7 +115,7 @@
             </div>
             {% endif %}
             
-            
+<!--             
             <label for="viewpreferences">Information visible to users</label>
             <select name="viewpreferences" class="form-control">
                 {% for item in view_preferences %}
@@ -123,6 +123,22 @@
                     {{ item }}
                 </option>
                 {% endfor %}
+            </select>
+            <br /> -->
+
+            <label for="viewpreferences">Visibility setting for displaying preferences</label>
+            <select name="viewpreferences" class="form-control">
+                <option value="1">Everyone can see all preferences</option>
+                <option value="2">Everyone can only see own preference</option>
+                <option value="3">Nothing</option>
+            </select>
+            <br />
+        
+            <label for="viewpreferences">Visibility setting for displaying user-info</label>
+            <select name="viewuserinfo" class="form-control">
+                <option value="1">Username of users will be shown</option>
+                <option value="2">Only numbers of users will be shown</option>
+                <option value="3">Nothing</option>
             </select>
             <br />
 

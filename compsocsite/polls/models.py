@@ -35,6 +35,7 @@ class Question(models.Model):
     recentCSVText = models.TextField(null=True, blank=True, default=None)
     status = models.IntegerField(default=1)
     display_pref = models.IntegerField(default=1)
+    display_user_info = models.IntegerField(default=1)
     creator_pref = models.IntegerField(default=1)
     emailInviteCSV = models.BooleanField(default=False)
     emailInvite = models.BooleanField(default=False)

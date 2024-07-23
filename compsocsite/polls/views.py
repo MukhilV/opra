@@ -1542,12 +1542,17 @@ def getAllocMethods():
 def getViewPreferences():
     return [
         # "Everyone can see all votes at all times",
-        "Everyone can see all votes", 
-        "Only show the names of voters",
-        "Only show number of voters", 
-        "Everyone can only see his/her own vote",
-        "All votes will be shown, but usernames will be hidden"
+        "Everyone can see all preferences", 
+        "Everyone can only see own preference",
+        "Nothing"
             ]
+
+def getViewUserInfo():
+    return [
+        "Only username of users will be shown",
+        "Only numbers of users will be shown",
+        "Nothing"
+    ]
 
 def getViewPreferencesForAllocation():
     return ["This is Duplicate view pref"]
@@ -2274,6 +2279,7 @@ def setInitialSettings(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     question.poll_algorithm = request.POST['pollpreferences']
     if "viewpreferences" in request.POST.keys(): question.display_pref = request.POST['viewpreferences']
+    if "viewuserinfo" in request.POST.keys(): question.display_user_info = request.POST['viewuserinfo']
     if "creatorpreferences" in request.POST.keys(): question.creator_pref = request.POST['creatorpreferences']
     openstring = request.POST['openpoll']
     signup_string = request.POST['selfsignup']
@@ -2407,20 +2413,8 @@ def setVisibilitySettings(request, question_id):
     # set the visibility settings, how much information should be shown to the user
     # options range from showing everything (most visibility) to showing only the user's vote
     #   (least visibility)
-    displayChoice = "always"
-    if "viewpreferences" in request.POST.keys(): displayChoice = request.POST['viewpreferences']
-    if displayChoice == "always":
-        question.display_pref = 0
-    elif displayChoice == "allpermit":
-        question.display_pref = 1
-    elif displayChoice == "voternames":
-        question.display_pref = 2
-    elif displayChoice == "justnumber":
-        question.display_pref = 3
-    elif displayChoice == "nothing":
-        question.display_pref = 4
-    else:
-        question.display_pref = 5
+    if "viewpreferences" in request.POST.keys(): question.display_pref = request.POST['viewpreferences']
+    if "viewuserinfo" in request.POST.keys(): question.display_user_info = request.POST['viewuserinfo']
         
     creatorChoice = str(question.creator_pref)
     if 'creatorpreferences' in request.POST:
