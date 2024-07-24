@@ -19,36 +19,42 @@
             <div class="panel-body">
                 <form class="form-group" method="post" action="{% url 'appauth:updateGlobalSettings' %}" align="center" style="font-size:100%;">
                     {% csrf_token %}
-                    <label for="viewpreferences">Visibility setting for all future polls</label>
-                    <select name="viewpreferences" class="form-control" onchange="this.form.submit()">
-						<!-- <option value="always" {% if request.user.userprofile.displayPref == 0 %} selected {% endif %} >Everyone can see all preferences at all times</option> -->
-                        <option value="allpermit" {% if request.user.userprofile.displayPref == 1 %} selected {% endif %} >Everyone can see all preferences</option>
-                        <option value="voternames" {% if request.user.userprofile.displayPref == 2 %} selected {% endif %} >Only username of users will be shown</option>
-                        <option value="justnumber" {% if request.user.userprofile.displayPref == 3 %} selected {% endif %}>Only numbers of users will be shown</option>
-                        <option value="nothing" {% if request.user.userprofile.displayPref == 4 %} selected {% endif %}>Everyone can only see his/her own preferences</option>
-                        <option value="5" {% if request.user.userprofile.displayPref == 5 %} selected {% endif %}>All preferences will be shown, but usernames will be hidden</option>
+                    <label for="viewpreferences">Visibility setting of displaying preferences for all future polls</label>
+                    <select name="viewpreferences" class="form-control">
+                        <option value="1" {% if request.user.userprofile.displayPref == 1 %} selected {% endif %} >Everyone can see all preferences</option>
+                        <option value="2" {% if request.user.userprofile.displayPref == 2 %} selected {% endif %}>Everyone can only see own preference</option>
+                        <option value="3" {% if request.user.userprofile.displayPref == 3 %} selected {% endif %}>Nothing</option>
                     </select>
                     <br/>
+
+                    <label for="viewuserinfo">Visibility setting of displaying user-info for all future polls</label>
+                    <select name="viewuserinfo" class="form-control">
+                        <option value="1" {% if request.user.userprofile.display_user_info == 1 %} selected {% endif %} >Username of users will be shown</option>
+                        <option value="2" {% if request.user.userprofile.display_user_info == 2 %} selected {% endif %}>Only numbers of users will be shown</option>
+                        <option value="3" {% if request.user.userprofile.display_user_info == 3 %} selected {% endif %}>Nothing</option>
+                    </select>
+                    <br />
+                    
                     <div class="col-md-6">
                         <label for="emailInvite">Send email when inviting users</label>
-                        <input type="checkbox" name="emailInvite" id="emailInvite" value="email" {% if request.user.userprofile.emailInvite == True %} checked {% endif %} onchange="this.form.submit()">
+                        <input type="checkbox" name="emailInvite" id="emailInvite" value="email" {% if request.user.userprofile.emailInvite == True %} checked {% endif %}>
                     </div>
                     <div class="col-md-6">
                         <label for="emailStart">Send email when the poll starts</label>
-                        <input type="checkbox" name="emailStart" id="emailStart" value="email" {% if request.user.userprofile.emailStart %} checked {% endif %} onchange="this.form.submit()">
+                        <input type="checkbox" name="emailStart" id="emailStart" value="email" {% if request.user.userprofile.emailStart %} checked {% endif %}>
                     </div>
                     <div class="col-md-6">
                         <label for="emailDelete">Send email when deleting users</label>
-                        <input type="checkbox" name="emailDelete" id="emailDelete" value="email" {% if request.user.userprofile.emailDelete %} checked {% endif %} onchange="this.form.submit()">
+                        <input type="checkbox" name="emailDelete" id="emailDelete" value="email" {% if request.user.userprofile.emailDelete %} checked {% endif %}>
                     </div>
                     <div class="col-md-6">
                         <label for="emailStop">Send email when the poll stops</label>
-                        <input type="checkbox" name="emailStop" id="emailStop" value="email" {% if request.user.userprofile.emailStop %} checked {% endif %} onchange="this.form.submit()">
+                        <input type="checkbox" name="emailStop" id="emailStop" value="email" {% if request.user.userprofile.emailStop %} checked {% endif %}>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                         <label for="showHint">Show all hints</label>
-                        <input type="checkbox" name="showHint" id="showHint" value="hint" {% if request.user.userprofile.showHint == True %} checked {% endif %} onchange="this.form.submit()">
+                        <input type="checkbox" name="showHint" id="showHint" value="hint" {% if request.user.userprofile.showHint == True %} checked {% endif %}>
                         </div>
                     </div>
                     <div class="row">

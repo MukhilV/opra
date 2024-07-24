@@ -265,19 +265,22 @@ def updateSettings(request):
 def updateGlobalSettings(request):
     context = RequestContext(request)
     if request.method == 'POST':
-        displayChoice = request.POST['viewpreferences']
-        if displayChoice == "always":
-            request.user.userprofile.displayPref = 0
-        if displayChoice == "allpermit":
-            request.user.userprofile.displayPref = 1
-        elif displayChoice == "voternames":
-            request.user.userprofile.displayPref = 2
-        elif displayChoice == "justnumber":
-            request.user.userprofile.displayPref = 3
-        elif displayChoice == "nothing":
-            request.user.userprofile.displayPref = 4
-        else:
-            request.user.userprofile.displayPref = 5
+
+        request.user.userprofile.displayPref = request.POST['viewpreferences']
+        request.user.userprofile.display_user_info = request.POST['viewuserinfo']
+        # displayChoice = request.POST['viewpreferences']
+        # if displayChoice == "always":
+        #     request.user.userprofile.displayPref = 0
+        # if displayChoice == "allpermit":
+        #     request.user.userprofile.displayPref = 1
+        # elif displayChoice == "voternames":
+        #     request.user.userprofile.displayPref = 2
+        # elif displayChoice == "justnumber":
+        #     request.user.userprofile.displayPref = 3
+        # elif displayChoice == "nothing":
+        #     request.user.userprofile.displayPref = 4
+        # else:
+        #     request.user.userprofile.displayPref = 5
         request.user.userprofile.emailInvite = request.POST.get('emailInvite') == 'email'
         request.user.userprofile.emailDelete = request.POST.get('emailDelete') == 'email'
         request.user.userprofile.emailStart = request.POST.get('emailStart') == 'email'

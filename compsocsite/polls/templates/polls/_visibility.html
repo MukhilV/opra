@@ -4,7 +4,6 @@
 
     <label for="viewpreferences">Visibility setting for displaying preferences</label>
     <select name="viewpreferences" class="form-control">
-        <!-- <option value="always" {% if question.display_pref == 0 %} selected {% endif %} >Everyone can see all votes at all times</option> -->
         <option value="1" {% if question.display_pref == 1 %} selected {% endif %} >Everyone can see all preferences</option>
         <option value="2" {% if question.display_pref == 2 %} selected {% endif %}>Everyone can only see own preference</option>
 		<option value="3" {% if question.display_pref == 3 %} selected {% endif %}>Nothing</option>
@@ -13,7 +12,6 @@
 
     <label for="viewpreferences">Visibility setting for displaying user-info</label>
     <select name="viewuserinfo" class="form-control">
-        <!-- <option value="always" {% if question.display_pref == 0 %} selected {% endif %} >Everyone can see all votes at all times</option> -->
         <option value="1" {% if question.display_user_info == 1 %} selected {% endif %} >Username of users will be shown</option>
         <option value="2" {% if question.display_user_info == 2 %} selected {% endif %}>Only numbers of users will be shown</option>
         <option value="3" {% if question.display_user_info == 3 %} selected {% endif %}>Nothing</option>

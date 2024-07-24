@@ -14,6 +14,7 @@ class UserProfile(models.Model):
     profile_pic = models.ImageField(upload_to='static/img/profile_pics', blank=True, null=True)
     time_creation = models.DateTimeField()
     displayPref = models.IntegerField(default=1)
+    display_user_info = models.IntegerField(default=1)
     emailInvite = models.BooleanField(default=False)
     emailDelete = models.BooleanField(default=False)
     emailStart = models.BooleanField(default=False)
