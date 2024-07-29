@@ -1030,8 +1030,7 @@ class PollInfoView(views.generic.DetailView):
         ctx = super(PollInfoView, self).get_context_data(**kwargs)
         curr_question = self.object
         emailInvite = Email.objects.filter(question=self.object, type=1)
-        if len(emailInvite) == 1:
-            setupEmail(self.object)
+        setupEmail(self.object)
         if Email.objects.filter(question=self.object).count() > 0:
             ctx['emailInvite'] = Email.objects.filter(question=self.object, type=1)[0]
             ctx['emailDelete'] = Email.objects.filter(question=self.object, type=2)[0]
@@ -1477,12 +1476,9 @@ class VoteResultsView(views.generic.DetailView):
             #ctx['margin_victory'] = getMarginOfVictory(latest_responses, cand_map)
             #ctx['mixtures_pl'] = mixtures[0]
         m = len(mixtures_pl1) - 1
-        print("pl2", mixtures_pl2)
-        print()
         ctx['mixtures_pl1'] = mixtures_pl1
         ctx['mixtures_pl2'] = mixtures_pl2
         ctx['mixtures_pl3'] = mixtures_pl3
-        print(mixtures_pl1)
         previous_results = self.object.voteresult_set.all()
         ctx['previous_winners'] = []
         for pw in previous_results:
@@ -1802,7 +1798,7 @@ def getVoteResults(latest_responses, cand_map):
     pwro = MechanismPluralityRunOff().PluRunOff_cowinners(pollProfile)
     bordamean = MechanismBordaMean().Borda_mean_winners(pollProfile)
     simapp, sim_scores = MechanismBordaMean().simulated_approval(pollProfile)
-    print("pwro=", pwro)
+    # print("pwro=", pwro)
     #print("test6")
     scoreVectorList.append(translateWinnerList(stv, cand_map))
     scoreVectorList.append(translateWinnerList(baldwin, cand_map))
@@ -2056,7 +2052,7 @@ def addVoters(request, question_id):
                 question.question_voters.add(voterObj.id)
             
             if email:
-                print("Email sending logic here to invite users")
+                # print("Email sending logic here to invite users")
                 email_class = EmailThread(request, question_id, 'invite', newVoters)
                 email_class.start()
 
@@ -2083,7 +2079,7 @@ def addVoters(request, question_id):
                 votersEmailIDsInGroups.remove(mailID)
 
         if email:
-            print("Email sending logic here to invite group users")
+            # print("Email sending logic here to invite group users")
             email_class = EmailThread(request, question_id, 'invite-group', votersEmailIDsInGroups)
             email_class.start()
 
@@ -2217,29 +2213,29 @@ def addUsersAndSendEmailInvite(request, question_id):
             
             if email:
                 if(recepients == "regVotersOnly"):
-                    print("Email sending logic for regVotersOnly")
+                    # print("Email sending logic for regVotersOnly")
                     email_class = EmailThread(request, question_id, 'invite-csv', registers_users_of_current_poll)
                     email_class.start()
                     # sendEmail(registers_users_of_current_poll, mailSubject, mailBody)
                 elif(recepients == "unregVotersOnly"):
-                    print("Email sending logic for unregVotersOnly")
+                    # print("Email sending logic for unregVotersOnly")
                     email_class = EmailThread(request, question_id, 'invite-csv', UnRegistered_users_of_current_poll)
                     email_class.start()
                     # sendEmail(UnRegistered_users_of_current_poll, mailSubject, mailBody)
                 elif(recepients == "customEmails"):
-                    print("Email sending logic for customEmails")
+                    # print("Email sending logic for customEmails")
                     email_class = EmailThread(request, question_id, 'invite-csv', customEmails)
                     email_class.start()
                     # sendEmail(customEmails, mailSubject, mailBody)
                 elif(recepients == "allVoters"):
-                    print("Email sending logic for All voters")
+                    # print("Email sending logic for All voters")
                     email_class = EmailThread(request, question_id, 'invite-csv', userIDsFromCSV)
                     email_class.start()
                     # sendEmail(userIDsFromCSV, mailSubject, mailBody) 
                 emailSettings(request, question_id)
             return     
     except Exception as e:
-        print(e) 
+        print(e) # TODO: handle specific exception and change this to logging
         return 
     return 
 
@@ -2256,6 +2252,7 @@ def removeVoter(request, question_id):
 
     question.emailDelete = email
     if email:
+        # print("Email sending logic to remove user")
         email_class = EmailThread(request, question_id, 'remove')
         email_class.start()
     
@@ -2989,7 +2986,7 @@ def addFolder(request):
             except:
                 print("Error: poll not working")
         fold.save()
-        print(fold.questions)
+        # print(fold.questions)
         return HttpResponseRedirect(reverse('polls:regular_polls'))
     else:
         print("Error: not post in addFolder function line 1993")
@@ -3431,7 +3428,7 @@ def takeAttendance(request, pk):
         item.save()
         cur_class.attendance = quiz.id
         cur_class.save()
-        print(cur_class.attendance)
+        # print(cur_class.attendance)
         for student in cur_class.students.all():
             quiz.question_voters.add(student.id)
     return HttpResponseRedirect(reverse('polls:classes'))
@@ -3562,7 +3559,7 @@ class GradesView(views.generic.ListView):
         ctx['quizzes_part_prev'] = quizzes_part_prev
         ctx['quizzes_part_curr'] = quizzes_part_curr
         ctx['taking_attendance'] = taking_attendance
-        print(taking_attendance)
+        # print(taking_attendance)
         return ctx
 
 def GradesDownload(request, pk):

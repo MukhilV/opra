@@ -14,7 +14,7 @@ def corresp_num(link_char):
     
 def corresp_char(linknum):
     link_num = linknum
-    print(linknum)
+    # print(linknum)
     upper_list = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
     lower_list = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
     if link_num == 0:

@@ -42,7 +42,6 @@ def register(request):
         data["username"] = data["email"]
         user_form = UserForm(data=data)
         # user_form = UserCreationForm(request.POST)
-        print(data)
  
         # If the two forms are valid...
         if user_form.is_valid():
@@ -87,7 +86,7 @@ def register(request):
             # user = authenticate(username=username, password=password)
             # login(request, user)
 
-            print("Registration successful")
+            print("Registration successful") # use logging
         #else    print (user_form.errors)
         else:
             return HttpResponse("The user_form.isValid(), failed OR This email already exists. Please try a different one. <a href='/auth/register'>Return to registration</a>")
@@ -167,14 +166,8 @@ def user_login(request):
         username = request.POST['email']
         password = request.POST['password']
 
-        # postdata = request.POST.copy()
-        # username = postdata.get('username', '')
-        # password = postdata.get('password', '')
-
-        print("usernname:", username, len(username), "password:", password, len(password))
         User = get_user_model()
         users = User.objects.all()
-        print(list(users))
 
         salt = ""
         for user in users:
@@ -187,21 +180,16 @@ def user_login(request):
             user = authenticate(username=username, password=password)
         else: 
             user = authenticate(username=username, password=password)
-        # user = authenticate(username=username)
 
-        for u in users: 
-            print(u.get_username(), username == u.get_username(), u.password, u.password == password, u.is_authenticated)
         # for u in users: 
         #     if(u.get_username() == username):
         #         user = u
                 # user.is_authenticated = True
                 # user.__setattr__("is_authenticated", True)
         # user = authenticate(username=username, password=user.password)
-        # if user : print("Is user authenticated:", user.is_authenticated)
-        # else : print(user)
+
         
         if user : 
-            print("Selected User : ", user)
             login(request, user)
             return HttpResponseRedirect('/polls/main')
             # return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
