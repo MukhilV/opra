@@ -23,7 +23,7 @@ import threading
 def switchModel(type, question, request):
     if type == 'invite' or type == 'invite-group':
         email = Email.objects.filter(question=question, type=1)
-    if type == 'remove':
+    if type == 'remove' or type == 'remove-group':
         email = Email.objects.filter(question=question, type=2)
     if type == 'start':
         email = Email.objects.filter(question=question, type=3)
@@ -40,32 +40,75 @@ def switchModel(type, question, request):
 def setupEmail(question):
     title = question.question_text
     creator = question.question_owner.username
-    emailInvite = Email(question=question, type=1,
-        subject="You have been invited to vote on " + title,
-        message='Hello [user_name],\n\n' + creator
-                + ' has invited you to vote on a poll. Please login at [url] to check it out.\n\nSincerely,\nOPRA Staff')
-    emailRemove = Email(question=question, type=2,
-        subject="You have been removed from " + title,
-        message='Hello [user_name],\n\n' + creator
-                + ' has deleted you from a poll.\n\nSincerely,\nOPRAH Staff')
-    emailStart = Email(question=question, type=3,
-        subject=title + ' has started!',
-        message='Hello [user_name],\n\n' + creator
-                + ' has started a poll. It is now available to vote on at [url] \n\nSincerely,\nOPRA Staff')
-    emailStop = Email(question=question, type=4,
-        subject=title + ' has stopped',
-        message='Hello [user_name],\n\n' + creator
-                + ' has ended a poll. Please visit [url] to view the decision.\n\nSincerely,\nOPRA Staff')
-    emailInviteCSV = Email(question=question, type=5,
-        subject="You have been invited to vote on " + title,
-        message='Hello [user_name],\n\n' + creator
-                + ' has invited you to vote on a poll. Please login at [url] to check it out.'
-                +' \n Email Invite from CSV. \n\nSincerely,\nOPRA Staff')
-    emailInvite.save()
-    emailRemove.save()
-    emailStart.save()
-    emailStop.save()
-    emailInviteCSV.save()
+
+    # Setup/Update the Email subject and body for inviting users
+    emailInvite = Email.objects.filter(question=question, type=1)
+    if not emailInvite.exists():
+        emailInvite = Email(question=question, type=1,
+            subject="You have been invited to vote on " + title,
+            message='Hello [user_name],\n\n' + creator
+                    + ' has invited you to vote on a poll. Please login at [url] to check it out.\n\nSincerely,\nOPRA Staff')
+        emailInvite.save()
+    else:
+        emailInvite.update(subject="You have been invited to vote on " + title,
+            message='Hello [user_name],\n\n' + creator
+                    + ' has invited you to vote on a poll. Please login at [url] to check it out.\n\nSincerely,\nOPRA Staff')
+        
+    # Setup/Update the Email subject and body for removing users
+    emailRemove = Email.objects.filter(question=question, type=2)
+    if not emailRemove.exists():
+        emailRemove = Email(question=question, type=2,
+            subject="You have been removed from " + title,
+            message='Hello [user_name],\n\n' + creator
+                    + ' has deleted you from a poll.\n\nSincerely,\nOPRAH Staff')
+        emailRemove.save()
+    else:
+        emailRemove.update(subject="You have been removed from " + title,
+            message='Hello [user_name],\n\n' + creator
+                    + ' has deleted you from a poll.\n\nSincerely,\nOPRAH Staff')
+    
+    # Setup/Update the Email subject and body while starting an instance
+    emailStart = Email.objects.filter(question=question, type=3)
+    if not emailStart.exists():
+        emailStart = Email(question=question, type=3,
+            subject=title + ' has started!',
+            message='Hello [user_name],\n\n' + creator
+                    + ' has started a poll. It is now available to vote on at [url] \n\nSincerely,\nOPRA Staff')
+        emailStart.save()
+    else:
+        emailStart.update(subject=title + ' has started!',
+            message='Hello [user_name],\n\n' + creator
+                    + ' has started a poll. It is now available to vote on at [url] \n\nSincerely,\nOPRA Staff')
+    
+    # Setup/Update the Email subject and body while stopping an instance
+    emailStop = Email.objects.filter(question=question, type=4)
+    if not emailStop.exists():
+        emailStop = Email(question=question, type=4,
+            subject=title + ' has stopped',
+            message='Hello [user_name],\n\n' + creator
+                    + ' has ended a poll. Please visit [url] to view the decision.\n\nSincerely,\nOPRA Staff')
+        emailStop.save()
+    else:
+        emailStop.update(subject=title + ' has stopped',
+            message='Hello [user_name],\n\n' + creator
+                    + ' has ended a poll. Please visit [url] to view the decision.\n\nSincerely,\nOPRA Staff')
+        
+    # Setup/Update the Email subject and body inviting users by giving CSV email-IDs
+    emailInviteCSV = Email.objects.filter(question=question, type=5)
+    if not emailInviteCSV.exists():
+        emailInviteCSV = Email(question=question, type=5,
+            subject="You have been invited to vote on " + title,
+            message='Hello [user_name],\n\n' + creator
+                    + ' has invited you to vote on a poll. Please login at [url] to check it out.'
+                    +' \n Email Invite from CSV. \n\nSincerely,\nOPRA Staff')
+        emailInviteCSV.save()
+    else:
+        emailInviteCSV.update(subject="You have been invited to vote on " + title,
+            message='Hello [user_name],\n\n' + creator
+                    + ' has invited you to vote on a poll. Please login at [url] to check it out.'
+                    +' \n Email Invite from CSV. \n\nSincerely,\nOPRA Staff')
+
+
 
 def emailSettings(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
@@ -177,7 +220,7 @@ def getOptions(items):
     return arr
 
 class EmailThread(threading.Thread):
-    def __init__(self, request, question_id, type, voters=None):
+    def __init__(self, request, question_id, type, voters=None, mail_sub = None, mail_body = None):
         threading.Thread.__init__(self)
         self.question = get_object_or_404(Question, pk=question_id)
         self.type = type
@@ -191,10 +234,14 @@ class EmailThread(threading.Thread):
 
         if type == 'remove':
             self.voters = request.POST.getlist('voters')
-        elif type == 'invite' or  type == 'invite-group' or type == 'invite-csv':
+        elif type == 'invite' or  type == 'invite-group' or type == 'invite-csv' or type == 'remove-group':
             self.voters = voters
         else:
             self.voters = self.question.question_voters.all()
+
+        if mail_sub: self.email[0] = mail_sub
+        if mail_body: self.email[1] = mail_body
+
 
     def run(self):
         options = ''
@@ -210,7 +257,7 @@ class EmailThread(threading.Thread):
                 
 
         for voter in self.voters:
-            if self.type == 'invite' or self.type == 'remove' or self.type == 'invite-group':
+            if self.type == 'invite' or self.type == 'remove' or self.type == 'invite-group' or self.type == 'remove-group':
                 voter = get_object_or_404(User, username=voter)
             name = voter.username
             uname = voter.username

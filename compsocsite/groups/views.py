@@ -5,6 +5,8 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.views import generic
 
+from polls.email import EmailThread
+
 from .models import *
 from django.contrib import messages
 from django.utils import timezone
@@ -148,6 +150,8 @@ def removegroupvoters(request, question_id):
                         recepients.append(voterObj.username)
     if email : 
         print("Email sending logic to remove group")
+        email_class = EmailThread(request, question_id, 'remove-group', recepients, mailSub, mailBody)
+        email_class.start()
         # sendEmail(recepients, mailSub, mailBody)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     
