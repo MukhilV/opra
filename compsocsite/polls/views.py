@@ -2089,14 +2089,13 @@ def addVoters(request, question_id):
             #                 ['mukhil1140@gmail.com'], # votersEmailIDsInGroups
             #                 html_message='')
 
-    request.session['setting'] = 1
-
     question.emailInvite = email
     # if email:
     #     email_class = EmailThread(request, question_id, 'invite')
     #     email_class.start()
     question.save()
     emailSettings(request, question_id)
+    request.session['setting'] = 1
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 # Save the recently uploaded csv text
@@ -2265,10 +2264,10 @@ def removeVoter(request, question_id):
     #                 'opra@cs.binghamton.edu',
     #                 ['mukhil1140@gmail.com'], # newVoters
     #                 html_message='')
-        
-    request.session['setting'] = 1
+
     question.save()
     emailSettings(request, question_id)
+    request.session['setting'] = 1
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 # called when creating the poll
@@ -2359,7 +2358,10 @@ def setInitialSettings(request, question_id):
         question.alloc_algorithms = alloc_algorithms_sum
 
     question.save()
-    return HttpResponseRedirect(reverse('polls:regular_polls'))
+    if question.question_type == 1: 
+        return HttpResponseRedirect(reverse('polls:regular_polls'))
+    else:
+        return HttpResponseRedirect(reverse('polls:allocation_tab'))
 
 # set algorithms and visibility
 def setPollingSettings(request, question_id):
@@ -2509,11 +2511,11 @@ def deleteUserVotes(request, response_id):
         question.response_set.filter(user=user).update(active=0)
     else:
         question.response_set.filter(anonymous_id=response.anonymous_id).update(active=0)
-    request.session['setting'] = 6
     if not question.new_vote:
     	question.new_vote = True
     	question.save()
     messages.success(request, 'Your changes have been saved.')
+    request.session['setting'] = 6
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 def restoreUserVotes(request, response_id):
@@ -3293,7 +3295,7 @@ def change_self_sign_up(request, question_id):
     else:
         question.allow_self_sign_up = 0
     question.save()
-    request.session['setting'] = 9
+    request.session['setting'] = 4
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 

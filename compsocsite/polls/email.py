@@ -246,6 +246,7 @@ class EmailThread(threading.Thread):
     def run(self):
         options = ''
         if self.type == 'invite-csv':
+            if self.voters[0] == 'None': return
             for voter in self.voters:
                 name, uname = voter, voter
                 url = self.request.build_absolute_uri(reverse('appauth:login')+'?name='+uname)
