@@ -2027,8 +2027,8 @@ def addVoter(request, question_id):
             for voter in newVoters:
                 voterObj = User.objects.get(username=voter)
                 question.question_voters.add(voterObj.id)
-    except:
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    except User.DoesNotExist:
+        print("User does not exist in function addVoter().") # use logging
     request.session['setting'] = 1
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     data = "{}"
@@ -2062,7 +2062,9 @@ def addVoters(request, question_id):
                 #             ['mukhil1140@gmail.com'], # newVoters
                 #             html_message='')
                 
-        except:
+        except User.DoesNotExist:
+            print("User does not exist in function addVoters().")
+            request.session['setting'] = 1
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     
     newGroups = request.POST.getlist('groups')
@@ -2109,8 +2111,8 @@ def saveLatestCSV(request, question_id):
         question.recentCSVText = recentCSVText
         question.save();
         addUsersAndSendEmailInvite(request, question_id)
-    except:
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    except Exception as e:
+        print(e)
     request.session['setting'] = 1
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -2130,7 +2132,7 @@ def getRegAndUnRegUsers(userIDsFromCSV):
         try:
             _user = User.objects.get(email = userID)
             regUsers.append(userID)
-        except: 
+        except User.DoesNotExist: 
             UnregUsers.append(userID)
 
     return regUsers, UnregUsers
@@ -2231,7 +2233,7 @@ def addUsersAndSendEmailInvite(request, question_id):
                     email_class = EmailThread(request, question_id, 'invite-csv', userIDsFromCSV)
                     email_class.start()
                     # sendEmail(userIDsFromCSV, mailSubject, mailBody) 
-                emailSettings(request, question_id)
+            emailSettings(request, question_id)
             return     
     except Exception as e:
         print(e) # TODO: handle specific exception and change this to logging

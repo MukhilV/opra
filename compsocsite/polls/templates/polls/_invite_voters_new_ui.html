@@ -203,7 +203,7 @@
                     <!-- {% if question.emailDelete == True or question.emailDelete == None %} checked {% endif %} -->
                 {% endif %}
                     <br />
-                    <div id="mailNotificationDivToRemove" class="hide">
+                    <div id="mailNotificationDivToRemove" class="{% if question.emailDelete == True %} show {% else %} hide {% endif %}">
                         <input type="text" id="mailNotificationSubject" name="mailNotificationSubject" class="form-control" placeholder="Subject of the Mail" value="{{emailDelete.subject}}">
                         <br>
                         <textarea class="form-control" id="mailNotificationBody" name="mailNotificationBody" rows="9" placeholder="Content of the E-mail..." >{{emailDelete.message}}</textarea>
@@ -252,7 +252,7 @@
                 <!-- {% if question.emailInvite == True or question.emailInvite == None %} checked {% endif %} -->
                 <br>
                 
-                <div id="mailNotificationDiv" class="hide">
+                <div id="mailNotificationDiv" class="{% if question.emailInvite == True %} show {% else %} hide {% endif %}">
 
                     {% if question.status == 1 %}
                     <div class="alert alert-danger">
@@ -292,7 +292,7 @@
                         </div>
                         <div>
                             <label for="email2">Email announcement</label>
-                            <input type="checkbox" name="email" id="emailNotificationToInvite" value="email" >
+                            <input type="checkbox" name="email" id="emailNotificationToInvite" value="email" {% if question.emailInviteCSV == True %} checked {% endif %}>
                             <!-- {% if question.emailDelete == True or question.emailDelete == None %} checked {% endif %} onchange="this.form.submit()" -->
                             <br />
                         </div>
@@ -318,7 +318,7 @@
 
             <br>
 
-            <div class="panel panel-default hide" id="emailDivForInvite" style="width: 90%; margin:auto; margin-bottom: 15px;">
+            <div class="panel panel-default {% if question.emailInviteCSV == True %} show {% else %} hide {% endif %}" id="emailDivForInvite" style="width: 90%; margin:auto; margin-bottom: 15px;">
                 <div class="panel-heading">Send E-mail to added/invited users: </div>
                 <div class="panel-body">      
                     <div class="row">
