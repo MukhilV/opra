@@ -71,6 +71,24 @@
         mailBodyEle.innerHTML = mailText;
     }
 
+    function validateEmailAddress(email){
+        var regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return regex.test(email)
+    }
+
+    function validateCSV(){
+        const csvTextAreaEle = document.getElementById('csvTextArea');
+        csvText = csvTextAreaEle.value;
+        emailAddresses = csvText.split(',')
+        for(var i=0; i<emailAddresses.length; i+=1){
+            if(!validateEmailAddress(emailAddresses[i].trim())){
+                alert("The text contains Invalid email address or the input format is wrong")
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     $(window).load(function(){
         function toggleSelectAll(selectAllCheckbox, multiSelect) {
@@ -281,15 +299,22 @@
     
     <div class="panel-heading">Add Users with CSV:</div>
     <div class="panel-body">
-        <form id="csvTextAreaForm" action="{% url 'polls:savelatestcsv' question.id %}" method="post">
+        <form id="csvTextAreaForm" action="{% url 'polls:savelatestcsv' question.id %}" method="post" onsubmit="return validateCSV()">
             <div class="row">
                 <div class="col-md-6">
-                    
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="csvTextArea">Enter the comma seperated email-IDs to add/invite users:</label>
                             <textarea class="form-control" id="csvTextArea" name="votersCSVText" rows="9" style="height: 221px;">{{ recentCSVText }}</textarea>
                         </div>
+
+                        <div class="alert alert-info">
+                            <p><strong>Note:</strong> 
+                                Input email addresses as CSV as shown in below example. Need not worry about white spaces!<br> 
+                                Example: user1@gmail.com,user2@gmail.com,user3@gmail.com<br> 
+                            </p>
+                        </div>
+
                         <div>
                             <label for="email2">Email announcement</label>
                             <input type="checkbox" name="email" id="emailNotificationToInvite" value="email" {% if question.emailInviteCSV == True %} checked {% endif %}>
@@ -297,6 +322,7 @@
                             <br />
                         </div>
                         <input type="submit" value="Submit CSV" class="btn btn-primary" style="margin-top: 0px;">
+
                     
                 </div>
                 <div class="col-md-6">
@@ -323,7 +349,6 @@
                 <div class="panel-body">      
                     <div class="row">
                         <div class="col-md-12">
-                            
                                 {% csrf_token %}
                                 <br>
                                 <label>Recepients:</label> 
