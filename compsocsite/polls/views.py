@@ -528,6 +528,7 @@ def editBasicInfo(request, question_id):
     # save the changes
     question.save()
     request.session['setting'] = 8
+    messages.success(request, "Your changes have been saved.")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
@@ -2055,6 +2056,7 @@ def addVoters(request, question_id):
                 # print("Email sending logic here to invite users")
                 email_class = EmailThread(request, question_id, 'invite', newVoters)
                 email_class.start()
+                messages.success(request,"The Email has been sent to the added users!")
 
                 # mail.send_mail(mailSub,
                 #             mailBody,
@@ -2084,6 +2086,7 @@ def addVoters(request, question_id):
             # print("Email sending logic here to invite group users")
             email_class = EmailThread(request, question_id, 'invite-group', votersEmailIDsInGroups)
             email_class.start()
+            messages.success(request,"The Email has been sent to the added users!")
 
             # mail.send_mail(mailSub,
             #                 mailBody,
@@ -2097,6 +2100,7 @@ def addVoters(request, question_id):
     #     email_class.start()
     question.save()
     emailSettings(request, question_id)
+    messages.success(request, "Selected users have been addedd to "+ question.question_text)
     request.session['setting'] = 1
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -2114,6 +2118,7 @@ def saveLatestCSV(request, question_id):
     except Exception as e:
         print(e)
     request.session['setting'] = 1
+    messages.success(request, "The users have been added to "+ question.question_text)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
@@ -2233,6 +2238,7 @@ def addUsersAndSendEmailInvite(request, question_id):
                     email_class = EmailThread(request, question_id, 'invite-csv', userIDsFromCSV)
                     email_class.start()
                     # sendEmail(userIDsFromCSV, mailSubject, mailBody) 
+                messages.success(request, "The Email has been sent to the recepients!")
             emailSettings(request, question_id)
             return     
     except Exception as e:
@@ -2256,6 +2262,7 @@ def removeVoter(request, question_id):
         # print("Email sending logic to remove user")
         email_class = EmailThread(request, question_id, 'remove')
         email_class.start()
+        messages.success(request,"The Email has been sent to the removed users!")
     
     for voter in newVoters:
         voterObj = User.objects.get(username=voter)
@@ -2269,6 +2276,7 @@ def removeVoter(request, question_id):
 
     question.save()
     emailSettings(request, question_id)
+    messages.success(request, "Selected users have been removed from "+ question.question_text)
     request.session['setting'] = 1
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -3298,7 +3306,7 @@ def change_self_sign_up(request, question_id):
         question.allow_self_sign_up = 0
     question.save()
     request.session['setting'] = 4
-
+    messages.success(request, "Your changes have been saved.")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 def self_sign_up(request, question_id):

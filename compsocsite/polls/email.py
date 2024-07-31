@@ -1,6 +1,8 @@
 import datetime
 import os
 
+from django.contrib import messages
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect, HttpResponse, HttpRequest
 from django.urls import reverse
@@ -100,13 +102,13 @@ def setupEmail(question):
             subject="You have been invited to vote on " + title,
             message='Hello [user_name],\n\n' + creator
                     + ' has invited you to vote on a poll. Please login at [url] to check it out.'
-                    +' \n Email Invite from CSV. \n\nSincerely,\nOPRA Staff')
+                    +' \n\nSincerely,\nOPRA Staff')
         emailInviteCSV.save()
     else:
         emailInviteCSV.update(subject="You have been invited to vote on " + title,
             message='Hello [user_name],\n\n' + creator
                     + ' has invited you to vote on a poll. Please login at [url] to check it out.'
-                    +' \n Email Invite from CSV. \n\nSincerely,\nOPRA Staff')
+                    +' \n\nSincerely,\nOPRA Staff')
 
 
 
@@ -149,6 +151,7 @@ def emailSettings(request, question_id):
         
     question.save()
     request.session['setting'] = 5
+    messages.success(request, "Your changes have been saved.")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 def voteEmail(request, key, resp_id):
@@ -205,6 +208,7 @@ def translateHTML(text, uname, url, options):
 def emailNow(request, question_id):
     email_class = EmailThread(request, question_id, "now")
     email_class.start()
+    messages.success(request, "The Email has been sent to all the participants of the poll.")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 #function to send email

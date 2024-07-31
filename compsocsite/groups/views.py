@@ -152,7 +152,9 @@ def removegroupvoters(request, question_id):
         print("Email sending logic to remove group")
         email_class = EmailThread(request, question_id, 'remove-group', recepients, mailSub, mailBody)
         email_class.start()
+        messages.success(request, "The Email has been sent to the removed users!")
         # sendEmail(recepients, mailSub, mailBody)
+    messages.success(request, "Selected groups have been removed from "+ question.question_text)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     
 def joingroup(request, group_id):
