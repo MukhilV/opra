@@ -82,7 +82,9 @@
         emailAddresses = csvText.split(',')
         for(var i=0; i<emailAddresses.length; i+=1){
             if(!validateEmailAddress(emailAddresses[i].trim())){
-                alert("The text contains Invalid email address or the input format is wrong")
+                let csvError = document.getElementById("csv_error")
+                csvError.innerHTML = "The input format is wrong (OR) The csv text contains Invalid email address!"
+                // alert("The text contains Invalid email address or the input format is wrong")
                 return false;
             }
         }
@@ -307,6 +309,8 @@
                             <label for="csvTextArea">Enter the comma seperated email-IDs to add/invite users:</label>
                             <textarea class="form-control" id="csvTextArea" name="votersCSVText" rows="9" style="height: 221px;">{{ recentCSVText }}</textarea>
                         </div>
+
+                        <div id="csv_error" style="color: #ff4d4d;"></div>
 
                         <div class="alert alert-info">
                             <p><strong>Note:</strong> 
