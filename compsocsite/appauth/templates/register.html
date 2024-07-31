@@ -4,11 +4,27 @@
 {% block content %}
 <script>
     function register(){
-        if($('#reg_email').val() == ''){ $('#error').html("Please enter an email."); $('#reg_email').focus(); }
+        if($('#reg_email').val() == ''){ 
+            $('#error').html("Please enter an email."); 
+            $('#reg_email').focus(); 
+        }
         // else if($('#reg_username').val() == ''){ $('#error').html("Please enter a username."); $('#reg_username').focus(); }
         // else if($('#reg_username').val().indexOf('@') > -1){ $('#error').html("Username should not include @ character."); $('#reg_username').focus(); }
-        else if($('#reg_password').val() == ''){ $('#error').html("Please enter a password."); $('#reg_password').focus(); }
-        else{ $('#user_form').submit(); }
+        else if($('#reg_password').val() == ''){ 
+            $('#error').html("Please enter a password."); 
+            $('#reg_password').focus(); 
+        }
+        else if($('#confirm_password').val() == ''){ 
+            $('#error').html("Please confirm your password."); 
+            $('#confirm_password').focus(); 
+        }
+        else if($('#reg_password').val() != $('#confirm_password').val()){ 
+            $('#error').html("Password and Confirm Password are not matching."); 
+            $('#reg_password').focus(); 
+        }
+        else{ 
+            $('#user_form').submit(); 
+        }
     }
 </script>
 <div class="col-md-6 col-md-offset-3" align="center" style="padding: 60px 20px;">
@@ -19,7 +35,7 @@
         Thank you for registering! Please check your email to activate your account.
         <a href="/polls/">Return to the homepage.</a><br />
     {% else %}
-        <div id="error"></div>
+        <div id="error" style="color: #ff4d4d;"></div>
         <form id="user_form" method="post" action="/auth/register/" enctype="multipart/form-data">
 
             {% csrf_token %}
@@ -36,8 +52,13 @@
             </fieldset> -->
             
             <fieldset class="form-group">
-                <label for="username">Password</label> 
+                <label for="password">Password</label> 
                 <input type="password" class="form-control" id="reg_password" name="password" placeholder="Password" value="" size="50" />
+            </fieldset>
+
+            <fieldset class="form-group">
+                <label for="confirm_password">Confirm Password</label> 
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Re-type Password" value="" size="50" />
             </fieldset>
 
             <input type="button" value="Register" class="btn btn-primary" onclick="register()"/> 
