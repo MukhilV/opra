@@ -76,7 +76,7 @@ def register(request):
             profile = UserProfile(user=user, displayPref = 1, time_creation=timezone.now(), salt = salt.decode('utf-8'))
             profile.save()
             
-            htmlstr =  "<p><a href='https://opra.cs.rpi.edu/auth/register/confirm/"+opra_crypto.encrypt(user.id)+"'>Click This Link To Activate Your Account</a></p>"
+            htmlstr =  "<p><a href='http://127.0.0.1:9083/auth/register/confirm/"+opra_crypto.encrypt(user.id)+"'>Click This Link To Activate Your Account</a></p>"
             # mail.send_mail("OPRA Confirmation","Please confirm your account registration.", from_email='oprahprogramtest@gmail.com', auth_user='oprahprogramtest@gmail.com', auth_password='ThisIsJustATestProgram' ,recipient_list = [user.email],html_message=htmlstr)
             # mail.send_mail("OPRA Confirmation","Please confirm your account registration." ,recipient_list = [user.email],html_message=htmlstr)
 
@@ -132,7 +132,7 @@ def quickRegister(request, question_id):
             # Update our variable to tell the template registration was successful.
             registered = True
             
-            htmlstr =  "<p><a href='https://opra.cs.rpi.edu/auth/"+str(question_id)+"/quickconfirm/"+opra_crypto.encrypt(user.id)+"'>Click This Link To Activate Your Account</a></p>"
+            htmlstr =  "<p><a href='http://127.0.0.1:9083/auth/"+str(question_id)+"/quickconfirm/"+opra_crypto.encrypt(user.id)+"'>Click This Link To Activate Your Account</a></p>"
             mail.send_mail("OPRA Confirmation","Please confirm your account registration.",'oprahprogramtest@gmail.com',[user.email],html_message=htmlstr)
         #else    print (user_form.errors)
         else:
@@ -311,8 +311,8 @@ def forgetPassword(request):
     if email == "" or username == "":
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     user = get_object_or_404(User, email=email, username=username)
-    htmlstr = "<p><a href='https://opra.cs.rpi.edu/auth/resetpassword/"+opra_crypto.encrypt(user.id) + "'>Click This Link To Reset Password</a></p>"
-    mail.send_mail("OPRA Forget Password","Please click the following link to reset password.",'mukhil1140@gmail.com',[email], auth_user="mukhil1140@gmail.com", auth_password="xkptaundeafioteq", html_message=htmlstr)
+    htmlstr = "<p><a href='http://127.0.0.1:9083/auth/resetpassword/"+opra_crypto.encrypt(user.id) + "'>Click This Link To Reset Password</a></p>"
+    mail.send_mail("OPRA Forget Password","Please click the following link to reset password.",'opra@cs.binghamton.edu',[email], html_message=htmlstr)
     # mail.send_mail("OPRA Forget Password","Please click the following link to reset password.",'opra@cs.binghamton.edu',[email], auth_user="opra@cs.binghamton.edu", html_message=htmlstr)
     return HttpResponse("An email has been sent to your email account. Please click on the link in that email and reset your password.")
     
@@ -323,7 +323,9 @@ def resetPassword(request, key):
     new = request.POST['newpassword']
     con = request.POST['confirmpassword']
     if new != "" and new == con:
-        user.set_password(new)
+        # user.set_password(new)
+        salt = user.userprofile.salt
+        user.password = bcrypt.hashpw(bytes(new,'utf-8'), bytes(salt,'utf-8')).decode('utf-8')
         user.save()
         return render(request,'success.html', {})
     else:

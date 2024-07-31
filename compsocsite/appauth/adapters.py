@@ -1,5 +1,9 @@
+import bcrypt
+from django.utils import timezone
+
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.contrib.auth import get_user_model
+from appauth.models import UserProfile
 from polls.models import UnregisteredUser
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
@@ -44,5 +48,10 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         # Do nothing, if the registering user is not invited to any polls
         except UnregisteredUser.DoesNotExist:
             pass
+
+        # Create user profile for the new user
+        salt = bcrypt.gensalt()
+        profile = UserProfile(user=user, displayPref = 1, time_creation=timezone.now(), salt = salt.decode('utf-8'))
+        profile.save()
         
         return user
