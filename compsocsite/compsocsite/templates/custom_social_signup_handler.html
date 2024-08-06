@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+
+        Sign In
+
+    </title>
+
+    {% load static%}
+        <!-- Bootstrap Core CSS -->
+        <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" integrity="" crossorigin="anonymous" />
+
+        <!-- jQuery UI CSS (base theme) -->
+        <link rel="stylesheet" type="text/css" href="/static/css/jquery-ui.css">
+    
+        <!-- Custom CSS -->
+        <link rel="stylesheet" type="text/css" href="/static/css/stylish-portfolio.css" />
+        <link rel="stylesheet" type="text/css" href="/static/css/shared.css"/>
+        <link rel="stylesheet" type="text/css" href="/static/css/introjs.css"/>
+        <link rel="stylesheet" type="text/css" href="/static/css/font-awesome.min.css"/>
+        <!-- Custom Fonts -->
+        <link href="/static/fonts/sanc.css" rel="stylesheet" type="text/css" />     
+        <link rel="stylesheet" href="/static/fonts/lato.css">
+        <!-- W3 -->
+        <link rel="stylesheet" href="/static/css/w3.css">
+    
+        <!-- Select2 -->
+        <link href="/static/css/select2.min.css" rel="stylesheet" />
+            {% if request.flavour == "mobile" %}
+            <link rel="stylesheet" type="text/css" href="/static/css/mobile.css"/>
+            {% else %}
+            <link rel="stylesheet" type="text/css" href="/static/css/desktop.css"/>
+            {% endif %}
+    
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    
+        <!-- jQuery -->
+        <script
+            src="/static/js/jquery-2.2.4.min.js"
+            integrity=""
+            crossorigin="anonymous"></script>
+        <script
+          src="/static/js/jquery-ui.min.js"
+          integrity=""
+          crossorigin="anonymous"></script>
+        <!-- Bootstrap Core JavaScript -->
+        <script src="/static/js/bootstrap.min.js"></script>
+        <!-- <script src="/static/js/5f5c1e4fb0.js"></script> -->
+        <script src="/static/js/select2.min.js"></script>
+        <script src='/static/js/intro.js'></script>
+        <script src='/static/js/base.js'></script>
+        <script src='/static/js/shared.js'></script>
+    
+
+</head>
+
+<body>
+
+    <div style="margin: auto; width: 70%; padding-top: 10%;">
+        <div class="panel panel-default" style="text-align: center;">
+            <div class="panel-heading"><h1>Sign In Via Google</h1></div>
+            <div class="panel-body">
+
+                <div><img src="/static/img/oprafullname.png" style="width:30% ; margin: auto; padding: 10px;"></div>
+
+                <p style="padding-top: 5px; padding-left: 2px; padding-right: 2px;">
+                    You are about to sign in using a third-party account from Google.
+                </p>
+
+
+                <form method="post" action="/accounts/google/login/">
+
+
+
+                    <input type="hidden">
+
+                    {% csrf_token %}
+
+                    <button type="submit" class="btn btn-dark">
+
+                        Continue
+
+                    </button>
+
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+</body>
+
+</html>

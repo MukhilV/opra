@@ -62,8 +62,16 @@
             </fieldset>
 
             <input type="button" value="Register" class="btn btn-primary" onclick="register()"/> 
-            <br><br>OR<br><br>    
-            <a title="Google" href="/accounts/google/login/?process=login">Sign up with Google</a>
+            <br><br>OR<br><br>        
+        </form>
+
+        <!-- <a title="Google" href="/accounts/google/login/?process=login">Sign up with Google</a> -->
+        <form method="post" action="{% url 'appauth:socialSignup' %}">
+            <input type="hidden">
+            {% csrf_token %}
+            <button type="submit" title="Google" class="btn btn-dark">
+                 Sign up with Google
+            </button>
         </form>
     {% endif %}
 </div>

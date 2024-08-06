@@ -480,3 +480,7 @@ def resetAllFinish(request):
         return HttpResponse("success!")
     else:
         return HttpResponse("failed!")
+
+# custom handler for Google sign-in/sign-up
+def socialSignup(request):
+    return render(request,'custom_social_signup_handler.html', {})

@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.views.generic.base import RedirectView
 from django.conf import settings
 from django.views.static import serve
+from appauth import views
 from polls.views import GMView
 from polls.views import GMResultsView
 from polls.views import sendMessage
@@ -46,6 +47,6 @@ urlpatterns = [
     re_path(r'^ResearchGroupCN$', RGView.as_view(), name='ResearchGroup'),
     re_path(r'^ResearchGroupEN$', RGENView.as_view(), name='ResearchGroupEN'),
     re_path('accounts/profile', RedirectView.as_view(url='/polls/main')),
-    re_path('accounts/', include('allauth.urls'))
-               
+    re_path(r'^socialSignup/$', views.socialSignup, name='socialSignup'),
+    re_path('accounts/', include('allauth.urls')),            
 ]

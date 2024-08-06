@@ -26,5 +26,6 @@ urlpatterns = [
     re_path(r'^(?P<key>\w+)/(?P<question_id>[0-9]+)/quicklogin/$', views.quickLogin, name='quickLogin'),
     re_path(r'^createmturk/$', views.createMturkUser, name='createmturk'),
     re_path(r'^resetfinish/$', views.resetAllFinish, name='resetfinish'),
+    re_path(r'^socialSignup/$', views.socialSignup, name='socialSignup'),
     re_path('accounts/', include('allauth.urls'))
 ]
