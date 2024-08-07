@@ -40,6 +40,9 @@ The web app is built on Django, and uses an SQLite database. [Click here](https:
 * **six**
 * **bcrypt**
 * **django-allauth**
+* **django-environ**
+* **django-guardian**
+
 	
 4. Clone [opra_dependencies] (https://github.com/tomjmwang/opra_dependencies) Github directoy to your local machine. Copy django_mobile and prefpy directoies to your python library and overwrite original files.
 	
