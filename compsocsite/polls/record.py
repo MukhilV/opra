@@ -330,9 +330,25 @@ def downloadParticipants(request):
         dic["current_poll"] = par.userprofile.cur_poll
         result.append(dic)
     return JsonResponse(result, safe=False)
+
+def downloadallocations(request):
+    all_poll = list(Question.objects.filter(question_type = 2).order_by('-pub_date'))
+    # .question_set.all()
+    result = []
+    for poll in all_poll:
+        dic = {}
+        dic["id"] = poll.id
+        dic["title"] = poll.question_text
+        dic["time_creation"] = str(poll.pub_date)
+        dic["UI"] = getUIs(poll)
+        dic["description"] = poll.question_desc
+        dic["alternatives"] = list(poll.item_set.all().values_list("item_text",flat=True))
+        result.append(dic)
+    return JsonResponse(result, safe=False)
     
 def downloadPolls(request):
-    all_poll = User.objects.get(username="opraexp").question_set.all()
+    all_poll = list(Question.objects.filter(question_type = 1).order_by('-pub_date'))
+    # .question_set.all()
     result = []
     for poll in all_poll:
         dic = {}
@@ -375,6 +391,7 @@ def downloadRecords(request):
     return JsonResponse(result, safe=False)
 
 def downloadSpecificRecords(request):
+    # return JsonResponse({})
     all_responses = []
     result = []
     polls = getMturkPollID()

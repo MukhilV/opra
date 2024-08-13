@@ -9,10 +9,18 @@
 <br/>
 
 <a href="{% url 'polls:downloadrecord' question.id %}" class= "btn btn-primary">Download as csv</a>
-<a href="{% url 'polls:downloadpolls' %}" class= "btn btn-primary">Download polls</a>
+
+{% if question.question_type == 1 %} 
+	<a href="{% url 'polls:downloadpolls' %}" class= "btn btn-primary">Download polls</a> 
+{% elif question.question_type == 2 %} 
+	<a href="{% url 'polls:downloadallocations' %}" class= "btn btn-primary">Download allocations</a> 
+{% endif %}
+
 <a href="{% url 'polls:downloadparticipants' %}" class= "btn btn-primary">Download participants</a>
 <a href="{% url 'polls:downloadallrecords' %}" class= "btn btn-primary">Download all vote records</a>
-<a href="{% url 'polls:downloadspecrecords' %}" class= "btn btn-primary">Download new vote records</a>
+
+<!-- Not sure what this new vote records are.. -->
+<!-- <a href="{% url 'polls:downloadspecrecords' %}" class= "btn btn-primary">Download new vote records</a> -->
 
 
 <ul>
