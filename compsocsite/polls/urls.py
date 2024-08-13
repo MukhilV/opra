@@ -100,6 +100,7 @@ urlpatterns = [
     re_path(r'^(?P<question_id>[0-9]+)/downloadrecord/$', record.downloadRecord, name='downloadrecord'),
     re_path(r'^(?P<user_id>[0-9]+)/downloadallrecord/$', record.downloadAllRecord, name='downloadallrecord'),
     re_path(r'^downloadpolls/$', record.downloadPolls, name='downloadpolls'),
+    re_path(r'^downloadallocations/$', record.downloadallocations, name='downloadallocations'),
     re_path(r'^downloadparticipants/$', record.downloadParticipants, name='downloadparticipants'),
     re_path(r'^downloadallrecords/$', record.downloadRecords, name='downloadallrecords'),
     re_path(r'^downloadspecrecords/$', record.downloadSpecificRecords, name='downloadspecrecords'),
