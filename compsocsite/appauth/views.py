@@ -76,9 +76,12 @@ def register(request):
             profile = UserProfile(user=user, displayPref = 1, time_creation=timezone.now(), salt = salt.decode('utf-8'))
             profile.save()
             
-            htmlstr =  "<p><a href='http://127.0.0.1:9083/auth/register/confirm/"+opra_crypto.encrypt(user.id)+"'>Click This Link To Activate Your Account</a></p>"
+            # htmlstr =  "<p><a href='http://127.0.0.1:9083/auth/register/confirm/"+opra_crypto.encrypt(user.id)+"'>Click This Link To Activate Your Account</a></p>"
             # mail.send_mail("OPRA Confirmation","Please confirm your account registration.", from_email='oprahprogramtest@gmail.com', auth_user='oprahprogramtest@gmail.com', auth_password='ThisIsJustATestProgram' ,recipient_list = [user.email],html_message=htmlstr)
-            # mail.send_mail("OPRA Confirmation","Please confirm your account registration." ,recipient_list = [user.email],html_message=htmlstr)
+            htmlstr = "You have been successfully registered to OPRA."
+            mail.send_mail("OPRA Registration Successful!","You have been successfully registered to OPRA." ,
+                           from_email= "opra@cs.binghamton.edu",
+                           recipient_list = [user.email])
 
             # Update our variable to tell the template registration was successful.
             registered = True

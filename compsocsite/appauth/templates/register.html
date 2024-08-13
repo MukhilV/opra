@@ -32,8 +32,9 @@
     <br/>
 
     {% if registered %}
-        Thank you for registering! Please check your email to activate your account.
-        <a href="/polls/">Return to the homepage.</a><br />
+        Thank you for registering! 
+        <!-- Please check your email to activate your account. -->
+        <a href="/polls/">Return to the homepage for signing in.</a><br />
     {% else %}
         <div id="error" style="color: #ff4d4d;"></div>
         <form id="user_form" method="post" action="/auth/register/" enctype="multipart/form-data">
