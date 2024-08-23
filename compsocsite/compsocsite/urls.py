@@ -48,5 +48,11 @@ urlpatterns = [
     re_path(r'^ResearchGroupEN$', RGENView.as_view(), name='ResearchGroupEN'),
     re_path('accounts/profile', RedirectView.as_view(url='/polls/main')),
     re_path(r'^socialSignup/$', views.socialSignup, name='socialSignup'),
-    re_path('accounts/', include('allauth.urls')),            
+    re_path('accounts/', include('allauth.urls')),  
+    
+    # user_guide 
+    # re_path(r'^docs/$', serve, {'path': 'index.html', 'document_root': 'static/user_guide_vitepress/docs/.vitepress/dist'}),
+    re_path('index.html', serve, {'path': 'index.html', 'document_root': 'static/user_guide_vitepress/docs/.vitepress/dist'}),
+    re_path(r'^assets/(?P<path>.*)$', serve, {'document_root':'static/user_guide_vitepress/docs/.vitepress/dist/assets'}),
+    re_path('hashmap.json', serve, {'path': 'hashmap.json', 'document_root': 'static/user_guide_vitepress/docs/.vitepress/dist'}),      
 ]
