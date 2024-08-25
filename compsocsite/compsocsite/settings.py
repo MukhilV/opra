@@ -221,6 +221,8 @@ EMAIL_PORT=587
 STATIC_URL = 'static/'
 LOGIN_URL = '/auth/login/'
 
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 STATICFILES_DIRS = (
     STATIC_URL,
     os.path.join(os.path.abspath(BASE_DIR), 'static'),
