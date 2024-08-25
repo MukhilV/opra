@@ -221,10 +221,12 @@ EMAIL_PORT=587
 STATIC_URL = 'static/'
 LOGIN_URL = '/auth/login/'
 
-STATICFILES_DIRS = (
-    STATIC_URL,
-    os.path.join(os.path.abspath(BASE_DIR), 'static'),
-)
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# STATICFILES_DIRS = (
+#     STATIC_URL,
+#     os.path.join(os.path.abspath(BASE_DIR), 'static'),
+# )
 
 # ACCOUNT_ADAPTER = 'appauth.adapters.CustomSocialAccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'appauth.adapters.CustomSocialAccountAdapter'
