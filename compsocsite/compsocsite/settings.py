@@ -31,7 +31,13 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = eval(env('DEBUG'))
 
 # SECURITY WARNING: allow only specific domains to access the site
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'opra.cs.binghamton.edu'
+    ]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://opra.cs.binghamton.edu',
+]
 
 X_FRAME_OPTIONS = env('X_FRAME_OPTIONS') # has been taken care by middleware
 SESSION_COOKIE_SECURE = eval(env('SESSION_COOKIE_SECURE'))
