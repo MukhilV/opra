@@ -1,3 +1,7 @@
+- deployment:
+    conda activate opra_envr
+    python3 manage.py runserver 0.0.0.0:8080
+    check that it is listening by running netstat -tlnp
 -admin.py:
 	-add section to view preferences from dict (currently can just view student/question/timestamp/allocation of a response)
 	-allow admin to choose which questions/results are published on the index page (possibly select date range?)
