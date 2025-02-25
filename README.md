@@ -4,7 +4,14 @@ This project is a web app that assists in the assignment of presentations to stu
 
 The web app is built on Django, and uses an SQLite database. [Click here](https://docs.djangoproject.com/) for more information on how Django works.
 
-##Installation
+## Installation
+
+1. Create a virtual enviroment with python version 3.12.2 (or try the latest version of python3).
+2. Go into the folder opra/compsocsite install all the dependencies from requirements.txt by running the below command.
+
+- `pip install -r requirements.txt`
+
+OR follow the first three steps below to manually install all the dependencies. 
 
 1. Install [Python](https://www.python.org/downloads/). It is recommended that you use the latest version of Python 3.
 2. Install [Django](https://www.djangoproject.com). The easiest way to do this is through [pip] (https://pip.pypa.io/en/latest/installing/#installing-with-get-pip-py). Then you can install django simply by entering the command: 
@@ -25,7 +32,7 @@ The web app is built on Django, and uses an SQLite database. [Click here](https:
 
     <code>  pip install Package-Name </code>
 
-##Dependencies
+## Dependencies
 * **django-mobile**:
 * **pillow**:
 * **prefpy**:
@@ -68,6 +75,11 @@ The web app is built on Django, and uses an SQLite database. [Click here](https:
 
   <code>http://127.0.0.1:8000</code>
 
+
+10. To run the server and listen to all the public ports in an network, use the below command.
+This is particularly useful when deploying in production.
+
+  <code>python3 manage.py runserver 0.0.0.0:8080</code>
 
 
 ##Models
