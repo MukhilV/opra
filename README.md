@@ -6,60 +6,27 @@ The web app is built on Django, and uses an SQLite database. [Click here](https:
 
 ## Installation
 
-1. Create a virtual enviroment with python version 3.12.2 (or try the latest version of python3).
-2. Go into the folder opra/compsocsite install all the dependencies from requirements.txt by running the below command.
+Note: The installation procedure is modified from the original repository `https://github.com/PrefPy/opra` to accomodate the recent changes.
+
+1. Clone this project and use `dev_test` branch for development, use `master` branch for production.
+
+2. Create a virtual enviroment using conda with python version 3.12.2 (or try the latest version of python3).
+
+- For example: `conda create --name opra_env python=3.12.2`
+- To list all the virtual environment created using conda: `conda env list`
+- To activate the virtual env : `conda activate env_name`.
+
+3. Activate the virtual environment and go into the folder opra install all the dependencies from requirements.txt by running the below command.
 
 - `pip install -r requirements.txt`
 
-OR follow the first three steps below to manually install all the dependencies. 
+4. If you can already find "settings.py" under "compsocsite/compsocsite" and "opra_crypto.py" under "compsocsite/polls", then don't do the next step. If you can't find those files, then follow the next step. 
 
-1. Install [Python](https://www.python.org/downloads/). It is recommended that you use the latest version of Python 3.
-2. Install [Django](https://www.djangoproject.com). The easiest way to do this is through [pip] (https://pip.pypa.io/en/latest/installing/#installing-with-get-pip-py). Then you can install django simply by entering the command: 
+5. Clone [opra_dependencies] (https://github.com/tomjmwang/opra_dependencies) Github directory to your local machine. Copy settings.py from opra_dependencies to compsocsite/compsocsite. Copy opra_crypto.py from opra_dependencies to compsocsite/polls.
 
-   <code>pip install django==4.2.7</code>
-   
-   You can verify installation by entering the command:
-   
-   <code> python </code>
-   
-   <code> import django </code>
-   
-   <code> print(django.get_version()) </code>
-   
-* Note that if your system has both Python 2 and Python 3, usually "python3" and "pip3" are used in places of "python" and "pip" repectively. Replace as needed.
-    
-3. Install the dependencies listed below in the Dependencies section by entering:
+6. Set up the .env file under opra/compsocsite or get the same from the developer who is already working on this project.
 
-    <code>  pip install Package-Name </code>
-
-## Dependencies
-* **django-mobile**:
-* **pillow**:
-* **prefpy**:
-* **WhiteNoise**:
-* **django-cors-headers**:
-* **django-qr-code**:
-* **scipy**:
-* **numpy**:
-* **networkx**:
-* **django-mathfilters**:
-* **matplotlib**:
-* **six**
-* **bcrypt**
-* **django-allauth**
-* **django-environ**
-* **django-guardian**
-
-	
-4. Clone [opra_dependencies] (https://github.com/tomjmwang/opra_dependencies) Github directoy to your local machine. Copy django_mobile and prefpy directoies to your python library and overwrite original files.
-	
-5. Clone this project from Github
-
-6. If you can already find "settings.py" under "compsocsite/compsocsite" and "opra_crypto.py" under "compsocsite/polls", then don't do step 7. If you can't find those files, then follow step 7. 
-
-7. Copy settings.py from opra_dependencies to compsocsite/compsocsite. Copy opra_crypto.py from opra_dependencies to compsocsite/polls.
-
-8. Open command line (terminal), change to OPRA's directory, and then enter the following commands:
+7. Open command line (terminal), change to OPRA's directory, and then enter the following commands:
   
   <code>cd compsocsite</code>
   
@@ -71,42 +38,52 @@ OR follow the first three steps below to manually install all the dependencies.
 
   <code>python3 manage.py runserver</code>
 
-9. To view the page, go to your web browser and visit this address:
+  if you want to run the server in a different port number.
+
+  <code>python manage.py runserver port_number</code> <br>
+  For example `python manage.py runserver 8000`
+
+8. To view the page, go to your web browser and visit this address:
 
   <code>http://127.0.0.1:8000</code>
 
-
-10. To run the server and listen to all the public ports in an network, use the below command.
+9. To run the server and listen to all the public ports in an network, use the below command.
 This is particularly useful when deploying in production.
 
   <code>python3 manage.py runserver 0.0.0.0:8080</code>
 
+10. Once the app is up and running, set up your own OAuth client to enable Sign-up/Sign-in using Google account. Follow the steps in the below YouTube video to set up OAuth Client ID and Secret key.<br>
+Video Link: `https://www.youtube.com/watch?v=yO6PP0vEOMc`
 
-##Models
+
+
+
+
+## Models
 The following models are used to organize information:
 * **User:** includes username, password, and personalized settings
-* **Question:** includes the text of a question, its publication date, and whether it is a follow-up to another question
+* **Question:** includes the text of a question, its publiction date, and whether it is a follow-up to another question
 * **Item:** an option within a question that can be ranked by users. Includes the text of the item and the question it is associated with
 * **Response:** the response of one student to one question. Includes a dictionary of the input preferences, the question and student it is associated with, the submission timestamp, and the item from this response the student has been allocated. This last field starts out blank, and is updated when an allocation algorithm is run
 
 
-##Poll Owner Usage
+## Poll Owner Usage
 The poll owner can add, view, edit, and delete questions, items, and voters. All lists of data are sortable by name and (when applicable) date.
 
 To display a question for users to respond to, the poll owner must make a new question, entering the relevant text and items. The poll owner can look in the history section to see which users have responded to which questions. When you wish to allocate the items for a question, click stop to end the poll.This will run the algorithm, update the allocated item field in each response, and publish the results.
 
-##Voter Usage
+## Voter Usage
 From the home page (/polls/), all available questions may be viewed. To view a specific question, click on it. The screen will show a simplfied voter interface, which allows you to visualize your preferences. One rank per item may be selected, but ties are allowed. Only complete preferences are accepted. A question response may either be submitted with a registered account or under an anonymous name, if the poll owner has agreed to allow anonymous voting. When the "Submit" button is clicked, a response will be submitted, associated with the given question, and with the preferences indicated. A small alert will be displayed.
 
 Also on the home page is a list of links to results for each question. A given link will not be clickable until the results for that question have been published by the poll owner (by performing the allocation algorithm action). Clicking on a link to a set of results will bring the student to a list of all students and the item they have been allocated for that particular question.
 
 
-##Allocation Algorithms
+## Allocation Algorithms
 The project is currently equipped with a serial dictatorship allocation algorithm. This algorithm chooses presentation topic assignment in increasing order of presentation topic response timestamp, then chooses presentation date assignment in decreasing order of presentation topic response timestamp.
 
 More algorithms can easily be added. Within the algorithms.py file inside the polls directory, add a function def for the desired algorithm, with the response set as a parameter. Then, at the top of the admin.py file inside the polls directory, add a function def for an admin action corresponding to the new algorithm. The preexisting admin action function can be used as a guide for the necessary syntax to add a new admin action. Lastly, in the ResponseAdmin class at the bottom of admin.py, add the new admin action function to the list of actions.
 
-##OPRA DOCUMENTATON
+## OPRA DOCUMENTATON
 
 OPRA stands for online preference reporting and aggregation, which is essentially an online voting system. The system is built up by taking advantage of Django free and open-source web framework written extensively in Python. It maintains Django’s basic model-view-template (MVT) architectural pattern.  This documentation basically consists of two parts. The first part will give you an overarching view of the major components of OPRA. The second part will dive into each component and detail each constituted function. 
 
@@ -120,7 +97,7 @@ The view layer basically encapsulates the logic responsible for processing a use
 * **C. The template layer**
 The template layer provides a designer-friendly syntax for rendering the information to be presented to the users. It provides a convenient way to generate HTML dynamically, and contains the static parts of the desired HTML output as well as some special syntax describing how the dynamic content will be inserted. 
 
-##Part II: Dive into OPRA component functions
+## Part II: Dive into OPRA component functions
 The outer compsocsite/ root directory is just a container for OPRA. You can rename it without any problems.
 •	**manage.py:** A Python command-line utility that lets the user interact with OPRA in various ways. 
 •	**Appauth:** This folder is responsible for registering users and login/logout setting. 
