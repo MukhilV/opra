@@ -56,7 +56,8 @@ This is particularly useful when deploying in production.
 Video Link: `https://www.youtube.com/watch?v=yO6PP0vEOMc`
 
 
-
+11. You may want to create a Django super user using the command `python manage.py createsuperuser` to access the admin
+site `http://127.0.0.1:8000/admin/login/?next=/admin/`.
 
 
 ## Models
