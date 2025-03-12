@@ -229,6 +229,9 @@ LOGIN_URL = '/auth/login/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') 
+
 # STATICFILES_DIRS = (
 #     STATIC_URL,
 #     os.path.join(os.path.abspath(BASE_DIR), 'static'),
