@@ -7,3 +7,5 @@ compsocsite/venv/
 static_root/
 .vscode/
 .env
+compsocsite/static 
+compsocsite/media
