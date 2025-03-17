@@ -1,267 +1,334 @@
-    <div class="steps"  align="center">
-        <p class="sameline" > 
-            1. General   
-            <span class="glyphicon glyphicon-chevron-right"> </span>  
-            2. Choices
-            <span class="glyphicon glyphicon-chevron-right"> </span>
-            3. Invite
-        </p>
-        <p class="sameline" style="color:grey;">
-            <span class="glyphicon glyphicon-chevron-right"> </span>
-            4. Settings 
-        </p>
+<div class="steps"  align="center">
+    <p class="sameline"> 
+        1. General
+        <span class="glyphicon glyphicon-chevron-right"></span>
+        2. Choices
+        <span class="glyphicon glyphicon-chevron-right"></span>
+        3. Invite
+    </p>
+    <p class="sameline" style="color:grey;">
+        <span class="glyphicon glyphicon-chevron-right"></span>
+        4. Settings
+    </p>
+</div>
+
+<div class="progress">
+    <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="20" aria-valuemin="0" 
+         aria-valuemax="100" style="width: 100%">
+        <span class="sr-only">100% Complete</span>
     </div>
+</div>
+<br/>
+
+<form class="form-group" method="post" action="{% url 'polls:setinitial' question.id %}" onsubmit="javascript:UICheckboxes();">
+    {% csrf_token %}
     
-    <div class="progress">
-        <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
-            <span class="sr-only">100% Complete</span>
-        </div>
-    </div>
-    <br/>
-
-        <form class="form-group" method="post" action="{% url 'polls:setinitial' question.id %}" onsubmit="javascript:UICheckboxes();">
-            {% csrf_token %}
-            
-            {% if question.question_type == 1 %}
-            <div class="panel panel-default">
-                <div class="panel-heading"><h4>Algorithms:<h4></div>
-                <div class="panel-body">
-                    <label for="pollpreferences">Select an algorithm <i class="fa fa-question-circle" aria-hidden="true" data-toggle="modal" data-target=".bs-example-modal-lg" style="color:GoldenRod;"></i></label>
-                    <select id="pollpreferences" name="pollpreferences" class="form-control">
-                    {% for item in poll_algorithms %}
-                        <option value="{{ forloop.counter }}">
-                            {{ item }}
-                        </option>
-                    {% endfor %}
-                    </select>
-                    <br />
-                    <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
-                    <div class="modal-dialog modal-lg" role="document">
-                        <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title">Voting Algorithms</h4>
-                        </div>
-                        <div class="modal-body">
-                            <p><strong>Plurality: </strong><br/>
-                            Plurality selects the top ranked candidate. Select this if unsure.<br/>
-                            <strong>Bordas:</strong><br/>
-                            Bordas is xxxx<br/>
-                            <strong>Veto: </strong><br/>
-                            Veto is xxxxxxx<br/></p>
-                        </div>
-                        </div> <!--modal content-->
-                    </div>
-                    </div>
-
-                    
-                        <label>Visible Algorithms</label>
-                        <div id="visible">
-                            <label class="checkbox-inline"><input id="vis1" type="checkbox" value="1" name="vr" checked disabled>Plurality</label>
-                            <label class="checkbox-inline"><input id="vis2" type="checkbox" value="2" name="vr" checked>Borda</label>
-                            <label class="checkbox-inline"><input id="vis4" type="checkbox" value="4" name="vr" checked>Veto</label>
-                            <label class="checkbox-inline"><input id="vis8" type="checkbox" value="8" name="vr" checked>K-Approval (K=3)</label>
-                            <label class="checkbox-inline"><input id="vis16" type="checkbox" value="16" name="vr" checked>Simplified Bucklin</label>
-                            <label class="checkbox-inline"><input id="vis32" type="checkbox" value="32" name="vr" checked>Copeland</label>
-                            <label class="checkbox-inline"><input id="vis64" type="checkbox" value="64" name="vr" checked>Maximin</label>
-                            <label class="checkbox-inline"><input id="vis128" type="checkbox" value="128" name="vr" checked>STV</label>
-                            <label class="checkbox-inline"><input id="vis256" type="checkbox" value="256" name="vr" checked>Baldwin</label>
-                            <label class="checkbox-inline"><input id="vis512" type="checkbox" value="512" name="vr" checked>Coombs</label>
-                            <label class="checkbox-inline"><input id="vis1024" type="checkbox" value="1024" name="vr" checked>Black</label>
-                            <label class="checkbox-inline"><input id="vis2048" type="checkbox" value="2048" name="vr" checked>Ranked Pairs</label>
-                            <label class="checkbox-inline"><input id="vis4096" type="checkbox" value="4096" name="vr" checked>Plurality With Runoff</label>
-                            <label class="checkbox-inline"><input id="vis8192" type="checkbox" value="8192" name="vr" checked>Borda Mean</label>
-                            <label class="checkbox-inline"><input id="vis16384" type="checkbox" value="16384" name="vr" checked>Simulated Approval</label>
-                        </div>
-                        <br>
-                    </div>
-                </div>
-            {% elif question.question_type == 2 %}
-            <div class="panel panel-default">
-                <div class="panel-heading"><h4>Algorithms:<h4></div>
-                <div class="panel-body">
-                    <label for="pollpreferences">Select an allocation method to calculate results
-                        <!-- <i class="fa fa-question-circle" aria-hidden="true" data-toggle="modal" data-target=".bs-example-modal-lg" style="color:GoldenRod;"></i> -->
-                    </label>
-                    <select name="pollpreferences" class="form-control">
-                    {% for item in alloc_methods %}
-                        <option value="{{ forloop.counter }}">
-                            {{ item }}
-                        </option>
-                    {% endfor %}
-                    </select>
-                    <br />
-
-
-                    <label>Allocation algorithms to show results</label>
-                    <div id="visible">
-                        <label class="checkbox-inline"><input id="round_robin_alloc" type="checkbox" value="1" name="alloc_algorithms" checked disabled>Round Robin</label>
-                    </div>
-                    <br /><br />
-
-                    <!--Explaination Model-->
-                    <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
-                    <div class="modal-dialog modal-lg" role="document">
-                        <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title">Allocation Methods</h4>
-                        </div>
-                        <div class="modal-body">
-                            <p>
-                            <strong>Early first </strong><br />
-                            Person who votes first gets their top preference<br />
-                            <strong>Late first</strong><br />
-                            Person who votes last gets their top preference<br />
-                            <strong>Manual allocation</strong><br />
-                            The creator assigns the order manually.<br />
-                            </p>
-                        </div>
-                        </div> <!--modal content-->
-                    </div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            
-<!--             
-            <label for="viewpreferences">Information visible to users</label>
-            <select name="viewpreferences" class="form-control">
-                {% for item in view_preferences %}
-                <option value="{{ forloop.counter0 }}" {% if forloop.counter == preference %} selected {% endif %}>
+    {% if question.question_type == 1 %}
+    <!-- Unchanged block for question_type=1 (Regular Polls) -->
+    <div class="panel panel-default">
+        <div class="panel-heading"><h4>Algorithms:</h4></div>
+        <div class="panel-body">
+            <label for="pollpreferences">
+                Select an algorithm 
+                <i class="fa fa-question-circle" aria-hidden="true" data-toggle="modal" data-target=".bs-example-modal-lg"
+                   style="color:GoldenRod;"></i>
+            </label>
+            <select id="pollpreferences" name="pollpreferences" class="form-control">
+                {% for item in poll_algorithms %}
+                <option value="{{ forloop.counter }}">
                     {{ item }}
                 </option>
                 {% endfor %}
             </select>
-            <br /> -->
-
-            <div class="panel panel-default">
-                <div class="panel-heading"><h4>Visibility:<h4></div>
-                <div class="panel-body">
-                    <label for="viewpreferences">Visibility setting for displaying preferences</label>
-                    <select name="viewpreferences" class="form-control">
-                        <option value="1">Everyone can see all preferences</option>
-                        <option value="2">Everyone can only see own preference</option>
-                        <option value="3">Nothing</option>
-                    </select>
-                    <br />
-                
-                    <label for="viewpreferences">Visibility setting for displaying user-info</label>
-                    <select name="viewuserinfo" class="form-control">
-                        <option value="1">Username of users will be shown</option>
-                        <option value="2">Only numbers of users will be shown</option>
-                        <option value="3">Nothing</option>
-                    </select>
-                    <br />
-
-                    <!-- <label for="viewpreferences">Information visible to users</label><br />
-                        {% for item in view_preferences %}
-                        <input name="viewpreferences" type="radio" value="{{ forloop.counter0 }}" 
-                            name="ui" {% if forloop.counter == preference %} checked {% endif %}> {{ item }}<br />
-                        {% endfor %}
-                    <br /> -->
-                    
-                    <label for="creatorpreferences">Information visible to the creator</label>
-                    <select name="creatorpreferences" class="form-control">
-                        <option value="1" selected>Creator can see everyone's vote</option>
-                        <option value="2">Creator has the same visibility setting as all users</option>
-                    </select>
-                    <br />
-                </div>
-            </div>
-
-            <!-- <label for="creatorpreferences">Information visible to the creator</label><br />
-            <input name="creatorpreferences" type="radio" value="1" checked> Creator can see everyone's vote <br>
-            <input name="creatorpreferences" type="radio" value="2" checked> Creator has the same visibility setting as all users <br>
-            <br /> -->
-
-            
-            <div class="panel panel-default">
-                <div class="panel-heading"><h4>Accessibility:<h4></div>
-                <div class="panel-body">
-                    <label for="openpoll">Who can participate? (QR Code can be accessed in settings)</label> <br />
-                    <div class="btn-group" data-toggle="buttons">
-                        <label class="btn btn-default active">
-                        <input type="radio" name="openpoll" value="anon" checked>Anonymous</option>
-                        </label>
-                        <label class="btn btn-default">
-                        <input type="radio" name="openpoll" value="invite">Invited</option>
-                        </label>
-                        <label class="btn btn-default">
-                        <input type="radio" name="openpoll" value="uninvite">Users-Only</option>
-                        </label>
-                    </div>
-
-                    <br /> <br />
-                    <label>Allow Self Sign Up</label> <br/>
-                    <div class="btn-group" data-toggle="buttons">
-                        <label class="btn btn-default active">
-                        <input type="radio" name="selfsignup" value="allow" checked>Allow
-                        </label>
-                        <label class="btn btn-default ">
-                        <input type="radio" name="selfsignup" value="notallow" >Don't Allow
-                        </label>
-                    </div>
-
-                    <br /><br />
-                </div>
-            </div>
-            
-
-
-            <div class="panel panel-default">
-                <div class="panel-heading"><h4>Interfaces to get Preferences:<h4></div>
-                <div class="panel-body">
-                    <label>Allowed Interfaces</label>
-                    <div>
-                        {% if question.question_type == 1 %}
-                        <label class="checkbox-inline"><input id="twocol_checkbox" type="checkbox" value="twocol" name="ui" checked>Two Column</label>
-                        <label class="checkbox-inline"><input id="onecol_checkbox" type="checkbox" value="onecol" name="ui" checked>One Column</label>
-                        <label class="checkbox-inline"><input id="slider_checkbox" type="checkbox" value="slider" name="ui" checked>Slider</label>
-                        <label class="checkbox-inline"><input id="star_checkbox" type="checkbox" value="star" name="ui" checked>Star Rating</label>
-                        <label class="checkbox-inline"><input id="yesno_checkbox" type="checkbox" value="yesno" name="ui" checked>Yes/No</label>
-                        <label class="checkbox-inline"><input id="yesno2_checkbox" type="checkbox" value="yesno2" name="ui">Yes/No Grid</label>
-                        {% elif question.question_type == 2 %}
-                        <label class="checkbox-inline"><input id="budgetUI_slider_checkbox" type="radio" value="BUI_slider" name="ui" checked >Budget UI</label>
-                        <label class="checkbox-inline"><input id="listUI_checkbox" type="radio" value="LUI" name="ui" >List UI</label>
-                        <label class="checkbox-inline"><input id="InfiniteBudgetUI_checkbox" type="radio" value="IBUI" name="ui" >Infinite Budget UI</label>
-                        {% endif %}
-                    </div>
-                    <br />
-                </div>
-            </div>
-
-            {% if question.question_type == 2 %}
-            <div class="panel panel-default">
-                <div class="panel-heading"><h4>Allocation Results:<h4></div>
-                <div class="panel-body">
-                    <label>Information to show in Allocation Results Page</label>
-                    <div id="visible">
-                        <label class="checkbox-inline"><input id="my_pref_table" type="checkbox" value="1" name="alloc_res_tables" >My Preferences</label>
-                        <label class="checkbox-inline"><input id="alloc_items_bundle_table" type="checkbox" value="2" name="alloc_res_tables" checked>Items Bundle</label>
-                        <label class="checkbox-inline"><input id="alloc_res_table" type="checkbox" value="4" name="alloc_res_tables" checked>Allocation Result Table</label>
-                        <label class="checkbox-inline"><input id="EF1_matrix" type="checkbox" value="8" name="alloc_res_tables" >Envy Matrix Upto EF1 </label>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-            <script>
-                $('#pollpreferences').change(function(){
-                    $("#visible").children().each(function(index, value){
-                        $(value).children().each(function(i, v){
-                            $(v).prop( "disabled", false );
-                        });
-                    });
-                    var changed = Math.pow(2, $('#pollpreferences option:selected').val() - 1);
-                    $('#vis' + changed).prop("checked", true);
-                    $('#vis' + changed).prop("disabled", true);
-                });
-            </script>
-
             <br />
-            <div class="col-md-6 col-md-offset-3" align="center">
-                <input type="submit" value="Finish" class="btn btn-primary">
+
+            <!-- Modal with info about voting algorithms -->
+            <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">Voting Algorithms</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                <strong>Plurality: </strong><br/>
+                                Plurality selects the top ranked candidate. Select this if unsure.<br/><br/>
+                                <strong>Borda:</strong><br/>
+                                Borda is ... <br/><br/>
+                                <strong>Veto: </strong><br/>
+                                Veto is ...
+                            </p>
+                        </div>
+                    </div> <!-- modal-content -->
+                </div> <!-- modal-dialog -->
+            </div> <!-- modal fade -->
+
+            <label>Visible Algorithms</label>
+            <div id="visible">
+                <label class="checkbox-inline"><input id="vis1" type="checkbox" value="1" name="vr" checked disabled>Plurality</label>
+                <label class="checkbox-inline"><input id="vis2" type="checkbox" value="2" name="vr" checked>Borda</label>
+                <label class="checkbox-inline"><input id="vis4" type="checkbox" value="4" name="vr" checked>Veto</label>
+                <label class="checkbox-inline"><input id="vis8" type="checkbox" value="8" name="vr" checked>K-Approval (K=3)</label>
+                <label class="checkbox-inline"><input id="vis16" type="checkbox" value="16" name="vr" checked>Simplified Bucklin</label>
+                <label class="checkbox-inline"><input id="vis32" type="checkbox" value="32" name="vr" checked>Copeland</label>
+                <label class="checkbox-inline"><input id="vis64" type="checkbox" value="64" name="vr" checked>Maximin</label>
+                <label class="checkbox-inline"><input id="vis128" type="checkbox" value="128" name="vr" checked>STV</label>
+                <label class="checkbox-inline"><input id="vis256" type="checkbox" value="256" name="vr" checked>Baldwin</label>
+                <label class="checkbox-inline"><input id="vis512" type="checkbox" value="512" name="vr" checked>Coombs</label>
+                <label class="checkbox-inline"><input id="vis1024" type="checkbox" value="1024" name="vr" checked>Black</label>
+                <label class="checkbox-inline"><input id="vis2048" type="checkbox" value="2048" name="vr" checked>Ranked Pairs</label>
+                <label class="checkbox-inline"><input id="vis4096" type="checkbox" value="4096" name="vr" checked>Plurality With Runoff</label>
+                <label class="checkbox-inline"><input id="vis8192" type="checkbox" value="8192" name="vr" checked>Borda Mean</label>
+                <label class="checkbox-inline"><input id="vis16384" type="checkbox" value="16384" name="vr" checked>Simulated Approval</label>
             </div>
-            <br><br><br><br>
-        </form>
+            <br>
+        </div>
+    </div>
+
+    {% elif question.question_type == 2 %}
+    <!-- ALLOCATION SECTION (question_type=2) -->
+    <div class="panel panel-default">
+        <div class="panel-heading"><h4>Algorithms:</h4></div>
+        <div class="panel-body">
+            <label for="pollpreferences">
+                Select an allocation method to calculate results
+            </label>
+            <select id="pollpreferences" name="pollpreferences" class="form-control">
+                {% for item in alloc_methods %}
+                <option value="{{ forloop.counter }}"
+                        {% if question.poll_algorithm == forloop.counter %} selected {% endif %}>
+                    {{ item }}
+                </option>
+                {% endfor %}
+            </select>
+            <br />
+
+            <label>Allocation algorithms to show results</label>
+            <div id="visible">
+                <!-- Round Robin => bit=1 -->
+                <label class="checkbox-inline">
+                    <input id="vis1" type="checkbox" value="1" name="alloc_algorithms">
+                    Round Robin
+                </label>
+
+                <!-- Max Nash Welfare => bit=2 -->
+                <label class="checkbox-inline">
+                    <input id="vis2" type="checkbox" value="2" name="alloc_algorithms">
+                    Max Nash Welfare
+                </label>
+
+                <!-- Market (EF1) => bit=4 -->
+                <label class="checkbox-inline">
+                    <input id="vis4" type="checkbox" value="4" name="alloc_algorithms">
+                    Market (EF1)
+                </label>
+
+                <!-- MarketEq (EQ1) => bit=8 -->
+                <label class="checkbox-inline">
+                    <input id="vis8" type="checkbox" value="8" name="alloc_algorithms">
+                    MarketEq (EQ1)
+                </label>
+
+                <!-- Leximin => bit=16 -->
+                <label class="checkbox-inline">
+                    <input id="vis16" type="checkbox" value="16" name="alloc_algorithms">
+                    Leximin
+                </label>
+
+                <!-- MNW Binary => bit=32 -->
+                <label class="checkbox-inline">
+                    <input id="vis32" type="checkbox" value="32" name="alloc_algorithms">
+                    MNW Binary
+                </label>
+            </div>
+            <br /><br />
+
+            <!-- Explanation Modal (unchanged) -->
+            <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">Allocation Methods</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                <strong>Early first</strong><br />
+                                Person who votes first gets their top preference<br />
+                                <strong>Late first</strong><br />
+                                Person who votes last gets their top preference<br />
+                                <strong>Manual allocation</strong><br />
+                                The creator assigns the order manually.<br />
+                            </p>
+                        </div>
+                    </div> <!-- modal-content -->
+                </div> <!-- modal-dialog -->
+            </div> <!-- modal fade -->
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Everything else is unchanged -->
+    <div class="panel panel-default">
+        <div class="panel-heading"><h4>Visibility:</h4></div>
+        <div class="panel-body">
+            <label for="viewpreferences">Visibility setting for displaying preferences</label>
+            <select name="viewpreferences" class="form-control">
+                <option value="1">Everyone can see all preferences</option>
+                <option value="2">Everyone can only see own preference</option>
+                <option value="3">Nothing</option>
+            </select>
+            <br />
+        
+            <label for="viewpreferences">Visibility setting for displaying user-info</label>
+            <select name="viewuserinfo" class="form-control">
+                <option value="1">Username of users will be shown</option>
+                <option value="2">Only numbers of users will be shown</option>
+                <option value="3">Nothing</option>
+            </select>
+            <br />
+
+            <label for="creatorpreferences">Information visible to the creator</label>
+            <select name="creatorpreferences" class="form-control">
+                <option value="1" selected>Creator can see everyone's vote</option>
+                <option value="2">Creator has the same visibility setting as all users</option>
+            </select>
+            <br />
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading"><h4>Accessibility:</h4></div>
+        <div class="panel-body">
+            <label for="openpoll">Who can participate? (QR Code can be accessed in settings)</label> <br />
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-default active">
+                    <input type="radio" name="openpoll" value="anon" checked>Anonymous
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" name="openpoll" value="invite">Invited
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" name="openpoll" value="uninvite">Users-Only
+                </label>
+            </div>
+
+            <br /> <br />
+            <label>Allow Self Sign Up</label> <br/>
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-default active">
+                    <input type="radio" name="selfsignup" value="allow" checked>Allow
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" name="selfsignup" value="notallow">Don't Allow
+                </label>
+            </div>
+
+            <br /><br />
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading"><h4>Interfaces to get Preferences:</h4></div>
+        <div class="panel-body">
+            <label>Allowed Interfaces</label>
+            <div>
+                {% if question.question_type == 1 %}
+                <label class="checkbox-inline">
+                    <input id="twocol_checkbox" type="checkbox" value="twocol" name="ui" checked>Two Column
+                </label>
+                <label class="checkbox-inline">
+                    <input id="onecol_checkbox" type="checkbox" value="onecol" name="ui" checked>One Column
+                </label>
+                <label class="checkbox-inline">
+                    <input id="slider_checkbox" type="checkbox" value="slider" name="ui" checked>Slider
+                </label>
+                <label class="checkbox-inline">
+                    <input id="star_checkbox" type="checkbox" value="star" name="ui" checked>Star Rating
+                </label>
+                <label class="checkbox-inline">
+                    <input id="yesno_checkbox" type="checkbox" value="yesno" name="ui" checked>Yes/No
+                </label>
+                <label class="checkbox-inline">
+                    <input id="yesno2_checkbox" type="checkbox" value="yesno2" name="ui">Yes/No Grid
+                </label>
+                {% elif question.question_type == 2 %}
+                <label class="checkbox-inline">
+                    <input id="budgetUI_slider_checkbox" type="radio" value="BUI_slider" name="ui" checked>Budget UI
+                </label>
+                <label class="checkbox-inline">
+                    <input id="listUI_checkbox" type="radio" value="LUI" name="ui">List UI
+                </label>
+                <label class="checkbox-inline">
+                    <input id="InfiniteBudgetUI_checkbox" type="radio" value="IBUI" name="ui">Infinite Budget UI
+                </label>
+                {% endif %}
+            </div>
+            <br />
+        </div>
+    </div>
+
+    {% if question.question_type == 2 %}
+    <div class="panel panel-default">
+        <div class="panel-heading"><h4>Allocation Results:</h4></div>
+        <div class="panel-body">
+            <label>Information to show in Allocation Results Page</label>
+            <div id="visible2">
+                <label class="checkbox-inline">
+                    <input id="my_pref_table" type="checkbox" value="1" name="alloc_res_tables">
+                    My Preferences
+                </label>
+                <label class="checkbox-inline">
+                    <input id="alloc_items_bundle_table" type="checkbox" value="2" name="alloc_res_tables" checked>
+                    Items Bundle
+                </label>
+                <label class="checkbox-inline">
+                    <input id="alloc_res_table" type="checkbox" value="4" name="alloc_res_tables" checked>
+                    Allocation Result Table
+                </label>
+                <label class="checkbox-inline">
+                    <input id="EF1_matrix" type="checkbox" value="8" name="alloc_res_tables">
+                    Envy Matrix Upto EF1
+                </label>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <script>
+        $(document).ready(function(){
+            lockSelectedAlgorithm();
+        });
+
+        $('#pollpreferences').change(function(){
+            lockSelectedAlgorithm();
+        });
+
+        function lockSelectedAlgorithm() {
+            // 1) Re-enable & uncheck all boxes in #visible
+            $("#visible").find('input[type=checkbox]').each(function(){
+                $(this).prop("disabled", false).prop("checked", false);
+            });
+
+            // 2) If there's a valid selection in the dropdown, compute the bit
+            var selectedVal = parseInt($('#pollpreferences option:selected').val());
+            if (!isNaN(selectedVal)) {
+                // e.g. if user picks "3", changed = 2^(3-1) = 4 => #vis4
+                var changed = Math.pow(2, selectedVal - 1);
+                // check & disable that box
+                $('#vis' + changed).prop("checked", true).prop("disabled", true);
+            }
+        }
+    </script>
+
+    <br />
+    <div class="col-md-6 col-md-offset-3" align="center">
+        <input type="submit" value="Finish" class="btn btn-primary">
+    </div>
+    <br><br><br><br>
+</form>

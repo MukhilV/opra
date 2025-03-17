@@ -1,0 +1,334 @@
+{% extends "polls/base.html" %}
+{% load poll_extra %}
+{% load static %}
+
+{% block content %}
+<div class="col-md-12">
+    <!-- results header with current algorithm + dropdown -->
+    <div class="results-header">
+        <h1 style="margin-top: 40px; margin-bottom: 25px;">{{ question.question_text }}</h1>
+        <div class="allocation-mechanism">
+            <span>current allocation algorithm:
+                <span id="selected-mechanism-display">{{ current_mechanism }}</span>
+            </span>
+            <div class="dropdown-container">
+                <select id="mechanism-dropdown" onchange="updateAllocationMechanism(this.value)">
+                    <!-- In lower case as requested -->
+                    <option value="">switch allocation method</option>
+                    {% for mechanism in available_mechanisms %}
+                    <!-- mechanism is a tuple (bit, label) -->
+                    <option value="{{ mechanism.0 }}"
+                            {% if mechanism.0 == current_mechanism_id %} selected {% endif %}>
+                        {{ mechanism.1 }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    {% if current_user_name != empty_string %}
+    {% if selected_alloc_res_tables_sum|bitwise_and:1 != 0 %}
+    <div class="panel panel-default" style="margin: 20px;">
+        <div class="panel-heading">My Preference:</div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <th>Item</th>
+                        <th>Value</th>
+                    </tr>
+                    {% for item in curr_user_pref %}
+                    <tr>
+                        <td>{{ item }}</td>
+                        <td>{{ curr_user_pref_values|index:forloop.counter0 }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if selected_alloc_res_tables_sum|bitwise_and:2 != 0 %}
+    <div class="panel panel-default" style="margin: 20px;">
+        <div class="panel-heading">Allocated Items Bundle:</div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Bundle</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>{{ current_user_name }}</td>
+                        <td>
+                            <div>
+                                {% for item in curr_user_bundle %}
+                                <div class="options-container">
+                                    {% if item.image %}
+                                    <img class="item" src="{{ item.image.url }}" />
+                                    {% endif %}
+                                    <span>{{ item.item_text }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>{{ curr_user_bundle_sum }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    {% if selected_alloc_res_tables_sum|bitwise_and:4 != 0 %}
+    <div class="panel panel-default" style="margin: 20px;">
+        <div class="panel-heading">Allocation Table</div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <th></th>
+                        {% for item in items_obj %}
+                        <th>
+                            <div style="display: flex; padding-left: 25%; padding-right: 25%;">
+                                {% if item.image %}
+                                <img class="item" src="{{ item.image.url }}" />
+                                {% endif %}
+                                <div style="margin: auto;">{{ item.item_text }}</div>
+                            </div>
+                        </th>
+                        {% endfor %}
+                    </tr>
+                    {% for row in allocation_matrix %}
+                    <tr>
+                        <td>
+                            <div>
+                                <img src="{{ profile_pics|index:forloop.counter0 }}"
+                                     style="height: 40px; width: 40px;" />
+                                {{ candidates|index:forloop.counter0 }}
+                            </div>
+                        </td>
+                        {% for entry in row %}
+                        <td style="text-align: center;">{{ entry }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if selected_alloc_res_tables_sum|bitwise_and:8 != 0 %}
+    <div class="panel panel-default" style="margin: 20px;">
+        <div class="panel-heading">Envy Matrix
+            <div class="pull-right" style="display: flex;">
+                <div style="margin-right: 15px;">
+                    <button type="button" class="btn btn-default" style="background-color: #66B032"></button>
+                    &nbsp;<span>No Envy</span>
+                </div>
+                <div style="margin-right: 15px;">
+                    <button type="button" class="btn btn-default" style="background-color: #FBA90A"></button>
+                    &nbsp;<span>EF1</span>
+                </div>
+                <div style="margin-right: 15px;">
+                    <button type="button" class="btn btn-default" style="background-color: #FE8176"></button>
+                    &nbsp;<span>Envy</span>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table" id="envy_matrix" style="border-spacing: 3px; border-collapse: separate;">
+                    <tr>
+                        <th></th>
+                        {% for candidate in candidates %}
+                        <th style="text-align: center;">
+                            <div>
+                                <img src="{{ profile_pics|index:forloop.counter0 }}"
+                                     style="height: 40px; width: 40px;" />
+                                {{ candidate }}
+                            </div>
+                        </th>
+                        {% endfor %}
+                    </tr>
+                    {% for row in envy_matrix %}
+                    <tr>
+                        <td>
+                            <div>
+                                <img src="{{ profile_pics|index:forloop.counter0 }}"
+                                     style="height: 40px; width: 40px;" />
+                                {{ candidates|index:forloop.counter0 }}
+                            </div>
+                        </td>
+                        {% for envy, sum2 in row %}
+                        <td style="text-align: center;">
+                            <div style="height: 100%; width: 100%;" class="table-data">
+                                <input type="hidden" value="{{ envy }}" />
+                                <span class="hover-message">{{ sum2 }}</span>
+                                <span class="hide-sum">{{ sum2 }}</span>
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="panel panel-default" style="margin: 20px;">
+        <div class="panel-heading">Welfare Metrics</div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Utilitarian Welfare:</strong> {{ utilitarian_welfare }}</p>
+                    <p class="text-muted">
+                        Sum of all agents' utilities: Σ V<sub>i</sub>(A<sub>i</sub>)
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Egalitarian Welfare:</strong> {{ egalitarian_welfare }}</p>
+                    <p class="text-muted">
+                        Minimum utility across all agents: min V<sub>i</sub>(A<sub>i</sub>)
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Pareto Optimality:</strong>
+                        {% if is_pareto_optimal %}
+                        <span class="label label-success">Yes</span>
+                        {% else %}
+                        <span class="label label-danger">No</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if first_choices_data %}
+    <div class="panel panel-default" style="margin: 20px;">
+        <div class="panel-heading">First-choices Analysis</div>
+        <div class="panel-body">
+            <div class="chart-container" style="height: 300px;">
+                <canvas id="first-choices-chart"></canvas>
+            </div>
+            <div class="chart-description">
+                <p>Number of items given to an agent that were ranked first by that agent.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if fractional_share_data %}
+    <div class="panel panel-default" style="margin: 20px;">
+        <div class="panel-heading">Fractional Share Analysis</div>
+        <div class="panel-body">
+            <div class="chart-container" style="height: 300px;">
+                <canvas id="fractional-share-chart"></canvas>
+            </div>
+            <div class="fractional-description">
+                <p><strong>MMS Threshold:</strong> {{ mms_threshold }}</p>
+                <p>MMS(i) = max min V<sub>i</sub>(B[j])</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.allocation-mechanism {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#mechanism-dropdown {
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.options-container {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f0f8ff;
+    padding: 10px;
+    width: fit-content;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.options-container img {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.options-container span {
+    font-size: 16px;
+    color: #333;
+}
+
+td,
+th {
+    height: 7px;
+    width: 20px;
+}
+</style>
+
+<script>
+    function updateAllocationMechanism(mechanismId) {
+        // keep param as 'alg' to match python
+        const url = new URL(window.location.href);
+        if (mechanismId) {
+            url.searchParams.set('alg', mechanismId);
+        } else {
+            // remove param if blank
+            url.searchParams.delete('alg');
+        }
+        window.location.href = url.toString();
+    }
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        // chart code
+        if (document.getElementById('first-choices-chart')) {
+            // const ctx = document.getElementById('first-choices-chart').getContext('2d');
+            // new Chart(ctx, { ... });
+        }
+        if (document.getElementById('fractional-share-chart')) {
+            // const ctx = document.getElementById('fractional-share-chart').getContext('2d');
+            // new Chart(ctx, { ... });
+        }
+    
+        // color envy matrix
+        const envyCells = document.querySelectorAll('#envy_matrix .table-data');
+        envyCells.forEach(cell => {
+            const envyValue = parseInt(cell.querySelector('input').value);
+            if (envyValue === 0) {
+                cell.style.backgroundColor = '#66B032'; // no envy
+            } else if (envyValue === 1) {
+                cell.style.backgroundColor = '#FBA90A'; // ef1
+            } else if (envyValue > 1) {
+                cell.style.backgroundColor = '#FE8176'; // envy
+            }
+        });
+    });
+    </script>    
+{% endblock %}

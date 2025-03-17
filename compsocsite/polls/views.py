@@ -34,6 +34,7 @@ import itertools
 import numpy as np
 import random
 import csv
+import ast
 
 
 active_polls = []
@@ -1103,12 +1104,10 @@ class PollInfoView(views.generic.DetailView):
         """
         return Question.objects.filter(pub_date__lte=timezone.now())
 
-import ast
-import json
 # view for results detail
 class AllocateResultsView(views.generic.DetailView):
     model = Question
-    template_name = 'polls/allocate_results.html'
+    template_name = 'polls/allocationResults/results_page.html'
 
     def getItemsObjects(self):
         items = [] 
@@ -1283,115 +1282,174 @@ class AllocateResultsView(views.generic.DetailView):
                 if item_name == obj.item_text:
                     allocated_items_objs.append(obj)
         return allocated_items_objs
-    
-
+       
     def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        question = self.object  # the current question instance
 
-        ctx = super(AllocateResultsView, self).get_context_data(**kwargs)
-        curr_question = self.object
-        round_robin = MechanismRoundRobinAllocation()
-
-        if len(list(self.object.response_set.all())) == 0:
+        # 1) if no responses, nothing to show
+        if not question.response_set.exists():
             return ctx
 
-        # Neccessary variables
+        # 2) read from the question model
+        locked_alg_id = question.poll_algorithm  # the poll’s “locked” or default algorithm
+        alg_bitmask   = question.alloc_algorithms
+        ctx["selected_alloc_res_tables_sum"] = question.alloc_res_tables
+
+        # 3) define known allocation mechanisms
+        all_mechanisms = [
+            (1,  "Round Robin",       MechanismRoundRobinAllocation),
+            (2,  "Max Nash Welfare",  MechanismMaximumNashWelfare),
+            (4,  "Market (EF1)",      MechanismMarketAllocation),
+            (8,  "MarketEq (EQ1)",    MechanismMarketEqAllocation),
+            (16, "Leximin",           MechanismLeximinAllocation),
+            (32, "MNW Binary",        MechanismMaximumNashWelfareBinary),
+        ]
+
+        # 4) build a list of allowed (bit, label) from the bitmask
+        available_mechanisms = []
+        for (bit, label, cls) in all_mechanisms:
+            if (alg_bitmask & bit) != 0:
+                available_mechanisms.append((bit, label))
+        ctx["available_mechanisms"] = available_mechanisms
+
+        # 5) see if user requested ?alg=...
+        requested_alg = self.request.GET.get("alg", None)
+        if requested_alg is not None:
+            try:
+                requested_bit = int(requested_alg)
+                # if that bit is not in the poll's bitmask, revert to locked
+                if (alg_bitmask & requested_bit) == 0:
+                    current_mechanism_id = locked_alg_id
+                else:
+                    current_mechanism_id = requested_bit
+            except ValueError:
+                current_mechanism_id = locked_alg_id
+        else:
+            current_mechanism_id = locked_alg_id
+
+        ctx["current_mechanism_id"] = current_mechanism_id
+
+        # 6) find which mechanism class is chosen
+        chosen_cls = None
+        chosen_label = "Unknown"
+        for (bit, label, cls) in all_mechanisms:
+            if bit == current_mechanism_id:
+                chosen_cls = cls
+                chosen_label = label
+                break
+
+        # if none matched, default to round robin
+        if not chosen_cls:
+            chosen_cls = MechanismRoundRobinAllocation
+            chosen_label = "Round Robin"
+
+        ctx["current_mechanism"] = chosen_label
+
+        # 7) gather user responses
+        response_set = question.response_set.all()
         current_user_id = self.request.user.id
-        response_set = self.object.response_set.all()
 
-        current_user_profile_pic = self.request.user.userprofile.profile_pic
-        ctx['current_user_profile_pic'] = current_user_profile_pic
-        
-        # items = ast.literal_eval(response_set[0].resp_str) # change this
+        # build map of user ids -> name/pic
+        user_names = {}
+        user_pics = {}
+        for resp in response_set:
+            uid = resp.user_id
+            if uid not in user_names:
+                user_names[uid] = resp.user.first_name
+                pic_path = resp.user.userprofile.profile_pic.name
+                user_pics[uid] = f"/{pic_path}" if pic_path else ""
 
-        items, items_obj = self.getItemsObjects();
-        ctx['items_obj'] = items_obj
+        sorted_user_ids = sorted(user_names.keys())
+        ctx["candidates"]   = [user_names[uid] for uid in sorted_user_ids]
+        ctx["profile_pics"] = [user_pics[uid]  for uid in sorted_user_ids]
 
-        # Get neccessar data fro response_set
-        pref_set, candidates, submitted_rankings, profile_pics = self.getDataFromResponseSet(response_set)
+        # 8) build a matrix of numeric valuations from resp.resp_str
+        user_valuations_map = {}  # user_id -> list of floats
+        for resp in response_set:
+            uid = resp.user_id
+            raw_list = ast.literal_eval(resp.resp_str)  # e.g. ["itema","12","itemb","8"]
+            numeric_vals = []
+            for x in raw_list:
+                val = 0.0
+                if isinstance(x, (int, float)):
+                    # if already a number
+                    val = float(x)
+                else:
+                    # if it's a string, try to parse
+                    s = str(x).lower().strip()
+                    if s.startswith("item"):
+                        remainder = s[4:]
+                        try:
+                            val = float(remainder)
+                        except ValueError:
+                            val = 0.0
+                    else:
+                        try:
+                            val = float(s)
+                        except ValueError:
+                            val = 0.0
+                numeric_vals.append(val)
+            user_valuations_map[uid] = numeric_vals
 
-        # sorting the set based on key values, as round robin is based on the user_id
-        pref_set = dict(sorted(pref_set.items()))
-        candidates = dict(sorted(candidates.items()))
-        profile_pics = dict(sorted(profile_pics.items()))
-        submitted_rankings = dict(sorted(submitted_rankings.items()))
+        # convert them to a 2d list in user-id sorted order
+        preferences = []
+        for uid in sorted_user_ids:
+            # if not present or mismatch length, just get(...) or fill
+            preferences.append(user_valuations_map.get(uid, []))
 
-        ctx['candidates'] = list(candidates.values())
-        ctx['profile_pics'] = list(profile_pics.values())
+        # 9) run the chosen mechanism
+        mechanism = chosen_cls()
+        result = mechanism.allocate(valuations=preferences)  # => AllocationResult
 
-        # get transformed Submitted rankings
-        submitted_rankings = self.transformSubmittedRankings(items, submitted_rankings)
+        # 10) extract NxM allocation matrix
+        allocation_matrix = result.A  # shape: (num_agents, num_items)
+        ctx["allocation_matrix"] = allocation_matrix
 
-        # get preference from response, transform it and store it
-        preferences = self.getPreferencesList(pref_set)
-        preferences = self.transformPreferences(items, preferences)
-        ctx['preferences'] = preferences
+        # reconstruct allocated items
+        allocated_items = []
+        if allocation_matrix is not None:
+            N = len(allocation_matrix)
+            if N > 0:
+                M = len(allocation_matrix[0])
+                for i in range(N):
+                    user_items = []
+                    for j in range(M):
+                        if allocation_matrix[i][j] == 1:
+                            user_items.append(f"Item #{j}")
+                    allocated_items.append(user_items)
+        ctx["allocated_items"] = allocated_items
 
-        # extract paramters to call round robin mechanism
-        N,M = len(preferences),len(preferences[0])
-        
-        # call roundRobin mechanism
-        allocated_items, allocation_matrix = round_robin.roundRobin(np.array(items), np.array(preferences), N)
+        # 11) sum of allocated items
+        sum_of_alloc_items_values = []
+        if allocation_matrix is not None:
+            N = len(allocation_matrix)
+            if N > 0:
+                M = len(allocation_matrix[0])
+                for i in range(N):
+                    total_val = 0.0
+                    for j in range(M):
+                        if allocation_matrix[i][j] == 1:
+                            total_val += preferences[i][j]
+                    sum_of_alloc_items_values.append(total_val)
+        ctx["sum_of_alloc_items_values"] = sum_of_alloc_items_values
 
-        # tansform the allocated_items
-        allocated_items_transformed = self.transformAllocatedItems(allocated_items)
-        ctx['allocated_items'] = allocated_items_transformed
-        ctx['allocation_matrix'] = allocation_matrix
+        # 12) identify the current user’s name/bundle
+        current_user_name = ""
+        if current_user_id in user_names:
+            current_user_name = user_names[current_user_id]
+        ctx["current_user_name"] = current_user_name
 
-        # get sum of allocted items as matrix
-        allocated_items_with_values, sum_of_alloc_items_values = self.getSumOfAllocatedItems(allocated_items, submitted_rankings)
-        ctx['sum_of_alloc_items_values'] = sum_of_alloc_items_values
-
-        empty_string = ""
-        ctx['empty_string'] = empty_string
-
-        # find the current user of the session
-        current_user_name = empty_string
-        if current_user_id in candidates.keys(): 
-            current_user_name = candidates[current_user_id];
-        
-        ctx['current_user_name'] = current_user_name
-        if current_user_name!=empty_string:
-            curr_user_index = sorted(list(candidates.keys())).index(current_user_id)
-            ctx['curr_user_bundle'] = self.getAllocatedItemObjects(items_obj, allocated_items_transformed[curr_user_index])
-            # ctx['curr_user_bundle'] = allocated_items_transformed[curr_user_index]
-            ctx['curr_user_bundle_sum'] = sum_of_alloc_items_values[curr_user_index]
-
-
-        items = self.formatOptions(items)
-        ctx['items'] = items
-        
-
-        # get Preferences with Values 
-        preferences_with_values = self.getPrefWithValues(submitted_rankings)
-
-        if current_user_name!=empty_string:
-            curr_user_preferences_with_values = preferences_with_values[curr_user_index];
-            zipped = list(zip(*curr_user_preferences_with_values))
-            curr_user_pref = zipped[0]
-            curr_user_pref_values = zipped[1]
-
-            ctx['curr_user_pref'] = curr_user_pref
-            ctx['curr_user_pref_values'] = curr_user_pref_values
-
-        # Compute envy upto EF1
-        envy_matrix = self.computeEnvyUptoEF1(preferences, allocated_items_with_values,preferences_with_values)
-        ctx['envy_matrix'] = envy_matrix
-
-        # compute pure EF1
-        ef1_matrix = self.computePureEF1(preferences, allocated_items_with_values, preferences_with_values)
-        ctx['ef1_matrix'] = ef1_matrix
-
-        # alloc_res_tables contains display options for results of an allocation
-        selected_alloc_res_tables_sum = curr_question.alloc_res_tables
-        ctx['selected_alloc_res_tables_sum'] = selected_alloc_res_tables_sum
-
-        # Allocation algorithms to show
-        alloc_algorithms = curr_question.alloc_algorithms
-        ctx['alloc_algorithms'] =  alloc_algorithms
+        if current_user_name:
+            row_index = sorted_user_ids.index(current_user_id)
+            if row_index < len(allocated_items):
+                ctx["curr_user_bundle"] = allocated_items[row_index]
+                if row_index < len(sum_of_alloc_items_values):
+                    ctx["curr_user_bundle_sum"] = sum_of_alloc_items_values[row_index]
+                else:
+                    ctx["curr_user_bundle_sum"] = 0
 
         return ctx
-    
-
 
 # view for submission confirmation
 class ConfirmationView(views.generic.DetailView):
@@ -1528,9 +1586,17 @@ def getListAlgorithmLinks():
             "https://en.wikipedia.org/wiki/Coombs%27_method","","","","",""]
 
 # get a list of allocation methods
-# return List<String>
+# return List[String]
 def getAllocMethods():
-    return ["Round Robin"]
+    return [
+        "Round Robin",
+        "Maximum Nash Welfare",
+        "Market",
+        "MarketEq",
+        "Leximin",
+        "MNW Binary"
+    ]
+
     # return ["Serial dictatorship: early voters first",
     #         "Serial dictatorship: late voter first", "Manually allocate"]
 
@@ -2280,141 +2346,168 @@ def removeVoter(request, question_id):
     request.session['setting'] = 1
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-# called when creating the poll
 def setInitialSettings(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    question.poll_algorithm = request.POST['pollpreferences']
-    if "viewpreferences" in request.POST.keys(): question.display_pref = request.POST['viewpreferences']
-    if "viewuserinfo" in request.POST.keys(): question.display_user_info = request.POST['viewuserinfo']
-    if "creatorpreferences" in request.POST.keys(): question.creator_pref = request.POST['creatorpreferences']
-    openstring = request.POST['openpoll']
-    signup_string = request.POST['selfsignup']
-    twocol = False
-    onecol = False
-    slider = False
-    star = False
-    yesno = False
-    yesno2 = False
-    BUI_slider = False
-    LUI = False
-    IBUI = False
-    uilist = request.POST.getlist('ui')
-    if "twocol" in uilist:
-        twocol = True
-    if "onecol" in uilist:
-        onecol = True
-    if "slider" in uilist:
-        slider = True
-    if "star" in uilist:
-        star = True
-    if "yesno" in uilist:
-        yesno = True
-    if "yesno2" in uilist:
-        yesno2 = True
-    if "BUI_slider" in uilist:
-        BUI_slider = True 
-    if "LUI" in uilist:
-        LUI = True
-    if "IBUI" in uilist:
-        IBUI = True
 
-    vr = (2 ** (int(request.POST['pollpreferences']) - 1))
-    for rule in request.POST.getlist('vr'):
-        if int(rule) != (2 ** (int(request.POST['pollpreferences']) - 1)):
-            vr += int(rule)
-    question.twocol_enabled = twocol
-    question.onecol_enabled = onecol
-    question.slider_enabled = slider
-    question.star_enabled = star
-    question.yesno_enabled = yesno
-    question.yesno2_enabled = yesno2
-    question.budgetUI_enabled = BUI_slider
-    question.ListUI_enabled =LUI
-    question.infiniteBudgetUI_enabled = IBUI
-    question.ui_number = twocol+onecol+slider+star+yesno+yesno2+BUI_slider+LUI+IBUI
-    question.vote_rule = vr
+    # map the 1-based dropdown index (1..6) to the actual bits (1,2,4,8,16,32)
+    BIT_MAP = {1: 1, 2: 2, 3: 4, 4: 8, 5: 16, 6: 32}
+
+    # 1) read the single dropdown selection ("pollpreferences")
+    #    for question_type==1 => regular poll; for question_type==2 => allocation method
+    #    store the actual bit in question.poll_algorithm
+    selected_idx = int(request.POST.get("pollpreferences", "1"))
+    question.poll_algorithm = BIT_MAP.get(selected_idx, 1)  # default to bit=1 if out-of-range
+
+    # 2) optional fields: display_pref, display_user_info, creator_pref
+    if "viewpreferences" in request.POST:
+        question.display_pref = request.POST["viewpreferences"]
+    if "viewuserinfo" in request.POST:
+        question.display_user_info = request.POST["viewuserinfo"]
+    if "creatorpreferences" in request.POST:
+        question.creator_pref = request.POST["creatorpreferences"]
+
+    # 3) accessibility
+    openstring = request.POST.get("openpoll", "anon")
+    signup_string = request.POST.get("selfsignup", "allow")
+
+    # 4) read ui checkboxes
+    uilist = request.POST.getlist("ui")
+    question.twocol_enabled = ("twocol" in uilist)
+    question.onecol_enabled  = ("onecol" in uilist)
+    question.slider_enabled  = ("slider" in uilist)
+    question.star_enabled    = ("star" in uilist)
+    question.yesno_enabled   = ("yesno" in uilist)
+    question.yesno2_enabled  = ("yesno2" in uilist)
+    question.budgetUI_enabled   = ("BUI_slider" in uilist)
+    question.ListUI_enabled     = ("LUI" in uilist)
+    question.infiniteBudgetUI_enabled = ("IBUI" in uilist)
+
+    # count how many ui are selected
+    question.ui_number = sum([
+        question.twocol_enabled,
+        question.onecol_enabled,
+        question.slider_enabled,
+        question.star_enabled,
+        question.yesno_enabled,
+        question.yesno2_enabled,
+        question.budgetUI_enabled,
+        question.ListUI_enabled,
+        question.infiniteBudgetUI_enabled
+    ])
+
+    # 5) if question_type == 1 (regular poll), set vote_rule
+    if question.question_type == 1:
+        # question.poll_algorithm is already a bit
+        locked_bit = question.poll_algorithm
+        vr_sum = locked_bit
+        for rule_str in request.POST.getlist("vr"):
+            rule_val = int(rule_str)
+            if rule_val != locked_bit:
+                vr_sum += rule_val
+        question.vote_rule = vr_sum
+
+    # 6) set question.open => 0,1,2
     if openstring == "anon":
         question.open = 1
     elif openstring == "invite":
         question.open = 0
     else:
         question.open = 2
-    if signup_string == "allow":
-        question.allow_self_sign_up = 1
-    else:
-        question.allow_self_sign_up = 0
 
-    # by default show the 2nd(Allocated bundle) and 3rd(Allocation result) tables
-    # 6 = 0110
+    # set question.allow_self_sign_up => 0 or 1
+    question.allow_self_sign_up = 1 if signup_string == "allow" else 0
+
+    # 7) for question_type == 2, handle allocation results + allocation algorithms
+    #    by default, question.alloc_res_tables = 6 => bits 2 and 4 => items bundle + allocation table
     question.alloc_res_tables = 6
-    if question.question_type == 2 :
-        alloc_result_table_list = request.POST.getlist('alloc_res_tables')
-        alloc_res_tables = 0
-        for table_val in alloc_result_table_list:
-            alloc_res_tables += int(table_val)
-        question.alloc_res_tables = alloc_res_tables
-
-    # by default show Round robin
-    # 1 = 0001
-    question.alloc_algorithms = 1
     if question.question_type == 2:
-        alloc_algorithms_list = request.POST.getlist('alloc_algorithms')
-        # Adding round robin value to the sum, 
-        # As it is disabled in the UI for User to select, the value is not captured in backend explicitly
-        # Hence, aloc_algorithms_sum = 1 instead of alloc_algorithms_sum = 0
-        alloc_algorithms_sum = 1
-        for alg in alloc_algorithms_list:
-            alloc_algorithms_sum += int(alg)
-        question.alloc_algorithms = alloc_algorithms_sum
+        # read which result tables are checked
+        posted_tables = request.POST.getlist("alloc_res_tables")
+        alloc_res_sum = 0
+        for val_str in posted_tables:
+            alloc_res_sum += int(val_str)
+        question.alloc_res_tables = alloc_res_sum
 
+        # read which allocation algorithms are checked
+        # round robin => bit=1 is always included
+        posted_algs = request.POST.getlist("alloc_algorithms")  # e.g. ["2","4","16"]
+        alg_sum = 1  # start with round robin
+        for alg_str in posted_algs:
+            alg_sum += int(alg_str)
+        question.alloc_algorithms = alg_sum
+
+    # 8) save changes
     question.save()
-    if question.question_type == 1: 
-        return HttpResponseRedirect(reverse('polls:regular_polls'))
+
+    # 9) redirect
+    if question.question_type == 1:
+        return HttpResponseRedirect(reverse("polls:regular_polls"))
     else:
-        return HttpResponseRedirect(reverse('polls:allocation_tab'))
+        return HttpResponseRedirect(reverse("polls:allocation_tab"))
+
 
 # set algorithms and visibility
 def setPollingSettings(request, question_id):
+    """
+    Process the POST submission from _set_polling_settings.html and update the Question model
+    with the chosen algorithms/bitmasks.
+    """
     question = get_object_or_404(Question, pk=question_id)
-    # set the poll algorithm or allocation method using an integer
-    poll_alg = question.poll_algorithm
+
+    # Map the 1-based dropdown index to the actual bit:
+    BIT_MAP = {1: 1, 2: 2, 3: 4, 4: 8, 5: 16, 6: 32}
+
+    # 1) read the single dropdown selection ("pollpreferences")
+    #    for question_type==1, that's the poll algorithm (1-based).
+    #    for question_type==2, that's the allocation method (also 1-based).
     if 'pollpreferences' in request.POST:
-        poll_alg = int(request.POST['pollpreferences'])
-        question.poll_algorithm = poll_alg
+        selected_idx = int(request.POST['pollpreferences'])
+        # store the actual bit in question.poll_algorithm
+        question.poll_algorithm = BIT_MAP.get(selected_idx, 1)  # default to 1 if out-of-range
 
+    # 2) if question_type == 1 (regular poll), handle the visible algorithms bitmask (vote_rule)
+    if question.question_type == 1:
+        # the chosen poll_algorithm is already a bit (like 4 for "Market(EF1)")
+        locked_bit = question.poll_algorithm
+        posted_vr = request.POST.getlist('vr')  # e.g. ["1","4","8"]
+        vr_sum = locked_bit
+        for rule_str in posted_vr:
+            rule_val = int(rule_str)
+            # skip the locked bit (so we don't double-add it)
+            if rule_val != locked_bit:
+                vr_sum += rule_val
+        question.vote_rule = vr_sum
 
-    vr = (2 ** (poll_alg - 1))
-    for rule in request.POST.getlist('vr'):
-        if int(rule) != (2 ** (poll_alg - 1)):
-            vr += int(rule)
-    question.vote_rule = vr
-
-    # by default show the 2nd(Allocated bundle) and 3rd(Allocation result) tables
-    # 6 = 0110
-    if question.question_type == 2 :
-        alloc_result_table_list = request.POST.getlist('alloc_res_tables')
-        alloc_res_tables = 0
-        for table_val in alloc_result_table_list:
-            alloc_res_tables += int(table_val)
-        question.alloc_res_tables = alloc_res_tables
-
-    # by default show Round robin
-    # 1 = 0001
-    question.alloc_algorithms = 1
+    # 3) if question_type == 2 (allocation poll), handle:
+    #    (a) "alloc_algorithms" => question.alloc_algorithms bitmask
+    #    (b) "alloc_res_tables" => question.alloc_res_tables bitmask
     if question.question_type == 2:
-        alloc_algorithms_list = request.POST.getlist('alloc_algorithms')
-        # Adding round robin value to the sum, 
-        # As it is disabled in the UI for User to select, the value is not captured in backend explicitly
-        # Hence, aloc_algorithms_sum = 1 instead of alloc_algorithms_sum = 0
-        alloc_algorithms_sum = 1
-        for alg in alloc_algorithms_list:
-            alloc_algorithms_sum += int(alg)
-        question.alloc_algorithms = alloc_algorithms_sum
+        # 3a) read the posted "alloc_algorithms" checkboxes
+        #     round robin (bit=1) is always included, so start with 1
+        posted_alloc_algs = request.POST.getlist('alloc_algorithms')  # e.g. ["2","8","16"]
+        alloc_algs_sum = 1  # we always include round robin
+        for alg_str in posted_alloc_algs:
+            alg_val = int(alg_str)
+            alloc_algs_sum += alg_val
+        question.alloc_algorithms = alloc_algs_sum
 
+        # 3b) read the posted "alloc_res_tables" checkboxes
+        #     e.g. 1 => "my preferences", 2 => "items bundle", etc.
+        posted_res_tables = request.POST.getlist('alloc_res_tables')  # e.g. ["1","4"]
+        alloc_res_sum = 0
+        for table_str in posted_res_tables:
+            table_val = int(table_str)
+            alloc_res_sum += table_val
+        question.alloc_res_tables = alloc_res_sum
+
+    # 4) save changes
     question.save()
-    request.session['setting'] = 2
-    messages.success(request, 'Your changes have been saved.')
+
+    # 5) success message and redirect
+    messages.success(request, "Allocation/poll settings have been updated.")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
 
 def setVisibilitySettings(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
@@ -2438,6 +2531,29 @@ def setVisibilitySettings(request, question_id):
     request.session['setting'] = 10
     messages.success(request, 'Your changes have been saved.')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+def show_polling_settings(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+
+    # base context
+    ctx = {
+        'question': question
+    }
+
+    # if question is a regular poll (type=1), we pass poll_algorithms + question.vote_rule
+    if question.question_type == 1:
+        ctx['poll_algorithms'] = getListPollAlgorithms()
+        ctx['bools'] = question.vote_rule  # for the script
+    else:
+        # question_type == 2 => an allocation poll
+        ctx['alloc_methods'] = getAllocMethods()
+        ctx['bools'] = question.alloc_algorithms  # for the script
+
+    # if question_type == 2, also pass the existing bitmask for which result-tables are selected
+    if question.question_type == 2:
+        ctx['selected_alloc_res_tables_sum'] = question.alloc_res_tables
+
+    return render(request, 'polls/_set_polling_settings.html', ctx)
 
 
 # poll is open to anonymous voters

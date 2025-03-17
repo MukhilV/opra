@@ -1,0 +1,21 @@
+
+Gurobi 12.0.1 (linux64, gurobi_cl) logging started Mon Mar 10 07:51:40 2025
+
+Set parameter LogFile to value "gurobi.log"
+Using license file /home/mert/.conda/envs/opram/lib/gurobi.lic
+Restricted license - for non-production use only - expires 2026-11-23
+
+Gurobi 12.0.1 (linux64, gurobi_cl) logging started Mon Mar 10 07:53:40 2025
+
+Set parameter LogFile to value "gurobi.log"
+Using license file /home/mert/.conda/envs/opram/lib/gurobi.lic
+Restricted license - for non-production use only - expires 2026-11-23
+
+Gurobi 12.0.1 (linux64, gurobi_cl) logging started Mon Mar 10 07:59:36 2025
+
+Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2633579
+Set parameter LogFile to value "gurobi.log"
+Using license file /home/mert/.gurobi/gurobi.lic
+Academic license 2633579 - for non-commercial use only - registered to mv___@binghamton.edu

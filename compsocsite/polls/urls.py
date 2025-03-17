@@ -85,6 +85,9 @@ urlpatterns = [
     re_path(r'^(?P<question_id>[0-9]+)/duplicatepoll/$', views.duplicatePoll, name='duppoll'), 
     re_path(r'^(?P<response_id>[0-9]+)/deleteuservotes/$', views.deleteUserVotes, name='deluservotes'), 
     re_path(r'^(?P<response_id>[0-9]+)/restoreuservotes/$', views.restoreUserVotes, name='resuservotes'), 
+    
+    # dropdown allocation algorithms
+    re_path(r'^(?P<question_id>[0-9]+)/settings/polling$', views.show_polling_settings, name='show_polling_settings'),
        
     # anonymous voting
     re_path(r'^(?P<question_id>[0-9]+)/anonymousjoin/$', views.anonymousJoin, name='anonymousjoin'),
